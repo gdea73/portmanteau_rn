@@ -19,65 +19,64 @@ const { StatusBarManager } = NativeModules;
 const STATUS_BAR_HEIGHT = Platform.OS === 'ios' ? 20 : StatusBarManager.HEIGHT;
 // this was 7/8 but I left room for padding in a janky way
 const BOARD_ASPECT_RATIO = 7/8.05;
-const RECENT_word_SIZE = 14;
-const RECENT_wordS_VISIBLE = 5;
 
 class GameScreen extends React.Component {
 	static navigationOptions = {
 		title: 'Game',
-		// headerMode: 'none',
+		headerMode: 'none',
 	};
 
 	constructor(props) {
 		super(props);
-		this.state = {
-			gameOver: false,
-			cols: [
-				[' ', ' ', ' ', ' ', ' ', ' ', ' '],
-				[' ', ' ', 'C', 'D', 'E', 'F', 'G'],
-				['A', 'B', 'C', 'D', 'E', 'F', 'G'],
-				['A', 'B', 'C', 'D', 'E', 'F', 'G'],
-				['A', 'B', 'C', 'D', 'E', 'F', 'G'],
-				['A', 'B', 'C', 'D', 'E', 'F', 'G'],
-				['A', 'B', 'C', 'D', 'E', 'F', 'G'],
-			],
-			dropTile: 'P',
-			dropCol: 1,
-		};
+		// attempt to load a previous game in-progress
+		try {
+			const lastGame = await AsyncStorage.getItem('@Portmanteau:lastGame');
+			if (lastGame !== null) {
+				console.debug('Loaded a game in progress from AsyncStorage.');
+				this.props.initialCols = lastGame.cols;
+				this.props.initialDropTile = lastGame.initialDropTile;
+			}
+		} catch (error) {
+			console.warn(error);
+		}
 	}
 
 	render() {
 		console.debug('board width in boardview: ' + (width - 2 * PADDING));
 		return(
 			<View style={styles.container}>
-				<GameStatus />
+				<GameStatus onRef={ref => (this.gameStatus = ref)} />
 				<View style={styles.boardView}>
-					<Board cols={this.state.cols} dropTile={this.state.dropTile} dropCol={this.state.dropCol} width={width - 2 * PADDING} onDrop={(colNo) => this.onDrop(colNo)}/>
+					<Board width={width - 2 * PADDING}
+						   increaseScore={this.increaseScore}
+						   incrementMoveCount={this.incrementMoveCount}
+						   addRecentWord={this.addRecentWord}
+						   gameOver={this.gameOver}
+						   initialCols={this.props.initialCols}
+						   initialDropTile={this.props.initialDropTile}
+					/>
 				</View>
 			</View>
 		);
 	}
-	
-	onDrop(colNo) {
-		var newState = this.state;
-		newState['dropCol'] = colNo;
-		this.setState(newState);
+
+	// Callback for Board to signify game over
+	gameOver() {
+		console.debug('game over');
+		// TODO: write GameOverScreen & link with stats from GameStatus
 	}
 
-	renderRecentWords() {
-		return(
-			<View>
-				<Text style={styles.recentWord}>word 0</Text>
-				<Text style={styles.recentWord}>word  1</Text>
-				<Text style={styles.recentWord}>word   2</Text>
-				<Text style={styles.recentWord}>word     4</Text>
-				<Text style={styles.recentWord}>word      5</Text>
-				<Text style={styles.recentWord}>word       6</Text>
-				<Text style={styles.recentWord}>word        7</Text>
-				<Text style={styles.recentWord}>word         8</Text>
-				<Text style={styles.recentWord}>word          9</Text>
-			</View>
-		);
+	// Callbacks for Board to update GameStatus
+	increaseScore(points, chainLevel) {
+		this.gameStatus.increaseScore(points, chainLevel);
+		// TODO: animate display of chain level if > 1
+		console.debug('current chain level: ' + chainLevel);
+	}
+	incrementMoveCount() {
+		this.gameStatus.incrementMoveCount();
+	}
+	addRecentWord(word) {
+		this.gameStatus.addRecentWord(word);
 	}
 }
 
