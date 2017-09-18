@@ -1,11 +1,8 @@
 import React from 'react';
 import { StyleSheet, View, Text } from 'react-native';
 
-import GameStatus from './GameStatus';
-
 const {width, height} = require('Dimensions').get('window');
 const TILE_PADDING = 3;
-const TILE_FONT_SIZE = 18;
 const TILE_TEXT_NONE = ' ';
 const VIEWS_BORDER_RAD = 4;
 const DEFAULT_DROP_COL = 3;
@@ -21,7 +18,9 @@ var tileSize, tileBorderRad, board_x, board_y, board_width, board_height;
 class Board extends React.Component {
 	constructor(props) {
 		super(props);
-		this.cols = [
+		if (this.props.initialCols) {
+			this.cols = this.props.initialCols;
+		} else {
 			// initialize the board as empty
 			[' ', ' ', ' ', ' ', ' ', ' ', ' '],
 			[' ', ' ', ' ', ' ', ' ', ' ', ' '],
@@ -30,9 +29,15 @@ class Board extends React.Component {
 			[' ', ' ', ' ', ' ', ' ', ' ', ' '],
 			[' ', ' ', ' ', ' ', ' ', ' ', ' '],
 			[' ', ' ', ' ', ' ', ' ', ' ', ' '],
-		];
-		this.state = {
-			dropTile: getNewDropTile(),
+		}
+		if (this.props.initialDropTile) {
+			this.state = {
+				dropTile: this.props.initialDropTile,
+			}
+		} else {
+			this.state = {
+				dropTile: getNewDropTile(),
+			}
 		}
 	}
 
@@ -74,9 +79,9 @@ class Board extends React.Component {
 			left: this.getColStartCoord(DEFAULT_DROP_COL);
 		}
 		return(
-			<View style={[styles.tileView, stile]}>
-				<Text style={styles.tileText}>{this.props.dropTile}</Text>
-			</View>
+			<Tile onRef={ref => (this.dropTile = ref)}
+				  style={stile} text={this.state.dropTile}>
+			</Tile>
 		);
 	}
 
