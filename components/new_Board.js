@@ -1,6 +1,8 @@
 import React from 'react';
 import { StyleSheet, View, Text } from 'react-native';
 
+import Tile from './Tile';
+
 const {width, height} = require('Dimensions').get('window');
 const TILE_PADDING = 3;
 const TILE_TEXT_NONE = ' ';

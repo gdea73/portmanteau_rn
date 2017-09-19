@@ -3,7 +3,7 @@ import {
 	View,
 	Text,
 	StyleSheet,
-	// TODO: Animated?
+	Animated,
 } from 'react-native';
 
 import Constants from '../etc/Constants';
@@ -12,7 +12,26 @@ const TILE_FONT_SIZE = 18;
 
 class Tile extends React.Component {
 	state = {
-		
+		dropAnimation: 0,
+	}
+
+	componentDidUpdate() {
+
+	}
+
+	render() {
+		var stile = { 
+            backgroundColor: TILE_COLORS[this.props.letter],
+            height: tileSize,
+            width: tileSize,
+            top: this.props.rowNo * (tileSize + TILE_PADDING),
+            borderRadius: tileBorderRad,
+            left: 0
+        }
+
+		<Animated.View style={[tileView, stile]}>
+			<Text>{this.props.letter}</Text>
+		</Animated.View>
 	}
 }
 
