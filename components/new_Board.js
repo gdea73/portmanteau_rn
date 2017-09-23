@@ -8,6 +8,7 @@ const TILE_PADDING = 3;
 const TILE_TEXT_NONE = ' ';
 const VIEWS_BORDER_RAD = 4;
 const DEFAULT_DROP_COL = 3;
+const BOARD_WIDTH = 7;
 
 // layer constants are summed with column numbers
 // to generate unique View keys for each layer of
@@ -24,21 +25,27 @@ class Board extends React.Component {
 			this.cols = this.props.initialCols;
 		} else {
 			// initialize the board as empty
-			[' ', ' ', ' ', ' ', ' ', ' ', ' '],
-			[' ', ' ', ' ', ' ', ' ', ' ', ' '],
-			[' ', ' ', ' ', ' ', ' ', ' ', ' '],
-			[' ', ' ', ' ', ' ', ' ', ' ', ' '],
-			[' ', ' ', ' ', ' ', ' ', ' ', ' '],
-			[' ', ' ', ' ', ' ', ' ', ' ', ' '],
-			[' ', ' ', ' ', ' ', ' ', ' ', ' '],
+			this.cols = [
+				[' ', ' ', ' ', ' ', ' ', ' ', ' '],
+				[' ', ' ', ' ', ' ', ' ', ' ', ' '],
+				[' ', ' ', ' ', ' ', ' ', ' ', ' '],
+				[' ', ' ', ' ', ' ', ' ', ' ', ' '],
+				[' ', ' ', ' ', ' ', ' ', ' ', ' '],
+				[' ', ' ', ' ', ' ', ' ', ' ', ' '],
+				[' ', ' ', ' ', ' ', ' ', ' ', ' '],
+			];
 		}
-		if (this.props.initialDropTile) {
-			this.state = {
-				dropTile: this.props.initialDropTile,
-			}
-		} else {
-			this.state = {
-				dropTile: getNewDropTile(),
+		var dropTile = this.props.initialDropTile || getNewDropTile();
+		var stiles = [][];
+		for (let col = 0; col < BOARD_WIDTH; col++) {
+			for (let row = 0; row < BOARD_WIDTH; row++) {
+				if (this.cols[col][row] === ' ') {
+					stiles[col][row] = undefined;
+				} else {
+					stiles[col][row] = {
+						top: row * (tileSize + TILE_PADDING),
+					}
+				}
 			}
 		}
 	}
@@ -119,6 +126,7 @@ class Board extends React.Component {
         }
         return result;
     }
+
     renderTile(colNo, rowNo) {
         // // console.debug('rendering tile (' + colNo + ', ' + rowNo + '): ' + this.props.cols[colNo][rowNo]);
         var stile = {
