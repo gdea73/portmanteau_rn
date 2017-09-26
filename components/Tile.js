@@ -11,12 +11,35 @@ import Constants from '../etc/Constants';
 const TILE_FONT_SIZE = 18;
 
 class Tile extends React.Component {
-	state = {
-		dropAnimation: 0,
+	constructor(props) {
+		super(props);
+	
+		this.state = {
+			gravAnim: new Animated.Value(this.props.style['top']),
+		}
+	}
+
+	shouldComponentUpdate(nextState, nextProps) {
+		return (nextState.gravAnim !== this.state.gravAnim
+		|| nextProps.style['top'] !== this.props.style['top']);
+	}
+
+	componentWillReceiveProps(nextProps) {
+		if (this.props.style['top'] !== nextProps.style['top']) {
+			// animate the change in Y position
+			this.setState({
+				gravAnim: new Animated.Value(this.props.style['top']),
+			});
+		}
 	}
 
 	componentDidUpdate() {
-
+		Animated.timing(
+			this.state.gravAnim, {
+				toValue: this.props.style['top'] + 100,
+				duration: 1000,
+			}
+		).start();
 	}
 
 	render() {
