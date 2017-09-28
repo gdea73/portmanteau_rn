@@ -5,7 +5,8 @@ import {
 	View,
 	StyleSheet,
 	Text,
-	NativeModules
+	NativeModules,
+	AsyncStorage,
 } from 'react-native';
 import { StackNavigator } from 'react-navigation';
 

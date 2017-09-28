@@ -16,7 +16,12 @@ class Tile extends React.Component {
 	
 		this.state = {
 			gravAnim: new Animated.Value(this.props.style['top']),
+			dropColAnim: new Animated.Value(this.props.style['left']),
 		}
+	}
+
+	componentDidMount() {
+		this.props.onRef(this);
 	}
 
 	shouldComponentUpdate(nextState, nextProps) {
@@ -42,6 +47,10 @@ class Tile extends React.Component {
 		).start();
 	}
 
+	componentWillUnmount() {
+		this.props.onRef(undefined);
+	}
+
 	render() {
 		var stile = { 
             backgroundColor: TILE_COLORS[this.props.letter],
@@ -52,9 +61,11 @@ class Tile extends React.Component {
             left: 0
         }
 
-		<Animated.View style={[tileView, stile]}>
-			<Text>{this.props.letter}</Text>
-		</Animated.View>
+		return(
+			<Animated.View style={[tileView, stile]}>
+				<Text style={styles.tileText}>{this.props.letter}</Text>
+			</Animated.View>
+		);
 	}
 }
 
