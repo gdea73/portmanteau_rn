@@ -79,7 +79,7 @@ class GameStatus extends React.Component {
 		var recentWords = [];
 		for (let i = 0; i < Constants.recentWordsCount; i++) {
 			recentWords.push(
-				<View id={'recentWords' + i}>
+				<View key={'recentWords' + i}>
 					<Text style={styles.recentWord}>{this.state.words[i]}</Text>
 				</View>
 			);

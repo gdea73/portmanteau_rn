@@ -7,6 +7,7 @@ import {
 } from 'react-native';
 
 import Constants from '../etc/Constants';
+import Board from './Board';
 
 const TILE_FONT_SIZE = 18;
 
@@ -54,9 +55,9 @@ class Tile extends React.Component {
 	render() {
 		var stile = { 
             backgroundColor: TILE_COLORS[this.props.letter],
-            height: tileSize,
-            width: tileSize,
-            top: this.props.rowNo * (tileSize + TILE_PADDING),
+            height: this.props.tileSize,
+            width: this.props.tileSize,
+            top: this.props.rowNo * (this.props.tileSize + Constants.tilePadding),
             borderRadius: tileBorderRad,
             left: 0
         }
@@ -72,8 +73,6 @@ class Tile extends React.Component {
 const styles = StyleSheet.create({
     tileView: {
         position: 'absolute',
-        width: tileSize,
-        height: tileSize,
         justifyContent: 'center',
         alignItems: 'center',
         borderWidth: 1,

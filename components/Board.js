@@ -2,9 +2,9 @@ import React from 'react';
 import { StyleSheet, View, Text } from 'react-native';
 
 import Tile from './Tile';
+import Constants from '../etc/Constants';
 
 const {width, height} = require('Dimensions').get('window');
-const TILE_PADDING = 3;
 const TILE_TEXT_NONE = ' ';
 const VIEWS_BORDER_RAD = 4;
 const DEFAULT_DROP_COL = 3;
@@ -19,6 +19,7 @@ const COL_TOUCH_LAYER = 200;
 var tileSize, tileBorderRad, board_x, board_y, board_width, board_height;
 
 class Board extends React.Component {
+
 	constructor(props) {
 		super(props);
 		if (this.props.initialCols) {
@@ -35,18 +36,11 @@ class Board extends React.Component {
 				[' ', ' ', ' ', ' ', ' ', ' ', ' '],
 			];
 		}
-		var dropTile = this.props.initialDropTile || getNewDropTile();
-		var stiles = [][];
-		for (let col = 0; col < BOARD_SIZE; col++) {
-			for (let row = 0; row < BOARD_SIZE; row++) {
-				if (this.cols[col][row] === ' ') {
-					stiles[col][row] = undefined;
-				} else {
-					stiles[col][row] = {
-						top: row * (tileSize + TILE_PADDING),
-					}
-				}
-			}
+		var dropTile = this.props.initialDropTile || this.getNewDropTile();
+		this.stilesInitialized = false;
+		var stiles = [];
+		this.state = {
+			stiles: stiles,
 		}
 	}
 
@@ -66,8 +60,29 @@ class Board extends React.Component {
 		this.setState(newState);
 	}
 
+	initializeStiles() {
+		tileSize = (this.props.width - 8 * Constants.tilePadding) / BOARD_SIZE;
+		var stiles = [];
+		for (let col = 0; col < BOARD_SIZE; col++) {
+			stiles[col] = [];
+			for (let row = 0; row < BOARD_SIZE; row++) {
+				if (this.cols[col][row] === ' ') {
+					stiles[col][row] = undefined;
+				} else {
+					stiles[col][row] = {
+						top: row * (tileSize + Constants.tilePadding),
+					}
+				}
+			}
+		}
+		this.stilesInitialized = true;
+		this.setState({stiles});
+	}
+
     render() {
-        tileSize = (this.props.width - 8 * TILE_PADDING) / BOARD_SIZE;
+		if (!this.stilesInitialized) {
+			this.initializeStiles();
+		}
         tileBorderRad = Math.floor(tileSize / 5);
         return (
             <View
@@ -88,7 +103,7 @@ class Board extends React.Component {
 			left: this.getColStartCoord(DEFAULT_DROP_COL),
 		}
 		return(
-			<Tile onRef={ref => (this.dropTile = ref)}
+			<Tile onRef={ref => (this.dropTile = ref)} size={tileSize}
 				  style={stile} text={this.state.dropTile}>
 			</Tile>
 		);
@@ -119,18 +134,19 @@ class Board extends React.Component {
 
 	renderTiles(colNo) {
 		var result = [];
-		for (let i = 0; i < BOARD_SIZE; i++) {
+		for (let rowNo = 0; rowNo < BOARD_SIZE; rowNo++) {
 			let stile = {
 				backgroundColor: TILE_COLORS[this.cols[colNo][rowNo]],
 				height: tileSize,
 				width: tileSize,
-				top: rowNo * (tileSize + TILE_PADDING),
+				top: rowNo * (tileSize + Constants.tilePadding),
 				borderRadius: tileBorderRad,
 				left: 0,
 			}
 			if (this.cols[colNo][rowNo] !== TILE_TEXT_NONE) {
 				result.push(
-					<Tile key={this.getTileId(colNo, rowNo)} style={stile} />
+					<Tile key={this.getTileId(colNo, rowNo)} style={stile}
+						  size={tileSize} />
 				);
 			}
 		}
@@ -149,11 +165,11 @@ class Board extends React.Component {
         return {
             flex: 0,
             position: 'absolute',
-            top: TILE_PADDING + tileSize,
+            top: Constants.tilePadding + tileSize,
             left: this.getColStartCoord(index),
             backgroundColor: bgColor,
             width: tileSize,
-            height: tileSize * BOARD_SIZE + 9 * TILE_PADDING,
+            height: tileSize * BOARD_SIZE + 9 * Constants.tilePadding,
             borderRadius: borderR,
             // TODO: test this properly
             overflow: 'scroll',
@@ -161,7 +177,7 @@ class Board extends React.Component {
     }
 
     getColStartCoord(colNo) {
-        return tileSize * colNo + (colNo + 1) * TILE_PADDING;
+        return tileSize * colNo + (colNo + 1) * Constants.tilePadding;
     }
 
     getTileId(colNo, rowNo) {

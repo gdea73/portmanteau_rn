@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { StackNavigator } from 'react-navigation';
 
-import Board from '../components/Board';
+import Board from '../components/TileBoard';
 import GameStatus from '../components/GameStatus';
 import Constants from '../etc/Constants';
 
@@ -27,18 +27,21 @@ class GameScreen extends React.Component {
 		headerMode: 'none',
 	};
 
-	constructor(props) {
-		super(props);
-		// attempt to load a previous game in-progress
+	componentDidMount() {
+		/* TODO: mess with persistent game storage
 		try {
-			const lastGame = await AsyncStorage.getItem('@Portmanteau:lastGame');
-			if (lastGame !== null) {
-				console.debug('Loaded a game in progress from AsyncStorage.');
-				this.props.initialCols = lastGame.cols;
-				this.props.initialDropTile = lastGame.initialDropTile;
-			}
+			AsyncStorage.getItem('@Portmanteau:lastGame')
+				.then(this.tryLoadGame(value));
 		} catch (error) {
-			console.warn(error);
+			console.info('error attempting to load game: ' + error);
+		} */
+	}
+
+	tryLoadGame(game) {
+		if (game !== null) {
+			console.debug('Loaded a game in progress from AsyncStorage.');
+			this.props.initialCols = lastGame.cols;
+			this.props.initialDropTile = lastGame.initialDropTile;
 		}
 	}
 
