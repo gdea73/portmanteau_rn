@@ -77,6 +77,11 @@ class GameScreen extends React.Component {
 		console.debug('current chain level: ' + chainLevel);
 	}
 	incrementMoveCount() {
+		// FIXME: where I left off -- this onRef wasn't working.
+		// May need to reevaluate data flow and move GameStatus
+		// data up to this Screen, or elsewhere, and have the
+		// front end display for the stats be dumb.
+		console.debug(this.gameStatus);
 		this.gameStatus.incrementMoveCount();
 	}
 	addRecentWord(word) {

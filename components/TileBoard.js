@@ -187,7 +187,7 @@ class Board extends React.Component {
 			// we can't drop into this column
 			return;
 		}
-		this.incrementMoveCount();
+		this.props.incrementMoveCount();
 		var animations = [];
 		if (col != CENTER_COL) {
 			// first, animate the shifting to the drop column
@@ -237,8 +237,8 @@ class Board extends React.Component {
 			if (validWord) {
 				validWordsFound = true;
 				// update GameStatus via callbacks to GameScreen
-				this.increaseScore(Words.getWordScore(validWord));
-				this.addRecentWord(validWord);
+				this.props.increaseScore(Words.getWordScore(validWord));
+				this.props.addRecentWord(validWord);
 				// "break" the word; leave empty space in its board position
 				if (boardWord.startCol === boardWord.endCol) {
 					// breaking a vertical word
@@ -313,7 +313,7 @@ class Board extends React.Component {
 						inWord = false;
 						var word = {
 							startCol: startCol,
-							endCol: c - 1
+							endCol: c - 1,
 							startRow: r,
 							endRow: r
 						};

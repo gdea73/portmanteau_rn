@@ -24,6 +24,9 @@ class GameStatus extends React.Component {
 			highestChain: 0,
 			words: recentWords,
 		};
+		this.increaseScore = this.increaseScore.bind(this);
+		this.incrementMoveCount = this.incrementMoveCount.bind(this);
+		this.addRecentWord = this.addRecentWord.bind(this);
 	}
 
 	// these functions allow the parent to access its GameScreen component
@@ -35,7 +38,7 @@ class GameStatus extends React.Component {
 		this.props.onRef(undefined);
 	}
 
-	increaseScore(points, chainLevel) {
+	increaseScore = (points, chainLevel) => {
 		var newState = this.state;
 		newState['score'] = this.state['score'] + points;
 		if (chainLevel > this.state['highestChain']) {
@@ -44,13 +47,13 @@ class GameStatus extends React.Component {
 		this.setState(newState);
 	}
 
-	incrementMoveCount() {
+	incrementMoveCount = () => {
 		var newState = this.state;
 		newState['moves'] = this.state['moves'] + 1;
 		this.setState(newState);
 	}
 
-	addRecentWord(word) {
+	addRecentWord = (word) => {
 		var recentWords = this.state['recentWords'].slice();
 		for (let i = RECENT_WORD_SIZE - 1; i > 0; i--) {
 			recentWords[i] = recentWords[i - 1];

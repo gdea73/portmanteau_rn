@@ -40,11 +40,11 @@ const lengthMultipliers = [
 ];
 
 class Words {
-	this.isValidWord = (string) => {
+	isValidWord = (string) => {
 		// TODO: implement dictionary (binary search)
 		return (string === 'PMT');
 	}
-	this.getWordScore = (word, chainLevel) => {
+	getWordScore = (word, chainLevel) => {
 		var score = 0;
 		for (let c = 0; c < word.length; c++) {
 			c += pointValues[word.charAt(c)];
@@ -70,7 +70,7 @@ class Words {
 		length === BOARD_SIZE.
 		return value: the string read from the board tiles
 	*/
-	this.readBoardWord = (word, board) => {
+	readBoardWord = (word, board) => {
 		var string = '';
 		if (word.startCol === word.endCol) {
 			// vertical word
@@ -79,7 +79,7 @@ class Words {
 			}
 		} else if (word.startRow === word.endRow) {
 			// horizontal word
-			for (let c = word.startCol; c <= word.endCol; c+) {
+			for (let c = word.startCol; c <= word.endCol; c++) {
 				string += board[c][word.startRow];
 			}
 		} else {
