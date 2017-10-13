@@ -187,6 +187,7 @@ class Board extends React.Component {
 			// we can't drop into this column
 			return;
 		}
+		this.incrementMoveCount();
 		var animations = [];
 		if (col != CENTER_COL) {
 			// first, animate the shifting to the drop column
@@ -224,15 +225,57 @@ class Board extends React.Component {
 		// we now have the complete array of words to look up in the dictionary.
 		var validWordsFound = false;
 		for (let i = 0; i < wordsToCheck.length; i++) {
-			if (Words.isValidWord(wordsToCheck[i])) {
-				validWordsFound = true;	
-
+			var boardWord = wordsToCheck[i];
+			var word = Words.readBoardWord(boardWord, board);
+			var word_rev = word.split('').reverse().join('');
+			var validWord;
+			if (Words.isValidWord(word)) {
+				validWord = word;
+			} else if (Words.isValidWord(word_rev)) {
+				validWord = word_rev;
+			}
+			if (validWord) {
+				validWordsFound = true;
+				// update GameStatus via callbacks to GameScreen
+				this.increaseScore(Words.getWordScore(validWord));
+				this.addRecentWord(validWord);
+				// "break" the word; leave empty space in its board position
+				if (boardWord.startCol === boardWord.endCol) {
+					// breaking a vertical word
+					for (let r = boardWord.startRow; r <= boardWord.endRow; r++) {
+						board[boardWord.startCol][r] = ' ';
+					}
+				} else if (boardWord.startRow === boardWord.endRow) {
+					// breaking a horizontal word
+					for (let c = boardWord.startCol; c <= boardWord.endCol; c++) {
+						board[c][boardWord.startRow] = ' ';
+					}
+				}
 			}
 		}
 		if (validWordsFound) {
-			// words were found and broken! after refreshing the visual board,
+			// Words were found and broken! After refreshing the visual board,
 			// this callback shall be called again with chainLevel incremented.
+			this.chainLevel++;
+			// TODO: make these animations happen BEFORE we call setState and
+			// thereby refresh the entire Board.
+			this.breakAndDrop(board);
+		} else {
+			this.chainLevel = 0;
 		}
+		var newState = this.state;
+		newState.cols = board;
+		this.setState(newState);
+	}
+
+	breakAndDrop(board) {
+		// TODO: compare 'board' to this.state.cols;
+		// note differences;
+		// animate the breaking of any newly-missing tiles;
+		// figure out which tiles will be affected by gravity;
+		// make gravity happen (from an animation standpoint);
+		// make gravity happen (on the back end, to the parameter board object);
+		return board;
 	}
 
 	getWordsToCheck(board) {
@@ -248,9 +291,10 @@ class Board extends React.Component {
 					}
 					// FIXME (possibly) - let or var?
 					var word = {
-						vertical: true,
-						startCoord: BOARD_SIZE - 1,
-						endCoord: endRow,
+						startCol: c,
+						endCol: c,
+						startRow: BOARD_SIZE - 1,
+						endRow: endRow
 					};
 					wordsToCheck.push(word);
 			}
@@ -268,18 +312,20 @@ class Board extends React.Component {
 						// the word has ended; mark its end column as (c - 1)
 						inWord = false;
 						var word = {
-							vertical: false,
-							startCoord: startCol,
-							endCoord: c - 1
+							startCol: startCol,
+							endCol: c - 1
+							startRow: r,
+							endRow: r
 						};
 						wordsToCheck.push(word);
 					} else if (c == BOARD_SIZE - 1) {
 						// the word intersects the board X-boundary
 						inWord = false;
 						var word = {
-							vertical: false,
-							startCoord: startCol,
-							endCoord: BOARD_SIZE - 1 // or, c
+							startCol: startCol,
+							endCol: BOARD_SIZE - 1, // or, c
+							startRow: r,
+							endRow: r
 						};
 						wordsToCheck.push(word);
 					} // else, continue scanning the word
