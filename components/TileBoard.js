@@ -4,9 +4,11 @@ import {
 	Text,
 	StyleSheet,
 	Animated,
+	Easing,
 } from 'react-native';
 
 import Constants from '../etc/Constants';
+import Words from '../etc/Words';
 
 // logical constants
 const {WIDTH, HEIGHT} = require('Dimensions').get('window');
@@ -52,7 +54,7 @@ class Board extends React.Component {
 			  [' ', ' ', ' ', ' ', ' ', ' ', 'M'],
 			  [' ', ' ', ' ', ' ', 'X', 'X', 'U'],
 			  [' ', ' ', ' ', 'Q', 'Q', 'Q', 'F'],
-			  ['Z', 'Z', 'G', 'Z', 'Z', 'Z', 'F'],
+			  [' ', 'Z', 'G', 'Z', 'Z', 'Z', 'F'],
 			  [' ', ' ', 'P', 'P', 'P', 'P', 'E'],
 			  ['M', 'M', 'M', 'M', 'M', 'M', 'D'],
 			  [' ', ' ', ' ', ' ', ' ', ' ', ' '],
@@ -60,9 +62,10 @@ class Board extends React.Component {
         }
 		this.state = {
 			cols: cols,	
-			dropTileLetter: this.getSaneRandomChar(),
+			dropLetter: this.getSaneRandomChar(),
 		}
 		this.firstRender = true;
+		this.chainLevel = 0;
 	}
 
 	getSaneRandomChar() {
@@ -111,13 +114,13 @@ class Board extends React.Component {
 		// its motion from the center of the board to the chosen drop
 		// column is animated by the Board
 		var stile = {
-			backgroundColor: TILE_COLORS[this.state.dropTileLetter],
+			backgroundColor: TILE_COLORS[this.state.dropLetter],
 			top: this.dropTileGravAnim,
 			left: this.dropTileAnim,
 		}
 		return(
 			<Tile style={stile}
-				  letter={this.state.dropTileLetter} />
+				  letter={this.state.dropLetter} />
 		);
 	}
 
@@ -152,7 +155,6 @@ class Board extends React.Component {
 			if (this.state.cols[col][row] !== ' ') {
 				// the gravity animation, if used, will be triggered by
 				// the Board with the proper ending position.
-				console.debug(this.gravAnims[col][row]);
 				let stile = {
 					backgroundColor: TILE_COLORS[this.state.cols[col][row]],
 					top: this.gravAnims[col][row],
@@ -185,7 +187,6 @@ class Board extends React.Component {
 			// we can't drop into this column
 			return;
 		}
-		console.debug(lowestEmptyRow);
 		var animations = [];
 		if (col != CENTER_COL) {
 			// first, animate the shifting to the drop column
@@ -193,6 +194,7 @@ class Board extends React.Component {
 				this.dropTileAnim, {
 					toValue: this.getColPosX(col),
 					duration: DROP_TILE_ANIM_X_DURATION,
+					easing: Easing.quad,
 				}
 			));
 		}
@@ -202,7 +204,89 @@ class Board extends React.Component {
 				duration: DROP_TILE_ANIM_Y_DURATION * (lowestEmptyRow + 1),
 			}
 		));
-		Animated.sequence(animations).start();
+		this.lastDropCol = col;
+		this.lastDropRow = lowestEmptyRow;
+		this.chainLevel = 1;
+		Animated.sequence(animations).start(this.wordBreakerCallback);
+	}
+
+	wordBreakerCallback() {
+		// every time the board changes, this function must be called;
+		// it checks for any valid words, breaks them, pulls tiles downward as
+		// necessary, and repeats the process (at the next chain level).
+		var board = this.state.cols.slice();
+		if (this.chainLevel === 1) {
+			// we've just dropped a tile into the board, so we need to add the
+			// drop tile to our temporary array of colums while we search.
+			board[this.lastDropCol][this.lastDropRow] = this.dropLetter;
+		}
+		var wordsToCheck = getBoardWords(board);
+		// we now have the complete array of words to look up in the dictionary.
+		var validWordsFound = false;
+		for (let i = 0; i < wordsToCheck.length; i++) {
+			if (Words.isValidWord(wordsToCheck[i])) {
+				validWordsFound = true;	
+
+			}
+		}
+		if (validWordsFound) {
+			// words were found and broken! after refreshing the visual board,
+			// this callback shall be called again with chainLevel incremented.
+		}
+	}
+
+	getWordsToCheck(board) {
+		var wordsToCheck = [];
+		// read the bord for "words," beginning with columns
+		for (let c = 0; c < BOARD_SIZE; c++) {
+			// only scan if there are at least two tiles in the column
+			if (board[c][BOARD_SIZE - 1] !== ' ' &&
+				board[c][BOARD_SIZE - 2] !== ' ') {
+					var endRow = BOARD_SIZE - 3;
+					while (endRow > 0 && board[c][endRow - 1] !== ' ') {
+						endRow--;
+					}
+					// FIXME (possibly) - let or var?
+					var word = {
+						vertical: true,
+						startCoord: BOARD_SIZE - 1,
+						endCoord: endRow,
+					};
+					wordsToCheck.push(word);
+			}
+		}
+		// scan for horizontal (contiguous) "words"
+		for (let r = 0; r < BOARD_SIZE; r++) {
+			var inWord = false;
+			var startCol;
+			for (let c = 0; c < BOARD_SIZE; c++) {
+				if (!inWord && board[c][r] !== ' ') {
+					inWord = true;
+					startCol = c;
+				} else if (inWord) {
+					if (board[c][r] === ' ') {
+						// the word has ended; mark its end column as (c - 1)
+						inWord = false;
+						var word = {
+							vertical: false,
+							startCoord: startCol,
+							endCoord: c - 1
+						};
+						wordsToCheck.push(word);
+					} else if (c == BOARD_SIZE - 1) {
+						// the word intersects the board X-boundary
+						inWord = false;
+						var word = {
+							vertical: false,
+							startCoord: startCol,
+							endCoord: BOARD_SIZE - 1 // or, c
+						};
+						wordsToCheck.push(word);
+					} // else, continue scanning the word
+				}
+			}
+		}
+		return wordsToCheck;
 	}
 
     getColStyle(columnKey) {
