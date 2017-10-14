@@ -45,11 +45,17 @@ class GameScreen extends React.Component {
 		}
 	}
 
+	setGSRef(ref) {
+		console.debug('setting GS ref; gameStatus here is:');
+		this.gameStatus = ref;
+		console.debug(this.gameStatus);
+	}
+
 	render() {
 		console.debug('board width in boardview: ' + (width - 2 * PADDING));
 		return(
 			<View style={styles.container}>
-				<GameStatus onRef={ref => (this.gameStatus = ref)} />
+				<GameStatus onRef={ref => {this.setGSRef(ref)}} />
 				<View style={styles.boardView}>
 					<Board width={width - 2 * PADDING}
 						   increaseScore={this.increaseScore}
