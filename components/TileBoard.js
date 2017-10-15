@@ -52,9 +52,9 @@ class Board extends React.Component {
                 [' ', ' ', ' ', ' ', ' ', ' ', ' '],
                 [' ', ' ', ' ', ' ', ' ', ' ', ' '], */
 			  [' ', ' ', ' ', ' ', ' ', ' ', 'M'],
-			  [' ', ' ', ' ', ' ', 'X', 'X', 'U'],
-			  [' ', ' ', ' ', 'Q', 'Q', 'Q', 'F'],
-			  [' ', 'Z', 'G', 'Z', 'Z', 'Z', 'F'],
+			  [' ', ' ', ' ', ' ', ' ', ' ', 'U'],
+			  [' ', ' ', ' ', ' ', ' ', ' ', 'F'],
+			  [' ', ' ', ' ', ' ', ' ', ' ', 'F'],
 			  [' ', ' ', 'P', 'P', 'P', 'P', 'E'],
 			  ['M', 'M', 'M', 'M', 'M', 'M', 'D'],
 			  [' ', ' ', ' ', ' ', ' ', ' ', ' '],
@@ -83,6 +83,7 @@ class Board extends React.Component {
 				borderRadius: tileBorderRad,
 			};
 			this.gravAnims = this.initializeGravAnims();
+			this.breakAnims = this.initializeBreakAnims();
 			this.firstRender = false;
 		}
 		this.dropTileGravAnim = new Animated.Value(DROP_TILE_MARGIN);
@@ -93,6 +94,13 @@ class Board extends React.Component {
 				{this.renderDropTile()}
 			</View>
 		);
+	}
+
+	componentDidUpdate() {
+		if (this.chainLevel > 0) {
+			// we're mid-chain; must return to the breakWordsCallback
+			this.breakWordsCallback();
+		}
 	}
 
 	initializeGravAnims() {
@@ -107,6 +115,16 @@ class Board extends React.Component {
 			}
 		}
 		return gravAnims;
+	}
+
+	initializeBreakAnims() {
+		var breakAnims = [[], [], [], [], [], [], []];
+		for (let c = 0; c < BOARD_SIZE; c++) {
+			for (let r = 0; r < BOARD_SIZE; r++) {
+				breakAnims[c][r] = new Animated.Value(tileSize);
+			}
+		}
+		return breakAnims;
 	}
 
 	renderDropTile() {
@@ -151,6 +169,7 @@ class Board extends React.Component {
 
 	renderTiles(col) {
 		var result = [];
+		console.debug('rendering tiles [' + col + ']:');
 		for (let row = 0; row < BOARD_SIZE; row++) {
 			if (this.state.cols[col][row] !== ' ') {
 				// the gravity animation, if used, will be triggered by
@@ -160,6 +179,7 @@ class Board extends React.Component {
 					top: this.gravAnims[col][row],
 					left: 0,
 				}
+				console.debug('\t\t[' + this.state.cols[col][row] + ']');
 				result.push(
 					<Tile key={this.getTileId(col, row)}
 						  style={stile}
@@ -176,7 +196,11 @@ class Board extends React.Component {
 
 	handleColClick(col) {
 		console.debug('handling click on col ' + col);
-		// find the lowest empty row in the drop column
+		// most importantly, don't allow any drops to occur
+		// if we're still mid-chain, and words may still be broken.
+		if (this.chainLevel > 0) {
+			return;
+		}
 		var lowestEmptyRow = -1;
 		for (let r = 0; r < BOARD_SIZE; r++) {
 			if (this.state.cols[col][r] === ' ') {
@@ -208,10 +232,10 @@ class Board extends React.Component {
 		this.lastDropCol = col;
 		this.lastDropRow = lowestEmptyRow;
 		this.chainLevel = 1;
-		Animated.sequence(animations).start(this.wordBreakerCallback);
+		Animated.sequence(animations).start(this.breakWordsCallback.bind(this));
 	}
 
-	wordBreakerCallback() {
+	breakWordsCallback() {
 		// every time the board changes, this function must be called;
 		// it checks for any valid words, breaks them, pulls tiles downward as
 		// necessary, and repeats the process (at the next chain level).
@@ -219,11 +243,13 @@ class Board extends React.Component {
 		if (this.chainLevel === 1) {
 			// we've just dropped a tile into the board, so we need to add the
 			// drop tile to our temporary array of colums while we search.
-			board[this.lastDropCol][this.lastDropRow] = this.dropLetter;
+			board[this.lastDropCol][this.lastDropRow] = this.state.dropLetter;
+			console.debug('setting dropCol in tempBoard at (' + this.lastDropCol + ', ' + this.lastDropRow + '): ' + this.state.dropLetter);
 		}
-		var wordsToCheck = getBoardWords(board);
+		var wordsToCheck = this.getWordsToCheck(board);
 		// we now have the complete array of words to look up in the dictionary.
 		var validWordsFound = false;
+		var breakAnimations = [];
 		for (let i = 0; i < wordsToCheck.length; i++) {
 			var boardWord = wordsToCheck[i];
 			var word = Words.readBoardWord(boardWord, board);
@@ -244,38 +270,103 @@ class Board extends React.Component {
 					// breaking a vertical word
 					for (let r = boardWord.startRow; r <= boardWord.endRow; r++) {
 						board[boardWord.startCol][r] = ' ';
+						breakAnimations.push(
+							getBreakAnimTiming(boardWord.startCol, r)
+						);
 					}
 				} else if (boardWord.startRow === boardWord.endRow) {
 					// breaking a horizontal word
 					for (let c = boardWord.startCol; c <= boardWord.endCol; c++) {
 						board[c][boardWord.startRow] = ' ';
+						breakAnimations.push(
+							getBreakAnimTiming(c, boardWord.startRow)
+						);
 					}
 				}
 			}
 		}
-		if (validWordsFound) {
-			// Words were found and broken! After refreshing the visual board,
-			// this callback shall be called again with chainLevel incremented.
-			this.chainLevel++;
-			// TODO: make these animations happen BEFORE we call setState and
-			// thereby refresh the entire Board.
-			this.breakAndDrop(board);
-		} else {
+		// bring the working 'board' to the class scope, so it can be accessed
+		// by the setNextBoardState() callback upon animation completion.
+		this.nextBoard = board.slice();
+		if (!validWordsFound) {
+			// by setting the chain level to zero, we ensure that this callback
+			// will not be re-entered upon the next render() after setState().
 			this.chainLevel = 0;
+			// the chain is over, so we need a new drop letter.
+			this.nextDropLetter = this.getSaneRandomChar();
+			this.setNextBoardState();
+			return;
 		}
+		// Beyond this point: words are to be broken, and the break cycle will
+		// continue, so long as there are new words to break post-gravity.
+
+		// Prepare the array of gravity animations based on newly-created
+		// spaces in the board.
+		var gravityAnimations = [];
+		for (let c = 0; c < BOARD_SIZE; c++) {
+			let fallDist = (board[BOARD_SIZE - 1][c] === ' ') ? 1 : 0;
+			// traverse the column from base to peak
+			for (let r = BOARD_SIZE - 1; r >= 0; r--) {
+				// for each blank we find during the ascent, any tile above
+				// the current row will need to fall one more space than the
+				// running counter of underlying spaces.
+				if (board[r][c] === ' ') {
+					fallDist++;
+				} else {
+					gravityAnimations.push(
+						getGravAnimTiming(r, c, fallDist)
+					);
+					// reflect the completed fall in nextBoard
+					this.nextBoard[r + fallDist][c] = this.nextBoard[r][c];
+					// this should be a non-destructive assignment, since we
+					// are replacing tiles from base to peak.
+					this.nextBoard[r][c] = ' ';
+				}
+			}
+		}
+		// Words were found and broken! After refreshing the visual board,
+		// this callback shall be called again with chainLevel incremented.
+		this.chainLevel++;
+		// First, the breaking animations should occur in parallel; the
+		// following parallel batch of animations, for gravity, must not
+		// begin until the tiles have broken.
+		Animated.sequence([
+			Animated.parallel(breakAnimations),
+			Animated.parallel(gravAnimations),
+		]).start(this.setNextBoardState.bind(this));
+	}
+
+	setNextBoardState() {
+		// This is called at the end of each breakWordsCallback() execution;
+		// if no words were broken, we have set a new drop letter and chainLevel
+		// is at zero. At render() time, if chainLevel > 0, breakWordsCallback()
+		// is re-entered.
 		var newState = this.state;
-		newState.cols = board;
+		newState.cols = this.nextBoard;
+		newState.dropLetter = this.nextDropLetter; // only differs at chain ending
+		console.debug('about to set new board state with dropLetter ' + newState.dropLetter);
+		console.debug('cols:');
+		console.debug(newState.cols);
 		this.setState(newState);
 	}
 
-	breakAndDrop(board) {
-		// TODO: compare 'board' to this.state.cols;
-		// note differences;
-		// animate the breaking of any newly-missing tiles;
-		// figure out which tiles will be affected by gravity;
-		// make gravity happen (from an animation standpoint);
-		// make gravity happen (on the back end, to the parameter board object);
-		return board;
+	getBreakAnimTiming(col, row) {
+		return Animated.timing(
+			this.breakAnims[col][row], {
+				toValue: 0,
+				duration: TILE_BREAK_ANIM_DURATION,
+				useNativeDriver: true,
+			}
+		);
+	}
+
+	getGravAnimTiming(col, row, fallDist) {
+		return Animated.timing(
+			this.gravAnims[col][row], {
+			toValue: getTilePosY(row + fallDist),
+			easing: Easing.quad,
+			useNativeDriver: true,
+		});
 	}
 
 	getWordsToCheck(board) {

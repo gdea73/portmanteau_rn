@@ -45,23 +45,17 @@ class GameScreen extends React.Component {
 		}
 	}
 
-	setGSRef(ref) {
-		console.debug('setting GS ref; gameStatus here is:');
-		this.gameStatus = ref;
-		console.debug(this.gameStatus);
-	}
-
 	render() {
 		console.debug('board width in boardview: ' + (width - 2 * PADDING));
 		return(
 			<View style={styles.container}>
-				<GameStatus onRef={ref => {this.setGSRef(ref)}} />
+				<GameStatus onRef={ref => (this.gameStatus = ref) } />
 				<View style={styles.boardView}>
 					<Board width={width - 2 * PADDING}
-						   increaseScore={this.increaseScore}
-						   incrementMoveCount={this.incrementMoveCount}
-						   addRecentWord={this.addRecentWord}
-						   gameOver={this.gameOver}
+						   increaseScore={this.increaseScore.bind(this)}
+						   incrementMoveCount={this.incrementMoveCount.bind(this)}
+						   addRecentWord={this.addRecentWord.bind(this)}
+						   gameOver={this.gameOver.bind(this)}
 						   initialCols={this.props.initialCols}
 						   initialDropTile={this.props.initialDropTile}
 					/>
@@ -83,11 +77,6 @@ class GameScreen extends React.Component {
 		console.debug('current chain level: ' + chainLevel);
 	}
 	incrementMoveCount() {
-		// FIXME: where I left off -- this onRef wasn't working.
-		// May need to reevaluate data flow and move GameStatus
-		// data up to this Screen, or elsewhere, and have the
-		// front end display for the stats be dumb.
-		console.debug(this.gameStatus);
 		this.gameStatus.incrementMoveCount();
 	}
 	addRecentWord(word) {
