@@ -8,12 +8,15 @@ import {
 } from 'react-native';
 
 import Constants from '../etc/Constants';
-import Words from '../etc/Words';
+import Words from '../etc/Words_min';
 
 // logical constants
 const {WIDTH, HEIGHT} = require('Dimensions').get('window');
 const BOARD_SIZE = 7;
 const CENTER_COL = 3;
+
+// TODO: remove this testing thing
+var t = 0;
 
 /* dumb constants from when I thought "unique ID" meant "unique numeric ID."
   
@@ -28,6 +31,7 @@ const COL_TOUCH_LAYER = 200;
 const DROP_TILE_ANIM_X_DURATION = 500;
 // TODO: use Y duration as a step / multiplier per distance dropped
 const DROP_TILE_ANIM_Y_DURATION = 100;
+const TILE_BREAK_ANIM_DURATION = 50;
 const DROP_TILE_MARGIN = 2;
 const COL_BORDER_RAD = 2;
 const TILE_PADDING = 3;
@@ -51,13 +55,13 @@ class Board extends React.Component {
                 [' ', ' ', ' ', ' ', ' ', ' ', ' '],
                 [' ', ' ', ' ', ' ', ' ', ' ', ' '],
                 [' ', ' ', ' ', ' ', ' ', ' ', ' '], */
-			  [' ', ' ', ' ', ' ', ' ', ' ', 'M'],
-			  [' ', ' ', ' ', ' ', ' ', ' ', 'U'],
-			  [' ', ' ', ' ', ' ', ' ', ' ', 'F'],
-			  [' ', ' ', ' ', ' ', ' ', ' ', 'F'],
-			  [' ', ' ', 'P', 'P', 'P', 'P', 'E'],
-			  ['M', 'M', 'M', 'M', 'M', 'M', 'D'],
 			  [' ', ' ', ' ', ' ', ' ', ' ', ' '],
+			  [' ', ' ', 'S', 'R', 'Q', 'P', 'U'],
+			  [' ', ' ', ' ', ' ', ' ', ' ', 'G'],
+			  [' ', ' ', ' ', ' ', ' ', ' ', ' '],
+			  [' ', ' ', ' ', ' ', ' ', ' ', ' '],
+			  [' ', ' ', ' ', 'C', 'G', 'V', 'M'],
+			  [' ', ' ', ' ', ' ', ' ', ' ', 'P'],
             ];
         }
 		this.state = {
@@ -69,6 +73,14 @@ class Board extends React.Component {
 	}
 
 	getSaneRandomChar() {
+		t++;
+		if (t == 4) {
+			return 'A';
+		} else if (t == 5) {
+			return 'R';
+		} else if (t == 6) {
+			return 'T';
+		}
 		return String.fromCharCode(Math.floor(65 + Math.random() * 26));
 	}
 
@@ -85,9 +97,11 @@ class Board extends React.Component {
 			this.gravAnims = this.initializeGravAnims();
 			this.breakAnims = this.initializeBreakAnims();
 			this.firstRender = false;
+			this.dropTileGravAnim = new Animated.Value(DROP_TILE_MARGIN);
+			this.dropTileAnim = new Animated.Value(this.getColPosX(CENTER_COL));
 		}
-		this.dropTileGravAnim = new Animated.Value(DROP_TILE_MARGIN);
-		this.dropTileAnim = new Animated.Value(this.getColPosX(CENTER_COL));
+		console.debug('board at render time:');
+		console.debug(this.state.cols);
 		return (
 			<View style={styles.boardContainer}>
 				{this.renderColumns()}
@@ -97,6 +111,14 @@ class Board extends React.Component {
 	}
 
 	componentDidUpdate() {
+		Animated.timing(this.dropTileGravAnim, {
+			toValue: DROP_TILE_MARGIN,
+			duration: 0
+		}).start();
+		Animated.timing(this.dropTileAnim, {
+			toValue: this.getColPosX(CENTER_COL),
+			duration: 0
+		}).start();
 		if (this.chainLevel > 0) {
 			// we're mid-chain; must return to the breakWordsCallback
 			this.breakWordsCallback();
@@ -121,7 +143,9 @@ class Board extends React.Component {
 		var breakAnims = [[], [], [], [], [], [], []];
 		for (let c = 0; c < BOARD_SIZE; c++) {
 			for (let r = 0; r < BOARD_SIZE; r++) {
-				breakAnims[c][r] = new Animated.Value(tileSize);
+				// this was for shrinking animation breakAnims[c][r] = new Animated.Value(tileSize);
+				// currently going to fade out instead, "because ... it's easy" -Bob O
+				breakAnims[c][r] = new Animated.Value(1);
 			}
 		}
 		return breakAnims;
@@ -169,7 +193,7 @@ class Board extends React.Component {
 
 	renderTiles(col) {
 		var result = [];
-		console.debug('rendering tiles [' + col + ']:');
+		// console.debug('rendering tiles [' + col + ']:');
 		for (let row = 0; row < BOARD_SIZE; row++) {
 			if (this.state.cols[col][row] !== ' ') {
 				// the gravity animation, if used, will be triggered by
@@ -177,9 +201,10 @@ class Board extends React.Component {
 				let stile = {
 					backgroundColor: TILE_COLORS[this.state.cols[col][row]],
 					top: this.gravAnims[col][row],
+					opacity: this.breakAnims[col][row],
 					left: 0,
 				}
-				console.debug('\t\t[' + this.state.cols[col][row] + ']');
+				// console.debug('\t\t[' + this.state.cols[col][row] + ']');
 				result.push(
 					<Tile key={this.getTileId(col, row)}
 						  style={stile}
@@ -250,6 +275,8 @@ class Board extends React.Component {
 		// we now have the complete array of words to look up in the dictionary.
 		var validWordsFound = false;
 		var breakAnimations = [];
+		console.debug('board words we will check:');
+		console.debug(wordsToCheck);
 		for (let i = 0; i < wordsToCheck.length; i++) {
 			var boardWord = wordsToCheck[i];
 			var word = Words.readBoardWord(boardWord, board);
@@ -263,15 +290,16 @@ class Board extends React.Component {
 			if (validWord) {
 				validWordsFound = true;
 				// update GameStatus via callbacks to GameScreen
-				this.props.increaseScore(Words.getWordScore(validWord));
-				this.props.addRecentWord(validWord);
+				console.debug('validWord: ' + validWord + '; score: ' + Words.getWordScore(validWord, this.chainLevel) + ' (chain level ' + this.chainLevel + ')');
+				this.props.increaseScore(Words.getWordScore(validWord, this.chainLevel));
+				this.props.addRecentWord(validWord, this.chainLevel);
 				// "break" the word; leave empty space in its board position
 				if (boardWord.startCol === boardWord.endCol) {
 					// breaking a vertical word
 					for (let r = boardWord.startRow; r <= boardWord.endRow; r++) {
 						board[boardWord.startCol][r] = ' ';
 						breakAnimations.push(
-							getBreakAnimTiming(boardWord.startCol, r)
+							this.getBreakAnimTiming(boardWord.startCol, r)
 						);
 					}
 				} else if (boardWord.startRow === boardWord.endRow) {
@@ -279,7 +307,7 @@ class Board extends React.Component {
 					for (let c = boardWord.startCol; c <= boardWord.endCol; c++) {
 						board[c][boardWord.startRow] = ' ';
 						breakAnimations.push(
-							getBreakAnimTiming(c, boardWord.startRow)
+							this.getBreakAnimTiming(c, boardWord.startRow)
 						);
 					}
 				}
@@ -304,23 +332,24 @@ class Board extends React.Component {
 		// spaces in the board.
 		var gravityAnimations = [];
 		for (let c = 0; c < BOARD_SIZE; c++) {
-			let fallDist = (board[BOARD_SIZE - 1][c] === ' ') ? 1 : 0;
+			let fallDist = (board[c][BOARD_SIZE - 1] === ' ') ? 1 : 0;
 			// traverse the column from base to peak
-			for (let r = BOARD_SIZE - 1; r >= 0; r--) {
+			for (let r = BOARD_SIZE - 2; r >= 0; r--) {
 				// for each blank we find during the ascent, any tile above
 				// the current row will need to fall one more space than the
 				// running counter of underlying spaces.
-				if (board[r][c] === ' ') {
+				if (board[c][r] === ' ') {
 					fallDist++;
 				} else {
+					console.debug('the "' + board[c][r] + '" at c: ' + c + ', r: ' + r + ' will drop by ' + fallDist + ' tiles.');
 					gravityAnimations.push(
-						getGravAnimTiming(r, c, fallDist)
+						this.getGravAnimTiming(r, c, fallDist)
 					);
 					// reflect the completed fall in nextBoard
-					this.nextBoard[r + fallDist][c] = this.nextBoard[r][c];
+					this.nextBoard[c][r + fallDist] = this.nextBoard[c][r];
 					// this should be a non-destructive assignment, since we
 					// are replacing tiles from base to peak.
-					this.nextBoard[r][c] = ' ';
+					this.nextBoard[c][r] = ' ';
 				}
 			}
 		}
@@ -330,9 +359,12 @@ class Board extends React.Component {
 		// First, the breaking animations should occur in parallel; the
 		// following parallel batch of animations, for gravity, must not
 		// begin until the tiles have broken.
+		console.debug("About to start break and gravity animations in sequence.");
+		console.debug("this.nextBoard:");
+		console.debug(this.nextBoard);
 		Animated.sequence([
 			Animated.parallel(breakAnimations),
-			Animated.parallel(gravAnimations),
+			Animated.parallel(gravityAnimations),
 		]).start(this.setNextBoardState.bind(this));
 	}
 
@@ -345,8 +377,8 @@ class Board extends React.Component {
 		newState.cols = this.nextBoard;
 		newState.dropLetter = this.nextDropLetter; // only differs at chain ending
 		console.debug('about to set new board state with dropLetter ' + newState.dropLetter);
-		console.debug('cols:');
-		console.debug(newState.cols);
+		/* console.debug('cols:');
+		console.debug(newState.cols); */
 		this.setState(newState);
 	}
 
@@ -355,17 +387,18 @@ class Board extends React.Component {
 			this.breakAnims[col][row], {
 				toValue: 0,
 				duration: TILE_BREAK_ANIM_DURATION,
-				useNativeDriver: true,
+				// useNativeDriver: true,
 			}
 		);
 	}
 
 	getGravAnimTiming(col, row, fallDist) {
+		console.debug('toValue: ' + this.getTilePosY(row + fallDist) + ' (row ' + row + '; fallDist ' + fallDist + ')');
 		return Animated.timing(
 			this.gravAnims[col][row], {
-			toValue: getTilePosY(row + fallDist),
+			toValue: this.getTilePosY(row + fallDist),
 			easing: Easing.quad,
-			useNativeDriver: true,
+			// useNativeDriver: true,
 		});
 	}
 
@@ -381,7 +414,7 @@ class Board extends React.Component {
 						endRow--;
 					}
 					// FIXME (possibly) - let or var?
-					var word = {
+					let word = {
 						startCol: c,
 						endCol: c,
 						startRow: BOARD_SIZE - 1,

@@ -22,7 +22,7 @@ class GameStatus extends React.Component {
 			score: 0,
 			moves: 0,
 			highestChain: 0,
-			words: recentWords,
+			recentWords: recentWords,
 		};
 		this.increaseScore = this.increaseScore.bind(this);
 		this.incrementMoveCount = this.incrementMoveCount.bind(this);
@@ -54,7 +54,7 @@ class GameStatus extends React.Component {
 	}
 
 	addRecentWord = (word) => {
-		var recentWords = this.state['recentWords'].slice();
+		var recentWords = this.state.recentWords.slice();
 		for (let i = RECENT_WORD_SIZE - 1; i > 0; i--) {
 			recentWords[i] = recentWords[i - 1];
 		}
@@ -83,7 +83,7 @@ class GameStatus extends React.Component {
 		for (let i = 0; i < Constants.recentWordsCount; i++) {
 			recentWords.push(
 				<View key={'recentWords' + i}>
-					<Text style={styles.recentWord}>{this.state.words[i]}</Text>
+					<Text style={styles.recentWord}>{this.state.recentWords[i]}</Text>
 				</View>
 			);
 		}
