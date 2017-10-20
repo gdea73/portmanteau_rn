@@ -3,3 +3,5 @@ node_modules/
 npm-debug.*
 *.swp
 android/.gradle**
+android/app/build/**
+android/build/**

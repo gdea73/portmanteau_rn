@@ -74,7 +74,6 @@ class GameScreen extends React.Component {
 	increaseScore(points, chainLevel) {
 		this.gameStatus.increaseScore(points, chainLevel);
 		// TODO: animate display of chain level if > 1
-		console.debug('current chain level: ' + chainLevel);
 	}
 	incrementMoveCount() {
 		this.gameStatus.incrementMoveCount();

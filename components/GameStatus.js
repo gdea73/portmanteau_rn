@@ -54,13 +54,17 @@ class GameStatus extends React.Component {
 	}
 
 	addRecentWord = (word) => {
+		console.debug('top of addRecentWord -- current recentWords:');
+		console.debug(this.state.recentWords);
 		var recentWords = this.state.recentWords.slice();
-		for (let i = RECENT_WORD_SIZE - 1; i > 0; i--) {
+		for (let i = RECENT_WORD_SIZE - 1; i >= 0; i--) {
 			recentWords[i] = recentWords[i - 1];
 		}
 		recentWords[0] = word;
 		var newState = this.state;
 		newState['recentWords'] = recentWords;
+		console.debug('bottom of addRecentWord -- current recentWords:');
+		console.debug(recentWords);
 		this.setState(newState);
 	}
 

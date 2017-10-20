@@ -8,7 +8,7 @@ import {
 } from 'react-native';
 
 import Constants from '../etc/Constants';
-import Words from '../etc/Words_min';
+import Words from '../etc/Words';
 
 // logical constants
 const {WIDTH, HEIGHT} = require('Dimensions').get('window');
@@ -48,20 +48,20 @@ class Board extends React.Component {
 		} else {
 			// initialize the board as empty
             cols = [
-               /* [' ', ' ', ' ', ' ', ' ', ' ', ' '],
                 [' ', ' ', ' ', ' ', ' ', ' ', ' '],
                 [' ', ' ', ' ', ' ', ' ', ' ', ' '],
                 [' ', ' ', ' ', ' ', ' ', ' ', ' '],
                 [' ', ' ', ' ', ' ', ' ', ' ', ' '],
                 [' ', ' ', ' ', ' ', ' ', ' ', ' '],
-                [' ', ' ', ' ', ' ', ' ', ' ', ' '], */
-			  [' ', ' ', ' ', ' ', ' ', ' ', ' '],
+                [' ', ' ', ' ', ' ', ' ', ' ', ' '],
+                [' ', ' ', ' ', ' ', ' ', ' ', ' '],
+			  /* [' ', ' ', ' ', ' ', ' ', ' ', ' '],
 			  [' ', ' ', 'S', 'R', 'Q', 'P', 'U'],
 			  [' ', ' ', ' ', ' ', ' ', ' ', 'G'],
 			  [' ', ' ', ' ', ' ', ' ', ' ', ' '],
 			  [' ', ' ', ' ', ' ', ' ', ' ', ' '],
 			  [' ', ' ', ' ', 'C', 'G', 'V', 'M'],
-			  [' ', ' ', ' ', ' ', ' ', ' ', 'P'],
+			  [' ', ' ', ' ', ' ', ' ', ' ', 'P'], */
             ];
         }
 		this.state = {
@@ -94,9 +94,9 @@ class Board extends React.Component {
 				width: tileSize,
 				borderRadius: tileBorderRad,
 			};
+			this.firstRender = false;
 			this.gravAnims = this.initializeGravAnims();
 			this.breakAnims = this.initializeBreakAnims();
-			this.firstRender = false;
 			this.dropTileGravAnim = new Animated.Value(DROP_TILE_MARGIN);
 			this.dropTileAnim = new Animated.Value(this.getColPosX(CENTER_COL));
 		}
@@ -111,6 +111,10 @@ class Board extends React.Component {
 	}
 
 	componentDidUpdate() {
+		// FIXME: reassigning new Animated.Value(initialVal) for these
+		// doesn't actually re-render their position. This hack actually
+		// reverses the animation back to its initial location with duration
+		// zero. I don't like it. I need to find a better alternative.
 		Animated.timing(this.dropTileGravAnim, {
 			toValue: DROP_TILE_MARGIN,
 			duration: 0
@@ -201,7 +205,7 @@ class Board extends React.Component {
 				let stile = {
 					backgroundColor: TILE_COLORS[this.state.cols[col][row]],
 					top: this.gravAnims[col][row],
-					opacity: this.breakAnims[col][row],
+					// opacity: this.breakAnims[col][row],
 					left: 0,
 				}
 				// console.debug('\t\t[' + this.state.cols[col][row] + ']');
@@ -265,6 +269,7 @@ class Board extends React.Component {
 		// it checks for any valid words, breaks them, pulls tiles downward as
 		// necessary, and repeats the process (at the next chain level).
 		var board = this.state.cols.slice();
+		console.debug('breakWordsCallback() entered; chainLevel ' + this.chainLevel);
 		if (this.chainLevel === 1) {
 			// we've just dropped a tile into the board, so we need to add the
 			// drop tile to our temporary array of colums while we search.
@@ -280,8 +285,9 @@ class Board extends React.Component {
 		for (let i = 0; i < wordsToCheck.length; i++) {
 			var boardWord = wordsToCheck[i];
 			var word = Words.readBoardWord(boardWord, board);
+			console.debug('board word read: ' + word);
 			var word_rev = word.split('').reverse().join('');
-			var validWord;
+			var validWord = undefined;
 			if (Words.isValidWord(word)) {
 				validWord = word;
 			} else if (Words.isValidWord(word_rev)) {
@@ -296,7 +302,7 @@ class Board extends React.Component {
 				// "break" the word; leave empty space in its board position
 				if (boardWord.startCol === boardWord.endCol) {
 					// breaking a vertical word
-					for (let r = boardWord.startRow; r <= boardWord.endRow; r++) {
+					for (let r = boardWord.startRow; r >= boardWord.endRow; r--) {
 						board[boardWord.startCol][r] = ' ';
 						breakAnimations.push(
 							this.getBreakAnimTiming(boardWord.startCol, r)
@@ -340,11 +346,11 @@ class Board extends React.Component {
 				// running counter of underlying spaces.
 				if (board[c][r] === ' ') {
 					fallDist++;
-				} else {
+				} else if (fallDist > 0) {
 					console.debug('the "' + board[c][r] + '" at c: ' + c + ', r: ' + r + ' will drop by ' + fallDist + ' tiles.');
-					gravityAnimations.push(
+					/* FIXME these are broken too gravityAnimations.push(
 						this.getGravAnimTiming(r, c, fallDist)
-					);
+					); */
 					// reflect the completed fall in nextBoard
 					this.nextBoard[c][r + fallDist] = this.nextBoard[c][r];
 					// this should be a non-destructive assignment, since we
@@ -398,7 +404,7 @@ class Board extends React.Component {
 			this.gravAnims[col][row], {
 			toValue: this.getTilePosY(row + fallDist),
 			easing: Easing.quad,
-			// useNativeDriver: true,
+			useNativeDriver: false,
 		});
 	}
 
@@ -495,10 +501,9 @@ class Board extends React.Component {
 class Tile extends React.Component {
 	/* constructor(props) {
 		super(props);
-		var gravAnim = new Animated.Value(this.props.style['top']),
 		this.state = {
-			gravAnim: gravAnim,
-
+			gravAnim: this.props.gravAnim,
+			breakAnim: this.props.breakAnim,	
 		}
 	} */
 

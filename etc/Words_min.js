@@ -1,4 +1,3 @@
-var RNFS = require('react-native-fs');
 
 const pointValues = { 
     A: 1,
@@ -41,58 +40,46 @@ const lengthMultipliers = [
 	5040 // seems absurd, but this is BOARD_SIZE, so this is hard to do.
 ];
 
-var dictLoaded = false;
-var dictionary = [];
+const words = [
+	'ARC',
+	'ART',
+	'CAB',
+	'CAR',
+	'DAG',
+	'DOG',
+	'DOT',
+	'MUG',
+	'GUM'
+];
+
+function binSearch(string, start, end) {
+	if (start === end) {
+		// as close as it gets
+		return !!(string === words[end]);
+	}
+	var midpt = (start + end) / 2;
+	if (string < words[midpt]) {
+		return binSearch(string, start, midpt);
+	}
+	if (string > words[midpt]) {
+		return binSearch(string, midpt + 1, end);
+	}
+	return !!(string === words[midpt]);
+}
 
 class Words {
-	static loadDictionary() {
-		if (!dictLoaded) {
-			console.debug('attempting to load dictionary from bundle...');
-			// get a list of files and directories in the main bundle
-			RNFS.readFileAssets('dictionary.txt', 'utf8')
-				.then((result) => {
-					console.debug('got dictionary from resources; splitting (slow)...');
-					dictionary = result.split(/\n/g);
-					console.debug('dict[73] === ' + dictionary[73]);
-					dictLoaded = true;
-			});
-		}
-	}
 	static isValidWord(string) {
-		// just poll until the dictionary is loaded, though this may slow down
-		// that process; it'll only happen if the player taps a column within
-		// roughly 1 second of the game first loading.
-		while (!dictLoaded);
-		if (string.length < 2) {
-			return false;
-		}
-		return this.binSearch(string, 0, dictionary.length);
-	}
-	static binSearch(string, start, end) {
-		if (start === end) {
-			// as close as it gets
-			return !!(string === words[end]);
-		}
-		var midpt = Math.floor((start + end) / 2);
-		if (string < dictionary[midpt]) {
-			return this.binSearch(string, start, midpt);
-		}
-		if (string > dictionary[midpt]) {
-			return this.binSearch(string, midpt + 1, end);
-		}
-		// if reached, we must have found the string
-		// console.debug('end of binsearch reached, string is ' + string + '; midpt of dict here is ' + dictionary[midpt]);
-		return !!(string === dictionary[midpt]);
+		return binSearch(string, 0, words.length);
 	}
 	static getWordScore(word, chainLevel) {
 		var score = 0;
 		for (let c = 0; c < word.length; c++) {
-			score += pointValues[word.charAt(c)];
+			c += pointValues[word.charAt(c)];
 		}
+		console.debug('score pre-multipliers');
 		score *= lengthMultipliers[word.length];
 		// TODO: solicit user feedback on square increase
 		score *= chainLevel * chainLevel;
-		console.debug('score post-multipliers (chainLevel ' + chainLevel + '): ' + score);
 		return score;
 	}
 
@@ -115,7 +102,7 @@ class Words {
 		var string = '';
 		if (word.startCol === word.endCol) {
 			// vertical word
-			for (let r = word.startRow; r > word.endRow; r--) {
+			for (let r = word.startRow; r <= word.endRow; r++) {
 				string += board[word.startCol][r];
 			}
 		} else if (word.startRow === word.endRow) {
@@ -131,13 +118,8 @@ class Words {
 			console.warn('Its end coordinates are (' + word.endCol + ', '
 						 + word.endRow + ').');
 		}
-		console.debug('readBoardWord returning "' + string + '" when it read from (' + word.startCol + ', ' + word.startRow + ') to (' + word.endCol + ', ' + word.endRow + ').');
 		return string;
 	}
 }
-
-const words = [
-	'ABC'
-];
 
 export default Words;
