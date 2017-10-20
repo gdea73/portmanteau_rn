@@ -115,7 +115,7 @@ class Words {
 		var string = '';
 		if (word.startCol === word.endCol) {
 			// vertical word
-			for (let r = word.startRow; r > word.endRow; r--) {
+			for (let r = word.startRow; r >= word.endRow; r--) {
 				string += board[word.startCol][r];
 			}
 		} else if (word.startRow === word.endRow) {

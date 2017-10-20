@@ -415,7 +415,7 @@ class Board extends React.Component {
 			// only scan if there are at least two tiles in the column
 			if (board[c][BOARD_SIZE - 1] !== ' ' &&
 				board[c][BOARD_SIZE - 2] !== ' ') {
-					var endRow = BOARD_SIZE - 3;
+					var endRow = BOARD_SIZE - 2;
 					while (endRow > 0 && board[c][endRow - 1] !== ' ') {
 						endRow--;
 					}
