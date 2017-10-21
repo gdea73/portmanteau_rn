@@ -66,22 +66,10 @@ class Board extends React.Component {
         }
 		this.state = {
 			cols: cols,	
-			dropLetter: this.getSaneRandomChar(),
+			dropLetter: Words.getDropLetter(),
 		}
 		this.firstRender = true;
 		this.chainLevel = 0;
-	}
-
-	getSaneRandomChar() {
-		t++;
-		if (t == 4) {
-			return 'A';
-		} else if (t == 5) {
-			return 'R';
-		} else if (t == 6) {
-			return 'T';
-		}
-		return String.fromCharCode(Math.floor(65 + Math.random() * 26));
 	}
 
 	render() {
@@ -111,21 +99,29 @@ class Board extends React.Component {
 	}
 
 	componentDidUpdate() {
-		// FIXME: reassigning new Animated.Value(initialVal) for these
-		// doesn't actually re-render their position. This hack actually
-		// reverses the animation back to its initial location with duration
-		// zero. I don't like it. I need to find a better alternative.
-		Animated.timing(this.dropTileGravAnim, {
-			toValue: DROP_TILE_MARGIN,
-			duration: 0
-		}).start();
-		Animated.timing(this.dropTileAnim, {
-			toValue: this.getColPosX(CENTER_COL),
-			duration: 0
-		}).start();
+		this.dropTileGravAnim.setValue(DROP_TILE_MARGIN);
+		this.dropTileAnim.setValue(this.getColPosX(CENTER_COL));
+		this.resetGravAnims();
+		this.resetBreakAnims();
 		if (this.chainLevel > 0) {
 			// we're mid-chain; must return to the breakWordsCallback
 			this.breakWordsCallback();
+		}
+	}
+
+	resetGravAnims() {
+		for (let c = 0; c < BOARD_SIZE; c++) {
+			for (let r = 0; r < BOARD_SIZE; r++) {
+				this.gravAnims[c][r].setValue(this.getTilePosY(r));
+			}
+		}
+	}
+
+	resetBreakAnims() {
+		for (let c = 0; c < BOARD_SIZE; c++) {
+			for (let r = 0; r < BOARD_SIZE; r++) {
+				this.breakAnims[c][r].setValue(1);
+			}
 		}
 	}
 
@@ -205,7 +201,7 @@ class Board extends React.Component {
 				let stile = {
 					backgroundColor: TILE_COLORS[this.state.cols[col][row]],
 					top: this.gravAnims[col][row],
-					// opacity: this.breakAnims[col][row],
+					opacity: this.breakAnims[col][row],
 					left: 0,
 				}
 				// console.debug('\t\t[' + this.state.cols[col][row] + ']');
@@ -254,7 +250,7 @@ class Board extends React.Component {
 		}
 		animations.push(Animated.timing(
 			this.dropTileGravAnim, {
-				toValue: this.getTilePosY(lowestEmptyRow + 1) + TILE_PADDING,
+				toValue: this.getTilePosY(lowestEmptyRow + 1),
 				duration: DROP_TILE_ANIM_Y_DURATION * (lowestEmptyRow + 1),
 			}
 		));
@@ -327,7 +323,7 @@ class Board extends React.Component {
 			// will not be re-entered upon the next render() after setState().
 			this.chainLevel = 0;
 			// the chain is over, so we need a new drop letter.
-			this.nextDropLetter = this.getSaneRandomChar();
+			this.nextDropLetter = Words.getDropLetter();
 			this.setNextBoardState();
 			return;
 		}
@@ -348,9 +344,9 @@ class Board extends React.Component {
 					fallDist++;
 				} else if (fallDist > 0) {
 					console.debug('the "' + board[c][r] + '" at c: ' + c + ', r: ' + r + ' will drop by ' + fallDist + ' tiles.');
-					/* FIXME these are broken too gravityAnimations.push(
-						this.getGravAnimTiming(r, c, fallDist)
-					); */
+					gravityAnimations.push(
+						this.getGravAnimTiming(c, r, fallDist)
+					);
 					// reflect the completed fall in nextBoard
 					this.nextBoard[c][r + fallDist] = this.nextBoard[c][r];
 					// this should be a non-destructive assignment, since we
@@ -393,7 +389,7 @@ class Board extends React.Component {
 			this.breakAnims[col][row], {
 				toValue: 0,
 				duration: TILE_BREAK_ANIM_DURATION,
-				// useNativeDriver: true,
+				useNativeDriver: false,
 			}
 		);
 	}
@@ -490,7 +486,7 @@ class Board extends React.Component {
 
 	// Translation methods from board coordinates to absolute coordinates.
 	getTilePosY(row) {
-		return row * tileSize + TILE_PADDING;
+		return row * (tileSize + TILE_PADDING) + TILE_PADDING;
 	}
 
 	getColPosX(col) {

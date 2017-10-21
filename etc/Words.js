@@ -1,5 +1,36 @@
 var RNFS = require('react-native-fs');
 
+const CHAR_TABLE_SIZE = 110;
+
+const quantities = { 
+    A: 9,
+	B: 2,
+	C: 2,
+	D: 4,
+	E: 12,
+	F: 2,
+	G: 3,
+	H: 2,
+	I: 9,
+	J: 1,
+	K: 1,
+	L: 4,
+	M: 2,
+    N: 6,
+	O: 8,
+	P: 2,
+	Q: 1,
+	R: 6,
+	S: 4,
+	T: 6,
+	U: 4,
+	V: 2,
+	W: 2,
+	X: 1,
+	Y: 2,
+	Z: 1
+};
+
 const pointValues = { 
     A: 1,
 	B: 3,
@@ -43,8 +74,47 @@ const lengthMultipliers = [
 
 var dictLoaded = false;
 var dictionary = [];
+var charTableLoaded = false;
+var charTable = [];
+
+function initCharTable() {
+	for (let letter in quantities) {
+		for (let i = 0; i < quantities[letter]; i++) {
+			charTable.push(letter);
+		}
+	}
+	for (let j = charTable.length; j < CHAR_TABLE_SIZE; j++) {
+		// pad the rest of the char table with BLANKS.
+		charTable.push(' ');
+	}
+}
+function binSearch(string, start, end) {
+	if (start === end) {
+		// as close as it gets
+		return !!(string === words[end]);
+	}
+	var midpt = Math.floor((start + end) / 2);
+	if (string < dictionary[midpt]) {
+		return binSearch(string, start, midpt);
+	}
+	if (string > dictionary[midpt]) {
+		return binSearch(string, midpt + 1, end);
+	}
+	// if reached, we must have found the string
+	// console.debug('end of binsearch reached, string is ' + string + '; midpt of dict here is ' + dictionary[midpt]);
+	return !!(string === dictionary[midpt]);
+}
 
 class Words {
+	static getDropLetter() {
+		if (!charTableLoaded) {
+			initCharTable();
+			charTableLoaded = true;
+		}
+		var index = Math.floor(Math.random() * CHAR_TABLE_SIZE);
+		console.debug('char table index ' + index);
+		return charTable[index];
+	}
 	static loadDictionary() {
 		if (!dictLoaded) {
 			console.debug('attempting to load dictionary from bundle...');
@@ -66,23 +136,7 @@ class Words {
 		if (string.length < 2) {
 			return false;
 		}
-		return this.binSearch(string, 0, dictionary.length);
-	}
-	static binSearch(string, start, end) {
-		if (start === end) {
-			// as close as it gets
-			return !!(string === words[end]);
-		}
-		var midpt = Math.floor((start + end) / 2);
-		if (string < dictionary[midpt]) {
-			return this.binSearch(string, start, midpt);
-		}
-		if (string > dictionary[midpt]) {
-			return this.binSearch(string, midpt + 1, end);
-		}
-		// if reached, we must have found the string
-		// console.debug('end of binsearch reached, string is ' + string + '; midpt of dict here is ' + dictionary[midpt]);
-		return !!(string === dictionary[midpt]);
+		return binSearch(string, 0, dictionary.length);
 	}
 	static getWordScore(word, chainLevel) {
 		var score = 0;
