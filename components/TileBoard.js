@@ -31,7 +31,7 @@ const COL_TOUCH_LAYER = 200;
 const DROP_TILE_ANIM_X_DURATION = 500;
 // TODO: use Y duration as a step / multiplier per distance dropped
 const DROP_TILE_ANIM_Y_DURATION = 100;
-const TILE_BREAK_ANIM_DURATION = 50;
+const TILE_BREAK_ANIM_DURATION = 200;
 const DROP_TILE_MARGIN = 2;
 const COL_BORDER_RAD = 2;
 const TILE_PADDING = 3;
