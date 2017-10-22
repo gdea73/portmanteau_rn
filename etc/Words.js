@@ -1,3 +1,5 @@
+import Constants from './Constants';
+
 var RNFS = require('react-native-fs');
 
 const CHAR_TABLE_SIZE = 110;
@@ -128,6 +130,7 @@ class Words {
 			});
 		}
 	}
+
 	static isValidWord(string) {
 		// just poll until the dictionary is loaded, though this may slow down
 		// that process; it'll only happen if the player taps a column within
@@ -138,6 +141,7 @@ class Words {
 		}
 		return binSearch(string, 0, dictionary.length);
 	}
+
 	static getWordScore(word, chainLevel) {
 		var score = 0;
 		for (let c = 0; c < word.length; c++) {
@@ -188,6 +192,63 @@ class Words {
 		console.debug('readBoardWord returning "' + string + '" when it read from (' + word.startCol + ', ' + word.startRow + ') to (' + word.endCol + ', ' + word.endRow + ').');
 		return string;
 	}
+
+	static getWordsToCheck(board) {
+        var wordsToCheck = []; 
+        // read the bord for "words," beginning with columns
+        for (let c = 0; c < Constants.BOARD_SIZE; c++) {
+            // only scan if there are at least two tiles in the column
+            if (board[c][Constants.BOARD_SIZE - 1] !== ' ' &&
+                board[c][Constants.BOARD_SIZE - 2] !== ' ') {
+                    var endRow = Constants.BOARD_SIZE - 2;
+                    while (endRow > 0 && board[c][endRow - 1] !== ' ') {
+                        endRow--;
+                    }
+                    let word = { 
+                        startCol: c,
+                        endCol: c,
+                        startRow: Constants.BOARD_SIZE - 1,
+                        endRow: endRow
+                    };  
+                    wordsToCheck.push(word);
+            }   
+        }
+        // scan for horizontal (contiguous) "words"
+        for (let r = 0; r < Constants.BOARD_SIZE; r++) {
+            var inWord = false;
+            var startCol;
+            for (let c = 0; c < Constants.BOARD_SIZE; c++) {
+                if (!inWord && board[c][r] !== ' ') {
+                    inWord = true;
+                    startCol = c;
+                } else if (inWord) {
+                    if (board[c][r] === ' ') {
+                        // the word has ended; mark its end column as (c - 1)
+                        inWord = false;
+                        var word = { 
+                            startCol: startCol,
+                            endCol: c - 1,
+                            startRow: r,
+                            endRow: r
+                        };
+                        wordsToCheck.push(word);
+                    } else if (c == Constants.BOARD_SIZE - 1) {
+                        // the word intersects the board X-boundary
+                        inWord = false;
+                        var word = {
+                            startCol: startCol,
+                            endCol: Constants.BOARD_SIZE - 1, // or, c
+                            startRow: r,
+                            endRow: r
+                       };
+                        wordsToCheck.push(word);
+                    } // else, continue scanning the word
+                }
+            }
+        }
+        return wordsToCheck;
+    }
+
 }
 
 const words = [

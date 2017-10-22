@@ -5,8 +5,9 @@ import { StackNavigator } from 'react-navigation';
 import Constants from '../etc/Constants';
 
 const RECENT_WORDS_VISIBLE = 5;
-const RECENT_WORD_SIZE = 14;
-const RECENT_WORD_SPACING = 1.25;
+const RECENT_WORD_CACHE_SIZE = 14;
+const RECENT_WORD_FONT_SIZE = 14;
+const RECENT_WORD_SPACING = 1.35;
 const PADDING = 3;
 
 var { width, height } = require('Dimensions').get('window');
@@ -15,7 +16,7 @@ class GameStatus extends React.Component {
 	constructor(props) {
 		super(props);
 		recentWords = [];
-		for (let i = 0; i < RECENT_WORD_SIZE; i++) {
+		for (let i = 0; i < RECENT_WORD_CACHE_SIZE; i++) {
 			recentWords.push('');
 		}
 		this.state = {
@@ -54,17 +55,13 @@ class GameStatus extends React.Component {
 	}
 
 	addRecentWord = (word) => {
-		console.debug('top of addRecentWord -- current recentWords:');
-		console.debug(this.state.recentWords);
 		var recentWords = this.state.recentWords.slice();
-		for (let i = RECENT_WORD_SIZE - 1; i >= 0; i--) {
+		for (let i = RECENT_WORD_CACHE_SIZE - 1; i >= 0; i--) {
 			recentWords[i] = recentWords[i - 1];
 		}
 		recentWords[0] = word;
 		var newState = this.state;
 		newState['recentWords'] = recentWords;
-		console.debug('bottom of addRecentWord -- current recentWords:');
-		console.debug(recentWords);
 		this.setState(newState);
 	}
 
@@ -84,7 +81,7 @@ class GameStatus extends React.Component {
 
 	renderRecentWords() {
 		var recentWords = [];
-		for (let i = 0; i < Constants.recentWordsCount; i++) {
+		for (let i = 0; i < Constants.RECENT_WORDS_COUNT; i++) {
 			recentWords.push(
 				<View key={'recentWords' + i}>
 					<Text style={styles.recentWord}>{this.state.recentWords[i]}</Text>
@@ -101,7 +98,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         backgroundColor: '#bbdfef',
         padding: PADDING,
-		borderRadius: Constants.defaultBorderRad,
+		borderRadius: Constants.DEFAULT_BORDER_RAD,
     },
 	score: {
 		color: '#111133',
@@ -112,13 +109,13 @@ const styles = StyleSheet.create({
 		fontSize: 15,
 	},
 	recentWordsContainer: {
-		height: RECENT_WORDS_VISIBLE * RECENT_WORD_SIZE * RECENT_WORD_SPACING,
+		height: RECENT_WORDS_VISIBLE * RECENT_WORD_FONT_SIZE * RECENT_WORD_SPACING,
 		backgroundColor: '#332222',
-		borderRadius: Constants.defaultBorderRad,
+		borderRadius: Constants.DEFAULT_BORDER_RAD,
 	},
 	recentWord: {
 		color: 'white',
-		fontSize: RECENT_WORD_SIZE,
+		fontSize: RECENT_WORD_FONT_SIZE,
 	},	
 });
 

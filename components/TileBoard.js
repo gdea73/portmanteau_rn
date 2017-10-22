@@ -1,8 +1,10 @@
 import React from 'react';
 import {
 	View,
+	ScrollView,
 	Text,
 	StyleSheet,
+	TouchableOpacity,
 	Animated,
 	Easing,
 } from 'react-native';
@@ -12,7 +14,6 @@ import Words from '../etc/Words';
 
 // logical constants
 const {WIDTH, HEIGHT} = require('Dimensions').get('window');
-const BOARD_SIZE = 7;
 const CENTER_COL = 3;
 
 // TODO: remove this testing thing
@@ -48,34 +49,35 @@ class Board extends React.Component {
 		} else {
 			// initialize the board as empty
             cols = [
+              /*  [' ', ' ', ' ', ' ', ' ', ' ', ' '],
                 [' ', ' ', ' ', ' ', ' ', ' ', ' '],
                 [' ', ' ', ' ', ' ', ' ', ' ', ' '],
                 [' ', ' ', ' ', ' ', ' ', ' ', ' '],
                 [' ', ' ', ' ', ' ', ' ', ' ', ' '],
                 [' ', ' ', ' ', ' ', ' ', ' ', ' '],
-                [' ', ' ', ' ', ' ', ' ', ' ', ' '],
-                [' ', ' ', ' ', ' ', ' ', ' ', ' '],
-			  /* [' ', ' ', ' ', ' ', ' ', ' ', ' '],
-			  [' ', ' ', 'S', 'R', 'Q', 'P', 'U'],
+                [' ', ' ', ' ', ' ', ' ', ' ', ' '], */
+			  [' ', ' ', ' ', ' ', ' ', 'T', 'Z'],
+			  [' ', ' ', ' ', ' ', ' ', ' ', 'N'],
 			  [' ', ' ', ' ', ' ', ' ', ' ', 'G'],
 			  [' ', ' ', ' ', ' ', ' ', ' ', ' '],
 			  [' ', ' ', ' ', ' ', ' ', ' ', ' '],
-			  [' ', ' ', ' ', 'C', 'G', 'V', 'M'],
-			  [' ', ' ', ' ', ' ', ' ', ' ', 'P'], */
+			  [' ', ' ', ' ', ' ', ' ', ' ', ' '],
+			  [' ', ' ', ' ', ' ', ' ', ' ', ' '],
             ];
         }
 		this.state = {
 			cols: cols,	
-			dropLetter: Words.getDropLetter(),
+			dropLetter: ' ',
 		}
+		// dropLetter: Words.getDropLetter(),
 		this.firstRender = true;
 		this.chainLevel = 0;
 	}
 
 	render() {
 		if (this.firstRender) {
-			tileSize = (this.props.width - (BOARD_SIZE + 1) * TILE_PADDING)
-					   / BOARD_SIZE;
+			tileSize = (this.props.width - (Constants.BOARD_SIZE + 1) * TILE_PADDING)
+					   / Constants.BOARD_SIZE;
 			tileBorderRad = Math.floor(tileSize / 5);
 			screenDependentStile = {
 				height: tileSize,
@@ -88,6 +90,9 @@ class Board extends React.Component {
 			this.dropTileGravAnim = new Animated.Value(DROP_TILE_MARGIN);
 			this.dropTileAnim = new Animated.Value(this.getColPosX(CENTER_COL));
 		}
+		if (this.isGameOver()) {
+			this.props.gameOver();
+		}
 		console.debug('board at render time:');
 		console.debug(this.state.cols);
 		return (
@@ -96,6 +101,18 @@ class Board extends React.Component {
 				{this.renderDropTile()}
 			</View>
 		);
+	}
+
+	isGameOver() {
+		var over = true;
+		for (let c = 0; c < Constants.BOARD_SIZE; c++) {
+			for (let r = 0; r < Constants.BOARD_SIZE; r++) {
+				if (this.state.cols[c][r] === ' ') {
+					over = false;
+				}
+			}
+		}
+		return over;
 	}
 
 	componentDidUpdate() {
@@ -110,16 +127,16 @@ class Board extends React.Component {
 	}
 
 	resetGravAnims() {
-		for (let c = 0; c < BOARD_SIZE; c++) {
-			for (let r = 0; r < BOARD_SIZE; r++) {
+		for (let c = 0; c < Constants.BOARD_SIZE; c++) {
+			for (let r = 0; r < Constants.BOARD_SIZE; r++) {
 				this.gravAnims[c][r].setValue(this.getTilePosY(r));
 			}
 		}
 	}
 
 	resetBreakAnims() {
-		for (let c = 0; c < BOARD_SIZE; c++) {
-			for (let r = 0; r < BOARD_SIZE; r++) {
+		for (let c = 0; c < Constants.BOARD_SIZE; c++) {
+			for (let r = 0; r < Constants.BOARD_SIZE; r++) {
 				this.breakAnims[c][r].setValue(1);
 			}
 		}
@@ -131,8 +148,8 @@ class Board extends React.Component {
 		// should be dropped due to underlying broken tiles, Board calls
 		// Animated.timing() to perform the gravity animation.
 		var gravAnims = [[], [], [], [], [], [], []];
-		for (let c = 0; c < BOARD_SIZE; c++) {
-			for (let r = 0; r < BOARD_SIZE; r++) {
+		for (let c = 0; c < Constants.BOARD_SIZE; c++) {
+			for (let r = 0; r < Constants.BOARD_SIZE; r++) {
 				gravAnims[c][r] = new Animated.Value(this.getTilePosY(r));
 			}
 		}
@@ -141,8 +158,8 @@ class Board extends React.Component {
 
 	initializeBreakAnims() {
 		var breakAnims = [[], [], [], [], [], [], []];
-		for (let c = 0; c < BOARD_SIZE; c++) {
-			for (let r = 0; r < BOARD_SIZE; r++) {
+		for (let c = 0; c < Constants.BOARD_SIZE; c++) {
+			for (let r = 0; r < Constants.BOARD_SIZE; r++) {
 				// this was for shrinking animation breakAnims[c][r] = new Animated.Value(tileSize);
 				// currently going to fade out instead, "because ... it's easy" -Bob O
 				breakAnims[c][r] = new Animated.Value(1);
@@ -160,15 +177,63 @@ class Board extends React.Component {
 			top: this.dropTileGravAnim,
 			left: this.dropTileAnim,
 		}
+		if (this.state.dropLetter === ' ') {
+			// the drop tile is a blank -- prompt the user to assign it a letter
+			// and then re-render the board with the newly-chosen drop tile.
+			return (
+				<View style={styles.tilePickerOuterView}>
+					<ScrollView
+						contentContainerStyle={[
+						styles.tilePickerInnerView, { height: tileSize + TILE_PADDING }
+					]}
+						horizontal={true}
+
+					>
+						{this.getTilePickerTiles()}
+					</ScrollView>
+				</View>
+			);
+		} else {
 		return(
-			<Tile style={stile}
-				  letter={this.state.dropLetter} />
+			<Tile style={stile} letter={this.state.dropLetter} />
 		);
+		}
+	}
+
+	getTilePickerTiles() {
+		var result = [];
+		for (let i = 0; i < 26; i++) {
+			let letter = String.fromCharCode(65 + i);
+			var stile = {
+				backgroundColor: TILE_COLORS[letter],
+				position: 'relative',
+				flex: 1,
+				height: tileSize,
+				width: tileSize,
+				paddingLeft: 1,
+				paddingRight: 1,
+			}
+			result.push(
+				<TouchableOpacity onPress={() => {
+					  	console.debug('assigning blank to ' + letter);
+					  	this.nextDropLetter = letter;
+						this.nextBoard = this.state.cols.slice();
+						this.setNextBoardState();
+					  }}
+					  key={this.getTileId(Constants.BOARD_SIZE + 1, i)}
+				>
+					<Tile style={stile} letter={letter}
+						  key={this.getTileId(Constants.BOARD_SIZE + 2, i)}
+					/>
+				</TouchableOpacity>
+			);
+		}
+		return result;
 	}
 
 	renderColumns() {
 		var result = [];
-		for (let col = 0; col < BOARD_SIZE; col++) {
+		for (let col = 0; col < Constants.BOARD_SIZE; col++) {
 			// first, render the views to provide each column's background color
             // second, within these views, render the actual tiles
             let key = COL_BG_LAYER + col;
@@ -194,7 +259,7 @@ class Board extends React.Component {
 	renderTiles(col) {
 		var result = [];
 		// console.debug('rendering tiles [' + col + ']:');
-		for (let row = 0; row < BOARD_SIZE; row++) {
+		for (let row = 0; row < Constants.BOARD_SIZE; row++) {
 			if (this.state.cols[col][row] !== ' ') {
 				// the gravity animation, if used, will be triggered by
 				// the Board with the proper ending position.
@@ -216,18 +281,19 @@ class Board extends React.Component {
 	}
 
 	getTileId(col, row) {
-		return BOARD_SIZE * col + row;
+		return Constants.BOARD_SIZE * col + row;
 	}
 
 	handleColClick(col) {
 		console.debug('handling click on col ' + col);
-		// most importantly, don't allow any drops to occur
+		// Most importantly, don't allow any drops to occur
 		// if we're still mid-chain, and words may still be broken.
-		if (this.chainLevel > 0) {
+		// Also, if we haven't assigned a letter to a blank drop tile, bail.
+		if (this.chainLevel > 0 || this.state.dropLetter === ' ') {
 			return;
 		}
 		var lowestEmptyRow = -1;
-		for (let r = 0; r < BOARD_SIZE; r++) {
+		for (let r = 0; r < Constants.BOARD_SIZE; r++) {
 			if (this.state.cols[col][r] === ' ') {
 				lowestEmptyRow = r;
 			}
@@ -272,16 +338,22 @@ class Board extends React.Component {
 			board[this.lastDropCol][this.lastDropRow] = this.state.dropLetter;
 			console.debug('setting dropCol in tempBoard at (' + this.lastDropCol + ', ' + this.lastDropRow + '): ' + this.state.dropLetter);
 		}
-		var wordsToCheck = this.getWordsToCheck(board);
+		var wordsToCheck = Words.getWordsToCheck(board);
 		// we now have the complete array of words to look up in the dictionary.
 		var validWordsFound = false;
 		var breakAnimations = [];
 		console.debug('board words we will check:');
 		console.debug(wordsToCheck);
+		// bring the working 'board' to the class scope, so it can be accessed
+		// by the setNextBoardState() callback upon animation completion.
+		this.nextBoard = [];
+		for (let boardCol = 0; boardCol < Constants.BOARD_SIZE; boardCol++) {
+			this.nextBoard.push(board[boardCol].slice());	
+		}
 		for (let i = 0; i < wordsToCheck.length; i++) {
 			var boardWord = wordsToCheck[i];
+			// it's important that we do not read words from 'nextBoard'
 			var word = Words.readBoardWord(boardWord, board);
-			console.debug('board word read: ' + word);
 			var word_rev = word.split('').reverse().join('');
 			var validWord = undefined;
 			if (Words.isValidWord(word)) {
@@ -299,7 +371,7 @@ class Board extends React.Component {
 				if (boardWord.startCol === boardWord.endCol) {
 					// breaking a vertical word
 					for (let r = boardWord.startRow; r >= boardWord.endRow; r--) {
-						board[boardWord.startCol][r] = ' ';
+						this.nextBoard[boardWord.startCol][r] = ' ';
 						breakAnimations.push(
 							this.getBreakAnimTiming(boardWord.startCol, r)
 						);
@@ -307,7 +379,7 @@ class Board extends React.Component {
 				} else if (boardWord.startRow === boardWord.endRow) {
 					// breaking a horizontal word
 					for (let c = boardWord.startCol; c <= boardWord.endCol; c++) {
-						board[c][boardWord.startRow] = ' ';
+						this.nextBoard[c][boardWord.startRow] = ' ';
 						breakAnimations.push(
 							this.getBreakAnimTiming(c, boardWord.startRow)
 						);
@@ -315,9 +387,6 @@ class Board extends React.Component {
 				}
 			}
 		}
-		// bring the working 'board' to the class scope, so it can be accessed
-		// by the setNextBoardState() callback upon animation completion.
-		this.nextBoard = board.slice();
 		if (!validWordsFound) {
 			// by setting the chain level to zero, we ensure that this callback
 			// will not be re-entered upon the next render() after setState().
@@ -333,10 +402,10 @@ class Board extends React.Component {
 		// Prepare the array of gravity animations based on newly-created
 		// spaces in the board.
 		var gravityAnimations = [];
-		for (let c = 0; c < BOARD_SIZE; c++) {
-			let fallDist = (board[c][BOARD_SIZE - 1] === ' ') ? 1 : 0;
+		for (let c = 0; c < Constants.BOARD_SIZE; c++) {
+			let fallDist = (board[c][Constants.BOARD_SIZE - 1] === ' ') ? 1 : 0;
 			// traverse the column from base to peak
-			for (let r = BOARD_SIZE - 2; r >= 0; r--) {
+			for (let r = Constants.BOARD_SIZE - 2; r >= 0; r--) {
 				// for each blank we find during the ascent, any tile above
 				// the current row will need to fall one more space than the
 				// running counter of underlying spaces.
@@ -404,63 +473,6 @@ class Board extends React.Component {
 		});
 	}
 
-	getWordsToCheck(board) {
-		var wordsToCheck = [];
-		// read the bord for "words," beginning with columns
-		for (let c = 0; c < BOARD_SIZE; c++) {
-			// only scan if there are at least two tiles in the column
-			if (board[c][BOARD_SIZE - 1] !== ' ' &&
-				board[c][BOARD_SIZE - 2] !== ' ') {
-					var endRow = BOARD_SIZE - 2;
-					while (endRow > 0 && board[c][endRow - 1] !== ' ') {
-						endRow--;
-					}
-					// FIXME (possibly) - let or var?
-					let word = {
-						startCol: c,
-						endCol: c,
-						startRow: BOARD_SIZE - 1,
-						endRow: endRow
-					};
-					wordsToCheck.push(word);
-			}
-		}
-		// scan for horizontal (contiguous) "words"
-		for (let r = 0; r < BOARD_SIZE; r++) {
-			var inWord = false;
-			var startCol;
-			for (let c = 0; c < BOARD_SIZE; c++) {
-				if (!inWord && board[c][r] !== ' ') {
-					inWord = true;
-					startCol = c;
-				} else if (inWord) {
-					if (board[c][r] === ' ') {
-						// the word has ended; mark its end column as (c - 1)
-						inWord = false;
-						var word = {
-							startCol: startCol,
-							endCol: c - 1,
-							startRow: r,
-							endRow: r
-						};
-						wordsToCheck.push(word);
-					} else if (c == BOARD_SIZE - 1) {
-						// the word intersects the board X-boundary
-						inWord = false;
-						var word = {
-							startCol: startCol,
-							endCol: BOARD_SIZE - 1, // or, c
-							startRow: r,
-							endRow: r
-						};
-						wordsToCheck.push(word);
-					} // else, continue scanning the word
-				}
-			}
-		}
-		return wordsToCheck;
-	}
-
     getColStyle(columnKey) {
         var bgColor = 'transparent';
         var index = columnKey % 100;
@@ -477,7 +489,7 @@ class Board extends React.Component {
             left: this.getColPosX(index),
             backgroundColor: bgColor,
             width: tileSize,
-            height: tileSize * BOARD_SIZE + TILE_PADDING * (BOARD_SIZE + 2),
+            height: tileSize * Constants.BOARD_SIZE + TILE_PADDING * (Constants.BOARD_SIZE + 2),
             borderRadius: borderR,
             // TODO: test this properly
             overflow: 'scroll',
@@ -495,18 +507,11 @@ class Board extends React.Component {
 }
 
 class Tile extends React.Component {
-	/* constructor(props) {
-		super(props);
-		this.state = {
-			gravAnim: this.props.gravAnim,
-			breakAnim: this.props.breakAnim,	
-		}
-	} */
-
 	render() {
 		return(
 			<Animated.View style={[styles.defaultStile,
-					              screenDependentStile, this.props.style]}>
+					              screenDependentStile, this.props.style]}
+						   onStartShouldSetResponder={this.props.onStartShouldSetResponder}>
 				<Text style={styles.tileText}>{this.props.letter}</Text>
 			</Animated.View>
 		);
@@ -517,16 +522,7 @@ const styles = StyleSheet.create({
     boardContainer: {
         flex: 1,
         backgroundColor: '#bbdfef',
-        borderRadius: Constants.defaultBorderRad,
-    },  
-
-    dropTileContainer: {
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        backgroundColor: '#126424',
-        height: tileSize,
+        borderRadius: Constants.DEFAULT_BORDER_RAD,
     },  
 
 	defaultStile: {
@@ -542,6 +538,19 @@ const styles = StyleSheet.create({
 		backgroundColor: 'transparent',
 		color: 'white',
 	},
+
+	tilePickerOuterView: {
+		position: 'absolute',
+		top: TILE_PADDING,
+		left: TILE_PADDING,
+		right: TILE_PADDING,
+		backgroundColor: 'white',
+		borderRadius: Constants.DEFAULT_BORDER_RAD,
+	},
+
+	tilerPickerInnerView: {
+		flexDirection: 'row',
+	}
 });
 
 const TILE_COLORS = { 
