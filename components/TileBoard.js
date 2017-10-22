@@ -403,13 +403,13 @@ class Board extends React.Component {
 		// spaces in the board.
 		var gravityAnimations = [];
 		for (let c = 0; c < Constants.BOARD_SIZE; c++) {
-			let fallDist = (board[c][Constants.BOARD_SIZE - 1] === ' ') ? 1 : 0;
+			let fallDist = (this.nextBoard[c][Constants.BOARD_SIZE - 1] === ' ') ? 1 : 0;
 			// traverse the column from base to peak
 			for (let r = Constants.BOARD_SIZE - 2; r >= 0; r--) {
 				// for each blank we find during the ascent, any tile above
 				// the current row will need to fall one more space than the
 				// running counter of underlying spaces.
-				if (board[c][r] === ' ') {
+				if (this.nextBoard[c][r] === ' ') {
 					fallDist++;
 				} else if (fallDist > 0) {
 					console.debug('the "' + board[c][r] + '" at c: ' + c + ', r: ' + r + ' will drop by ' + fallDist + ' tiles.');
