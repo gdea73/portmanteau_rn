@@ -82,9 +82,6 @@ class Board extends React.Component {
 			this.dropTileGravAnim = new Animated.Value(DROP_TILE_MARGIN);
 			this.dropTileAnim = new Animated.Value(this.getColPosX(CENTER_COL));
 		}
-		if (this.isGameOver()) {
-			this.props.gameOver();
-		}
 		console.debug('board at render time:');
 		console.debug(this.state.cols);
 		return (
@@ -98,16 +95,38 @@ class Board extends React.Component {
 	isGameOver() {
 		var over = true;
 		for (let c = 0; c < Constants.BOARD_SIZE; c++) {
+		let c = 0;
 			for (let r = 0; r < Constants.BOARD_SIZE; r++) {
 				if (this.state.cols[c][r] === ' ') {
 					over = false;
 				}
 			}
-		}
+		 }
 		return over;
 	}
 
+	renderGameOver() {
+		var stats = this.props.getGameOverStats();
+		return(
+			<View style={{flexDirection: 'column', justifyContent: 'center'}}>
+				<View style={{flex: 1}}>
+					<Text style={styles.gameOverTitleText}>GAME OVER</Text>
+				</View>
+				<View style={{flex: 4}}>
+					<Text style={styles.gameOverScoreText}>{stats.score}</Text>
+					<Text style={styles.gameOverMovesText}>Total Moves: {stats.moves}</Text>
+					<Text style={styles.gameOverLongestWordText}>Longest Word: {stats.longestWord}</Text>
+					<Text style={styles.gameOverLongestChainText}>Longest Chain: {stats.longestChain}</Text>
+				</View>
+			</View>
+		);
+	}
+
 	componentDidUpdate() {
+		if (this.isGameOver()) {
+			this.props.gameOver();
+			return;
+		}
 		this.dropTileGravAnim.setValue(DROP_TILE_MARGIN);
 		this.dropTileAnim.setValue(this.getColPosX(CENTER_COL));
 		this.resetGravAnims();
@@ -357,7 +376,10 @@ class Board extends React.Component {
 				validWordsFound = true;
 				// update GameStatus via callbacks to GameScreen
 				console.debug('validWord: ' + validWord + '; score: ' + Words.getWordScore(validWord, this.chainLevel) + ' (chain level ' + this.chainLevel + ')');
-				this.props.increaseScore(Words.getWordScore(validWord, this.chainLevel));
+				this.props.increaseScore(
+					Words.getWordScore(validWord, this.chainLevel),
+					this.chainLevel
+				);
 				this.props.addRecentWord(validWord, this.chainLevel);
 				// "break" the word; leave empty space in its board position
 				if (boardWord.startCol === boardWord.endCol) {
@@ -542,7 +564,7 @@ const styles = StyleSheet.create({
 
 	tilerPickerInnerView: {
 		flexDirection: 'row',
-	}
+	},
 });
 
 const TILE_COLORS = { 

@@ -22,7 +22,8 @@ class GameStatus extends React.Component {
 		this.state = {
 			score: 0,
 			moves: 0,
-			highestChain: 0,
+			longestChain: 0,
+			longestWord: 0,
 			recentWords: recentWords,
 		};
 		this.increaseScore = this.increaseScore.bind(this);
@@ -41,16 +42,16 @@ class GameStatus extends React.Component {
 
 	increaseScore = (points, chainLevel) => {
 		var newState = this.state;
-		newState['score'] = this.state['score'] + points;
-		if (chainLevel > this.state['highestChain']) {
-			newState['highestChain'] = chainLevel;
+		newState.score = this.state.score + points;
+		if (chainLevel > this.state.longestChain) {
+			newState.longestChain = chainLevel;
 		}
 		this.setState(newState);
 	}
 
 	incrementMoveCount = () => {
 		var newState = this.state;
-		newState['moves'] = this.state['moves'] + 1;
+		newState.moves = this.state.moves + 1;
 		this.setState(newState);
 	}
 
@@ -61,7 +62,10 @@ class GameStatus extends React.Component {
 		}
 		recentWords[0] = word;
 		var newState = this.state;
-		newState['recentWords'] = recentWords;
+		if (word.length > this.state.longestWord) {
+			newState.longestWord = word.length;
+		}
+		newState.recentWords = recentWords;
 		this.setState(newState);
 	}
 

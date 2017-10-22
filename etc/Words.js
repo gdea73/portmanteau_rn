@@ -2,7 +2,7 @@ import Constants from './Constants';
 
 var RNFS = require('react-native-fs');
 
-const CHAR_TABLE_SIZE = 110;
+const CHAR_TABLE_SIZE = 102;
 
 const quantities = { 
     A: 9,
@@ -85,6 +85,7 @@ function initCharTable() {
 			charTable.push(letter);
 		}
 	}
+	console.debug('number of blanks: ' + CHAR_TABLE_SIZE - charTable.length);
 	for (let j = charTable.length; j < CHAR_TABLE_SIZE; j++) {
 		// pad the rest of the char table with BLANKS.
 		charTable.push(' ');
@@ -114,9 +115,9 @@ class Words {
 			charTableLoaded = true;
 		}
 		var index = Math.floor(Math.random() * CHAR_TABLE_SIZE);
-		console.debug('char table index ' + index);
 		return charTable[index];
 	}
+
 	static loadDictionary() {
 		if (!dictLoaded) {
 			console.debug('attempting to load dictionary from bundle...');
@@ -125,7 +126,6 @@ class Words {
 				.then((result) => {
 					console.debug('got dictionary from resources; splitting (slow)...');
 					dictionary = result.split(/\n/g);
-					console.debug('dict[73] === ' + dictionary[73]);
 					dictLoaded = true;
 			});
 		}
@@ -150,6 +150,11 @@ class Words {
 		score *= lengthMultipliers[word.length];
 		// TODO: solicit user feedback on square increase
 		score *= chainLevel * chainLevel;
+		if (word === 'MUFFED') {
+			score *= 73;
+		} else if (word === 'GHIA') {
+			score += 1970;
+		}
 		console.debug('score post-multipliers (chainLevel ' + chainLevel + '): ' + score);
 		return score;
 	}
