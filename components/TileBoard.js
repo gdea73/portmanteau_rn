@@ -95,7 +95,6 @@ class Board extends React.Component {
 	isGameOver() {
 		var over = true;
 		for (let c = 0; c < Constants.BOARD_SIZE; c++) {
-		let c = 0;
 			for (let r = 0; r < Constants.BOARD_SIZE; r++) {
 				if (this.state.cols[c][r] === ' ') {
 					over = false;
