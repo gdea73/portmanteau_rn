@@ -5,3 +5,4 @@ npm-debug.*
 android/.gradle**
 android/app/build/**
 android/build/**
+*.keystore
