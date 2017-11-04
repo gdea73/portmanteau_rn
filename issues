@@ -1,0 +1,22 @@
+- break animation on drop tile itself; either:
+	- create this animation, or
+	- refresh the board so that the drop tile is not 'special' at word-breaking
+	  time.
+- splash screen:
+	- hide process of dictionary / char table / async storage loading
+	- aesthetic
+	- get loading to occur DURING animation; not after
+- gameplay & scoring:
+	- increase minimum word length to 3
+	- switch chain scoring to factorial
+	- switch word length scoring to exponential
+	- extremely rare 'power blank' that can replace an arbitrary tile
+	- prevent drop tile from 'flickering' mid-chain
+	- increase (create) timeout between chain levels
+- persistent storage:
+	- save high scores as JSON string
+	- save current game as JSON string
+- menu screen:
+	- dynamic "New Game" / "Load Game" button based on async storage
+- general appearance:
+	- replace <Button>s with <TouchableOpacity> & borderRadius == height / 2 

@@ -28,11 +28,13 @@ var t = 0;
 const COL_BG_LAYER = 100;
 const COL_TOUCH_LAYER = 200;
 
-// aesthetic constants
+// timing-related constants
 const DROP_TILE_ANIM_X_DURATION = 500;
-// TODO: use Y duration as a step / multiplier per distance dropped
 const DROP_TILE_ANIM_Y_DURATION = 100;
 const TILE_BREAK_ANIM_DURATION = 200;
+const CHAIN_DELAY = 500;
+
+// aesthetic constants
 const DROP_TILE_MARGIN = 2;
 const COL_BORDER_RAD = 2;
 const TILE_PADDING = 3;
@@ -132,8 +134,15 @@ class Board extends React.Component {
 		this.resetBreakAnims();
 		if (this.chainLevel > 0) {
 			// we're mid-chain; must return to the breakWordsCallback
-			this.breakWordsCallback();
+			// (new: after a brief delay to allow the user to process the chain)
+			this.timer = setTimeout(() => {
+					this.breakWordsCallback()
+				}, CHAIN_DELAY);
 		}
+	}
+
+	componentWillUnmount() {
+		clearTimeout(this.timer);
 	}
 
 	resetGravAnims() {
@@ -411,7 +420,7 @@ class Board extends React.Component {
 		}
 		// Beyond this point: words are to be broken, and the break cycle will
 		// continue, so long as there are new words to break post-gravity.
-
+		this.nextDropLetter = this.state.dropLetter;
 		// Prepare the array of gravity animations based on newly-created
 		// spaces in the board.
 		var gravityAnimations = [];

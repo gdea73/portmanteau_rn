@@ -3,6 +3,7 @@ import Constants from './Constants';
 var RNFS = require('react-native-fs');
 
 const CHAR_TABLE_SIZE = 102;
+const MIN_WORD_LENGTH = 3;
 
 const quantities = { 
     A: 9,
@@ -67,11 +68,11 @@ const lengthMultipliers = [
 	0, // shouldn't be calculating score with length 0
 	1, // 								 	  ... or 1, for that matter
 	2,
-	6,
-	24,
-	120,
-	720,
-	5040 // seems absurd, but this is BOARD_SIZE, so this is hard to do.
+	10, // currently MIN_WORD_LENGTH
+	50,
+	250,
+	1250,
+	2500 // seems absurd, but this is BOARD_SIZE, so this is hard to do.
 ];
 
 var dictLoaded = false;
@@ -118,7 +119,7 @@ class Words {
 		return charTable[index];
 	}
 
-	static loadDictionary() {
+	static loadDictionary(callback) {
 		if (!dictLoaded) {
 			console.debug('attempting to load dictionary from bundle...');
 			// get a list of files and directories in the main bundle
@@ -127,6 +128,7 @@ class Words {
 					console.debug('got dictionary from resources; splitting (slow)...');
 					dictionary = result.split(/\n/g);
 					dictLoaded = true;
+					callback();
 			});
 		}
 	}
@@ -136,7 +138,7 @@ class Words {
 		// that process; it'll only happen if the player taps a column within
 		// roughly 1 second of the game first loading.
 		while (!dictLoaded);
-		if (string.length < 2) {
+		if (string.length < MIN_WORD_LENGTH) {
 			return false;
 		}
 		return binSearch(string, 0, dictionary.length);
@@ -148,8 +150,7 @@ class Words {
 			score += pointValues[word.charAt(c)];
 		}
 		score *= lengthMultipliers[word.length];
-		// TODO: solicit user feedback on square increase
-		score *= chainLevel * chainLevel;
+		score *= chainLevel * chainLevel * chainLevel;
 		if (word === 'MUFFED') {
 			score *= 73;
 		} else if (word === 'GHIA') {
