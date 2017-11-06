@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, ScrollView, StyleSheet, Text } from 'react-native';
+import { View, ScrollView, StyleSheet, Text, Button } from 'react-native';
 import { StackNavigator } from 'react-navigation';
 
 import Constants from '../etc/Constants';

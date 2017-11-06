@@ -2,6 +2,7 @@ const RECENT_WORDS_COUNT = 10;
 const DEFAULT_BORDER_RAD = 4;
 const TILE_PADDING = 3;
 const BOARD_SIZE = 7;
+const DEBOUNCE_DELAY = 500;
 
 class Constants {
 	static get RECENT_WORDS_COUNT() {
@@ -15,6 +16,9 @@ class Constants {
 	}
 	static get BOARD_SIZE() {
 		return BOARD_SIZE;
+	}
+	static get DEBOUNCE_DELAY() {
+		return DEBOUNCE_DELAY;
 	}
 }
 

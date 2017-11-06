@@ -13,6 +13,7 @@ import Constants from '../etc/Constants';
 import Words from '../etc/Words';
 
 const LOADING_ANIMATION_DURATION = 800;
+const LOAD_DELAY = 100;
 
 class SplashScreen extends React.Component {
 	static navigationOptions = {
@@ -43,14 +44,6 @@ class SplashScreen extends React.Component {
 			   );
 	}
 	componentDidMount() {
-		Animated.timing(
-			this.state.loadingOpacity, {
-				toValue: 0.8,
-				duration: LOADING_ANIMATION_DURATION,
-			}
-		).start(this.loadStuff.bind(this));
-	}
-	async loadStuff() {
 		Words.loadDictionary(this.dictLoadCallback);
 		this.loadHighScores(this.highScoresLoadCallback);
 	}
@@ -59,24 +52,33 @@ class SplashScreen extends React.Component {
 		callback();
 	}
 	dictLoadCallback() {
+		console.debug('dictionary loaded (in splash screen callback)');
 		this.isDictLoaded = true;
 		this.setLoadedIfDone();
 	}
 	highScoresLoadCallback() {
+		console.debug('high scores loaded (in splash screen callback)');
 		this.areHighScoresLoaded = true;
 		this.setLoadedIfDone();
 	}
 	setLoadedIfDone() {
 		if (this.isDictLoaded && this.areHighScoresLoaded) {
-				this.setState({
-					isAppLoaded: true,
-				});
+			Animated.timing(
+				this.state.loadingOpacity, {
+					toValue: 1.0,
+					duration: LOADING_ANIMATION_DURATION,
+				}
+			).start(() => { this.setState({ isAppLoaded: true, }); });
+				
 			}
 	}
 	componentDidUpdate() {
 		if (this.state.isAppLoaded) {
 			this.props.navigation.navigate('Menu');
 		}
+	}
+	componentWillUnmount() {
+		clearTimeout(this.timer);
 	}
 }
 

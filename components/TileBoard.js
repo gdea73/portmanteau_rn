@@ -89,7 +89,7 @@ class Board extends React.Component {
 		return (
 			<View style={styles.boardContainer}>
 				{this.renderColumns()}
-				{this.renderDropTile()}
+				{this.state.dropLetter == null || this.renderDropTile()}
 			</View>
 		);
 	}
@@ -134,10 +134,14 @@ class Board extends React.Component {
 		this.resetBreakAnims();
 		if (this.chainLevel > 0) {
 			// we're mid-chain; must return to the breakWordsCallback
-			// (new: after a brief delay to allow the user to process the chain)
-			this.timer = setTimeout(() => {
-					this.breakWordsCallback()
-				}, CHAIN_DELAY);
+			if (this.chainLevel > 1) {
+				// (new: after a brief delay to allow the user to process the chain)
+				this.timer = setTimeout(() => {
+						this.breakWordsCallback()
+					}, CHAIN_DELAY);
+			} else {
+				this.breakWordsCallback();
+			}
 		}
 	}
 
@@ -342,7 +346,17 @@ class Board extends React.Component {
 		this.lastDropCol = col;
 		this.lastDropRow = lowestEmptyRow;
 		this.chainLevel = 1;
-		Animated.sequence(animations).start(this.breakWordsCallback.bind(this));
+
+		// The following code was moved from breakWordsCallback in an attempt
+		// to address the issue of the drop tile's missing break animation.
+		var board = this.state.cols.slice();	
+		// we've just dropped a tile into the board, so we need to add the
+		// drop tile to our temporary array of colums while we search.
+		board[this.lastDropCol][this.lastDropRow] = this.state.dropLetter;
+		console.debug('setting dropCol in nextBoard at (' + this.lastDropCol + ', ' + this.lastDropRow + '): ' + this.state.dropLetter);
+		this.nextBoard = board;
+		this.nextDropLetter = null;
+		Animated.sequence(animations).start(this.setNextBoardState.bind(this));
 	}
 
 	breakWordsCallback() {
@@ -351,12 +365,6 @@ class Board extends React.Component {
 		// necessary, and repeats the process (at the next chain level).
 		var board = this.state.cols.slice();
 		console.debug('breakWordsCallback() entered; chainLevel ' + this.chainLevel);
-		if (this.chainLevel === 1) {
-			// we've just dropped a tile into the board, so we need to add the
-			// drop tile to our temporary array of colums while we search.
-			board[this.lastDropCol][this.lastDropRow] = this.state.dropLetter;
-			console.debug('setting dropCol in tempBoard at (' + this.lastDropCol + ', ' + this.lastDropRow + '): ' + this.state.dropLetter);
-		}
 		var wordsToCheck = Words.getWordsToCheck(board);
 		// we now have the complete array of words to look up in the dictionary.
 		var validWordsFound = false;

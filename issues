@@ -16,7 +16,10 @@
 - persistent storage:
 	- save high scores as JSON string
 	- save current game as JSON string
+	- lifecycle hooks - save on backgrounding of app
 - menu screen:
 	- dynamic "New Game" / "Load Game" button based on async storage
 - general appearance:
 	- replace <Button>s with <TouchableOpacity> & borderRadius == height / 2 
+- navigation:
+	- debounce buttons "cleanly" as per comment in Facebook group

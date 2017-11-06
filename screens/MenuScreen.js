@@ -3,11 +3,16 @@ import { StyleSheet, Alert, Button, Text, View } from 'react-native';
 import { StackNavigator } from 'react-navigation';
 
 import Words from '../etc/Words';
+import Constants from '../etc/Constants';
 
 class MenuScreen extends React.Component {
 	static navigationOptions = {
 		title: 'PortmanteaU',
 	};
+	endDebounce() {
+		console.debug('debouncing done');
+		this.debounceActive = false;
+	}
 	render() {
 		return (
 				<View style={styles.container}>
@@ -17,9 +22,16 @@ class MenuScreen extends React.Component {
 					<View style={styles.buttonView}>
 						<Button
 						onPress={() => {
-							// Alert.alert('You did the right thing.')
-							Words.loadDictionary();
-							this.props.navigation.navigate('Game');
+							navDebounce('Game');
+							if (!this.debounceActive) {
+								this.debounceActive = true;
+								this.debounceTimer = setTimeout(
+									this.endDebounce.bind(this),
+									Constants.DEBOUNCE_DELAY
+								);
+								console.debug('started debounce timer');
+								this.props.navigation.navigate('Game');
+							}
 						}}
 						title="Play"
 						/>
@@ -34,6 +46,9 @@ class MenuScreen extends React.Component {
 					</View>
 				</View>
 			   );
+	}
+	componentWillUnmount() {
+		clearTimeout(this.debounceTimer);
 	}
 }
 

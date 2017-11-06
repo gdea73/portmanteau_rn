@@ -151,6 +151,7 @@ class Words {
 		}
 		score *= lengthMultipliers[word.length];
 		score *= chainLevel * chainLevel * chainLevel;
+		// easter eggs
 		if (word === 'MUFFED') {
 			score *= 73;
 		} else if (word === 'GHIA') {
