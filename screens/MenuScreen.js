@@ -3,6 +3,7 @@ import { StyleSheet, Alert, Button, Text, View } from 'react-native';
 import { StackNavigator } from 'react-navigation';
 
 import Words from '../etc/Words';
+import NavButton from '../components/NavButton';
 import Constants from '../etc/Constants';
 
 class MenuScreen extends React.Component {
@@ -20,20 +21,11 @@ class MenuScreen extends React.Component {
 						<Text style={styles.heading}>PORTMANTEAU</Text>
 					</View>
 					<View style={styles.buttonView}>
-						<Button
-						onPress={() => {
-							navDebounce('Game');
-							if (!this.debounceActive) {
-								this.debounceActive = true;
-								this.debounceTimer = setTimeout(
-									this.endDebounce.bind(this),
-									Constants.DEBOUNCE_DELAY
-								);
-								console.debug('started debounce timer');
+						<NavButton
+							title="Play"
+							onPress={() => {
 								this.props.navigation.navigate('Game');
-							}
-						}}
-						title="Play"
+							}}
 						/>
 						<Button
 						onPress={() => { Alert.alert('Try to make words out of tiles, and don\'t let the board fill up!')}}
@@ -46,9 +38,6 @@ class MenuScreen extends React.Component {
 					</View>
 				</View>
 			   );
-	}
-	componentWillUnmount() {
-		clearTimeout(this.debounceTimer);
 	}
 }
 
@@ -69,7 +58,7 @@ const styles = StyleSheet.create({
 	buttonView: {
 		flex: 3,
 		// alignItems: 'center',
-		backgroundColor: '#deeede',
+		backgroundColor: '#222255',
 		paddingLeft: 40,
 		paddingRight: 40,
 		paddingTop: 10,
