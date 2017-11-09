@@ -9,6 +9,7 @@ import {
 import Constants from '../etc/Constants';
 
 const DEBOUNCE_DELAY = 500;
+const NAV_BTN_HEIGHT = 50;
 
 class NavButton extends React.Component {
 	constructor(props) {
@@ -17,9 +18,6 @@ class NavButton extends React.Component {
 	}
 
 	render() {
-	// TODO: dynamic styles: border radius 1/2 height; font size appropriate
-	// try allowFontScaling={true}
-		console.debug('button height: ' + this.props.height);
 		return(
 			<TouchableOpacity
 				onPress={() => {
@@ -34,12 +32,7 @@ class NavButton extends React.Component {
 					);
 				}}
 			>
-				<View
-					style={[
-						styles.button,
-						{borderRadius: 2}
-					]}
-				>
+				<View style={styles.button}>
 					<Text style={styles.buttonText}>{this.props.title}</Text>
 				</View>
 			</TouchableOpacity>
@@ -56,10 +49,15 @@ const styles = StyleSheet.create({
 		borderColor: 'white',
 		borderWidth: 2,
 		backgroundColor: 'transparent',
+		height: NAV_BTN_HEIGHT,
+		borderRadius: NAV_BTN_HEIGHT / 2,
+		justifyContent: 'center',
 	},
 	buttonText: {
 		color: 'white',
 		justifyContent: 'center',
+		fontSize: 24,
+		textAlign: 'center',
 	},
 });
 

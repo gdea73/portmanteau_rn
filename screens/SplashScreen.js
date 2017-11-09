@@ -5,15 +5,20 @@ import {
 	View,
 	AsyncStorage,
 	Animated,
-	Image
+	Image,
+	Dimensions
 } from 'react-native';
 import { StackNavigator } from 'react-navigation';
 
 import Constants from '../etc/Constants';
 import Words from '../etc/Words';
+import TitleText from '../components/TitleText';
 
 const LOADING_ANIMATION_DURATION = 800;
 const LOAD_DELAY = 100;
+const TITLE_TEXT_PADDING = 50;
+
+let {width, height} = Dimensions.get('window');
 
 class SplashScreen extends React.Component {
 	static navigationOptions = {
@@ -31,8 +36,20 @@ class SplashScreen extends React.Component {
 	render() {
 		return (
 				<View style={styles.container}>
-					<Image source={require('../img/PMT_Splash.png')}
+					<Image source={require('../img/gradient_bg.png')}
 						   style={styles.bgImage} />
+					<View
+						style={{
+							height: height - Constants.STATUS_BAR_HEIGHT
+								- Constants.TITLE_TEXT_PADDING,
+							position: 'absolute',
+							top: 0, left: 0,
+							aspectRatio: Constants.TITLE_IMAGE_ASPECT,
+						}}
+					>
+						<Image source={require('../img/title_text.png')}
+							   style={styles.titleImage} />
+					</View>
 					<View style={styles.loading}>
 						<Animated.Text style={[
 							styles.loadingText,
@@ -91,7 +108,13 @@ const styles = StyleSheet.create({
 		flex: 1,
 		width: null,
 		height: null,
-		resizeMode: 'contain',
+		resizeMode: 'cover',
+	},
+	titleImage: {
+		flex: 1,
+		height: null,
+		width: null,
+		justifyContent: 'center',
 	},
 	loading: {
 		position: 'absolute',

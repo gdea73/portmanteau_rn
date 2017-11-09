@@ -18,7 +18,6 @@ import Constants from '../etc/Constants';
 const PADDING = 10;
 var { width, height } = require('Dimensions').get('window');
 const { StatusBarManager } = NativeModules;
-const STATUS_BAR_HEIGHT = Platform.OS === 'ios' ? 20 : StatusBarManager.HEIGHT;
 // this was 7/8 but I left room for padding in a janky way
 const BOARD_ASPECT_RATIO = 7/8.05;
 
@@ -124,7 +123,7 @@ const styles = StyleSheet.create({
 		flexDirection: 'column',
 		backgroundColor: '#cccccc',
 		justifyContent: 'space-between',
-		paddingTop: PADDING + STATUS_BAR_HEIGHT,
+		paddingTop: PADDING + Constants.STATUS_BAR_HEIGHT,
 		paddingLeft: PADDING,
 		paddingRight: PADDING,
 		paddingBottom: PADDING,

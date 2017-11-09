@@ -16,9 +16,6 @@ import Words from '../etc/Words';
 const {WIDTH, HEIGHT} = require('Dimensions').get('window');
 const CENTER_COL = 3;
 
-// TODO: remove this testing thing
-var t = 0;
-
 /* dumb constants from when I thought "unique ID" meant "unique numeric ID."
   
    layer constants are summed with column numbers

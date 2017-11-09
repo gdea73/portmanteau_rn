@@ -21,5 +21,8 @@
     "react-native": "^0.48.4",
     "react-native-fs": "^2.8.1",
     "react-navigation": "^1.0.0-beta.19"
+  },
+  "rnpm": {
+	"assets": ["./fonts"]
   }
 }
