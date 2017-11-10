@@ -8,6 +8,7 @@ import {
 	Text,
 	NativeModules,
 	AsyncStorage,
+	Image
 } from 'react-native';
 import { StackNavigator } from 'react-navigation';
 
@@ -82,17 +83,21 @@ class GameScreen extends React.Component {
 			);
 		}
 		return(
-			<View style={styles.container}>
-				<GameStatus onRef={ref => (this.gameStatus = ref) } />
-				<View style={styles.boardView}>
-					<Board width={Math.floor(width - 2 * PADDING)}
-						   increaseScore={this.increaseScore.bind(this)}
-						   incrementMoveCount={this.incrementMoveCount.bind(this)}
-						   addRecentWord={this.addRecentWord.bind(this)}
-						   gameOver={this.gameOver.bind(this)}
-						   initialCols={this.props.initialCols}
-						   initialDropTile={this.props.initialDropTile}
-					/>
+			<View style={{flex: 1}}>
+				<Image style={Constants.BG_IMAGE_STYLE}
+					   source={require('../img/gradient_bg.png')} />
+				<View style={styles.container}>
+					<GameStatus onRef={ref => (this.gameStatus = ref) } />
+					<View style={styles.boardView}>
+						<Board width={Math.floor(width - 2 * PADDING)}
+							   increaseScore={this.increaseScore.bind(this)}
+							   incrementMoveCount={this.incrementMoveCount.bind(this)}
+							   addRecentWord={this.addRecentWord.bind(this)}
+							   gameOver={this.gameOver.bind(this)}
+							   initialCols={this.props.initialCols}
+							   initialDropTile={this.props.initialDropTile}
+						/>
+					</View>
 				</View>
 			</View>
 		);
@@ -119,9 +124,10 @@ class GameScreen extends React.Component {
 
 const styles = StyleSheet.create({
 	container: {
-		flex: 1,
+		position: 'absolute',
+		top: 0, left: 0, right: 0, bottom: 0,
 		flexDirection: 'column',
-		backgroundColor: '#cccccc',
+		backgroundColor: 'transparent',
 		justifyContent: 'space-between',
 		paddingTop: PADDING + Constants.STATUS_BAR_HEIGHT,
 		paddingLeft: PADDING,

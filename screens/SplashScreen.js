@@ -37,18 +37,10 @@ class SplashScreen extends React.Component {
 		return (
 				<View style={styles.container}>
 					<Image source={require('../img/gradient_bg.png')}
-						   style={styles.bgImage} />
-					<View
-						style={{
-							height: height - Constants.STATUS_BAR_HEIGHT
-								- Constants.TITLE_TEXT_PADDING,
-							position: 'absolute',
-							top: 0, left: 0,
-							aspectRatio: Constants.TITLE_IMAGE_ASPECT,
-						}}
-					>
+						   style={Constants.BG_IMAGE_STYLE} />
+					<View style={Constants.LOGO_CONTAINER_STYLE(height)}>
 						<Image source={require('../img/title_text.png')}
-							   style={styles.titleImage} />
+							   style={Constants.LOGO_IMAGE_STYLE} />
 					</View>
 					<View style={styles.loading}>
 						<Animated.Text style={[
@@ -103,18 +95,6 @@ const styles = StyleSheet.create({
 	container: {
 		flex: 1,
 		backgroundColor: 'black',
-	},
-	bgImage: {
-		flex: 1,
-		width: null,
-		height: null,
-		resizeMode: 'cover',
-	},
-	titleImage: {
-		flex: 1,
-		height: null,
-		width: null,
-		justifyContent: 'center',
 	},
 	loading: {
 		position: 'absolute',

@@ -14,6 +14,8 @@ import Words from '../etc/Words';
 import NavButton from '../components/NavButton';
 import Constants from '../etc/Constants';
 
+const BUTTON_VIEW_PADDING = 30;
+
 let {width, height} = Dimensions.get('window');
 
 class MenuScreen extends React.Component {
@@ -25,21 +27,21 @@ class MenuScreen extends React.Component {
 		this.debounceActive = false;
 	}
 	render() {
+		var logoHeight = height - Constants.STATUS_BAR_HEIGHT
+								- Constants.TITLE_TEXT_PADDING;
 		return (
 				<View style={styles.container}>
-					<View
-						style={{
-							height: height - Constants.STATUS_BAR_HEIGHT
-								- Constants.TITLE_TEXT_PADDING,
-							position: 'absolute',
-							top: 0, left: 0,
-							aspectRatio: Constants.TITLE_IMAGE_ASPECT,
-						}}
-					>
+					<Image source={require('../img/gradient_bg.png')}
+						   style={Constants.BG_IMAGE_STYLE} />
+					<View style={Constants.LOGO_CONTAINER_STYLE(height)}>
 						<Image source={require('../img/title_text.png')}
-							   style={styles.titleImage} />
+							   style={Constants.LOGO_IMAGE_STYLE} />
 					</View>
-					<View style={styles.buttonView}>
+					<View style={[styles.buttonView, {
+								width: width - (logoHeight * Constants.TITLE_IMAGE_ASPECT),
+								height: logoHeight,
+						  }
+						  ]}>
 						<NavButton
 							title="Play"
 							onPress={() => {
@@ -65,32 +67,17 @@ const styles = StyleSheet.create({
 		flex: 1,
 		backgroundColor: 'black',
 	},
-	bgImage: {
-		flex: 1,
-		width: null,
-		height: null,
-		resizeMode: 'cover',
-	},
-	titleImage: {
-		flex: 1,
-		height: null,
-		width: null,
-		justifyContent: 'center',
-	},
 	logoView: {
 		flex: 1,
 		alignItems: 'center',
 		justifyContent: 'space-around',
 	},
 	buttonView: {
-		flex: 3,
-		// alignItems: 'center',
-		backgroundColor: '#222255',
-		paddingLeft: 40,
-		paddingRight: 40,
-		paddingTop: 10,
-		paddingBottom: 10,
+		position: 'absolute',
+		top: 0, right: 0,
+		backgroundColor: 'transparent',
 		justifyContent: 'space-between',
+		padding: BUTTON_VIEW_PADDING,
 	},
 	heading: {
 		color: '#111133',

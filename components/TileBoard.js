@@ -59,7 +59,7 @@ class Board extends React.Component {
         }
 		this.state = {
 			cols: cols,	
-			dropLetter: Words.getDropLetter(),
+			dropLetter: ' ',
 		}
 		this.firstRender = true;
 		this.chainLevel = 0;
@@ -230,8 +230,7 @@ class Board extends React.Component {
 				flex: 1,
 				height: tileSize,
 				width: tileSize,
-				paddingLeft: 1,
-				paddingRight: 1,
+				marginRight: TILE_PADDING / 2,
 			}
 			result.push(
 				<TouchableOpacity onPress={() => {
@@ -568,14 +567,13 @@ const styles = StyleSheet.create({
 
 	tilePickerOuterView: {
 		position: 'absolute',
-		top: TILE_PADDING,
+		top: TILE_PADDING / 2,
 		left: TILE_PADDING,
 		right: TILE_PADDING,
-		backgroundColor: 'white',
-		borderRadius: Constants.DEFAULT_BORDER_RAD,
+		backgroundColor: 'transparent',
 	},
 
-	tilerPickerInnerView: {
+	tilePickerInnerView: {
 		flexDirection: 'row',
 	},
 });

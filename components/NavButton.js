@@ -14,6 +14,11 @@ const NAV_BTN_HEIGHT = 50;
 class NavButton extends React.Component {
 	constructor(props) {
 		super(props);
+		if (!props.height) {
+			this.height = NAV_BTN_HEIGHT;
+		} else {
+			this.height = props.height;
+		}
 		this.state = { enabled: true };
 	}
 
@@ -32,7 +37,10 @@ class NavButton extends React.Component {
 					);
 				}}
 			>
-				<View style={styles.button}>
+				<View style={[styles.button, {
+								height: this.height,
+								borderRadius: this.height / 2,
+							}]}>
 					<Text style={styles.buttonText}>{this.props.title}</Text>
 				</View>
 			</TouchableOpacity>
@@ -49,8 +57,6 @@ const styles = StyleSheet.create({
 		borderColor: 'white',
 		borderWidth: 2,
 		backgroundColor: 'transparent',
-		height: NAV_BTN_HEIGHT,
-		borderRadius: NAV_BTN_HEIGHT / 2,
 		justifyContent: 'center',
 	},
 	buttonText: {
