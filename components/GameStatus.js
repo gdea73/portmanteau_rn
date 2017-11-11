@@ -6,7 +6,7 @@ import Constants from '../etc/Constants';
 
 const RECENT_WORDS_VISIBLE = 5;
 const RECENT_WORD_CACHE_SIZE = 14;
-const RECENT_WORD_FONT_SIZE = 14;
+const RECENT_WORD_FONT_SIZE = 18;
 const RECENT_WORD_SPACING = 1.35;
 const PADDING = 3;
 
@@ -100,17 +100,19 @@ const styles = StyleSheet.create({
     statusView: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        backgroundColor: '#bbdfef',
+        backgroundColor: '#bbdfef77',
         padding: PADDING,
 		borderRadius: Constants.DEFAULT_BORDER_RAD,
     },
 	score: {
-		color: '#111133',
+		color: 'white',
 		fontSize: 30,
+		fontFamily: 'League Spartan',
 	},
 	moves: {
-		color: '#111133',
+		color: 'white',
 		fontSize: 15,
+		fontFamily: 'League Spartan',
 	},
 	recentWordsContainer: {
 		height: RECENT_WORDS_VISIBLE * RECENT_WORD_FONT_SIZE * RECENT_WORD_SPACING,
@@ -120,6 +122,7 @@ const styles = StyleSheet.create({
 	recentWord: {
 		color: 'white',
 		fontSize: RECENT_WORD_FONT_SIZE,
+		fontFamily: 'League Spartan',
 	},	
 });
 

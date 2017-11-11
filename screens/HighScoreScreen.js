@@ -1,8 +1,9 @@
 import React from 'react';
-import { StyleSheet, Alert, Button, Text, View } from 'react-native';
+import { StyleSheet, Alert, Button, Text, View, Image } from 'react-native';
 import { StackNavigator } from 'react-navigation';
 
 import Constants from '../etc/Constants';
+import NavButton from '../components/NavButton';
 
 class HighScoreScreen extends React.Component {
 	static navigationOptions = {
@@ -11,10 +12,15 @@ class HighScoreScreen extends React.Component {
 	render() {
 		return (
 				<View style={styles.container}>
-						<Button
-						onPress={() => {this.props.navigation.goBack(null)}}
-						title="Go Back"
+					<Image source={require('../img/gradient_bg.png')}
+						   style={Constants.BG_IMAGE_STYLE}
+					/>
+					<View style={styles.scoresContainer}>
+						<NavButton
+							onPress={() => {this.props.navigation.goBack(null)}}
+							title="Go Back"
 						/>
+					</View>
 				</View>
 			   );
 	}
@@ -23,9 +29,11 @@ class HighScoreScreen extends React.Component {
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		flexDirection: 'column',
-		backgroundColor: '#efffef',
-		padding: 10,
+		backgroundColor: 'black',
+	},
+	scoresContainer: {
+		position: 'absolute',
+		top: 0, left: 0, right: 0, bottom: 0,
 	},
 });
 

@@ -41,7 +41,7 @@
 		9D0A2584681745A883D4B77C /* Fanwood Text Italic.otf in Resources */ = {isa = PBXBuildFile; fileRef = 3D6C6062B2AE44E2A1FDDBC1 /* Fanwood Text Italic.otf */; };
 		DEB70CB9D7514092AE34721F /* Fanwood Text.otf in Resources */ = {isa = PBXBuildFile; fileRef = 1F3AA205A06A4202B9D09BB9 /* Fanwood Text.otf */; };
 		D82BD5A86B2F4E1B98C22E21 /* Fanwood.otf in Resources */ = {isa = PBXBuildFile; fileRef = BD9E6299CB8A49DA80A77971 /* Fanwood.otf */; };
-		7030E682B5B44CD9B9E0C99B /* LeagueSpartan-Bold.otf in Resources */ = {isa = PBXBuildFile; fileRef = 509CA89FE8C34B4DBF410E70 /* LeagueSpartan-Bold.otf */; };
+		BA2770DBB87A49F79FD24319 /* League Spartan-Bold.otf in Resources */ = {isa = PBXBuildFile; fileRef = 1BE2354BC75C417682DDD50E /* League Spartan-Bold.otf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -275,7 +275,7 @@
 		3D6C6062B2AE44E2A1FDDBC1 /* Fanwood Text Italic.otf */ = {isa = PBXFileReference; name = "Fanwood Text Italic.otf"; path = "../fonts/Fanwood Text Italic.otf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 		1F3AA205A06A4202B9D09BB9 /* Fanwood Text.otf */ = {isa = PBXFileReference; name = "Fanwood Text.otf"; path = "../fonts/Fanwood Text.otf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 		BD9E6299CB8A49DA80A77971 /* Fanwood.otf */ = {isa = PBXFileReference; name = "Fanwood.otf"; path = "../fonts/Fanwood.otf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
-		509CA89FE8C34B4DBF410E70 /* LeagueSpartan-Bold.otf */ = {isa = PBXFileReference; name = "LeagueSpartan-Bold.otf"; path = "../fonts/LeagueSpartan-Bold.otf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		1BE2354BC75C417682DDD50E /* League Spartan-Bold.otf */ = {isa = PBXFileReference; name = "League Spartan-Bold.otf"; path = "../fonts/League Spartan-Bold.otf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -527,7 +527,7 @@
 				3D6C6062B2AE44E2A1FDDBC1 /* Fanwood Text Italic.otf */,
 				1F3AA205A06A4202B9D09BB9 /* Fanwood Text.otf */,
 				BD9E6299CB8A49DA80A77971 /* Fanwood.otf */,
-				509CA89FE8C34B4DBF410E70 /* LeagueSpartan-Bold.otf */,
+				1BE2354BC75C417682DDD50E /* League Spartan-Bold.otf */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -906,7 +906,7 @@
 				9D0A2584681745A883D4B77C /* Fanwood Text Italic.otf in Resources */,
 				DEB70CB9D7514092AE34721F /* Fanwood Text.otf in Resources */,
 				D82BD5A86B2F4E1B98C22E21 /* Fanwood.otf in Resources */,
-				7030E682B5B44CD9B9E0C99B /* LeagueSpartan-Bold.otf in Resources */,
+				BA2770DBB87A49F79FD24319 /* League Spartan-Bold.otf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

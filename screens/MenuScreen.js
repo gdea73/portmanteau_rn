@@ -14,7 +14,7 @@ import Words from '../etc/Words';
 import NavButton from '../components/NavButton';
 import Constants from '../etc/Constants';
 
-const BUTTON_VIEW_PADDING = 30;
+const BUTTON_VIEW_PADDING = 40;
 
 let {width, height} = Dimensions.get('window');
 
@@ -43,20 +43,22 @@ class MenuScreen extends React.Component {
 						  }
 						  ]}>
 						<NavButton
-							title="Play"
+								title="NEW GAME"
+								onPress={() => {
+									this.props.navigation.navigate('Game');
+								}}
+						/>
+						<NavButton
 							onPress={() => {
-								this.props.navigation.navigate('Game');
+								this.props.navigation.navigate('Instructions');
 							}}
+							title="INSTRUCTIONS"
 						/>
 						<NavButton
-						onPress={() => {
-							this.props.navigation.navigate('Instructions');
-						}}
-						title="How to Play"
-						/>
-						<NavButton
-						onPress={() => { Alert.alert('You are the world champion. (Until I implement a global scoreboard somehow.)')}}
-						title="High Scores"
+							onPress={() => {
+								this.props.navigation.navigate('HighScores');
+							}}
+							title="HIGH SCORES"
 						/>
 					</View>
 				</View>
@@ -78,7 +80,7 @@ const styles = StyleSheet.create({
 		position: 'absolute',
 		top: 0, right: 0,
 		backgroundColor: 'transparent',
-		justifyContent: 'space-between',
+		justifyContent: 'space-around',
 		padding: BUTTON_VIEW_PADDING,
 	},
 	heading: {

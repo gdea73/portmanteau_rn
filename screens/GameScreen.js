@@ -80,7 +80,7 @@ class GameScreen extends React.Component {
 			);
 		}
 		return(
-			<View style={{flex: 1}}>
+			<View style={{flex: 1, backgroundColor: 'black'}}>
 				<Image style={Constants.BG_IMAGE_STYLE}
 					   source={require('../img/gradient_bg.png')} />
 				<View style={styles.container}>

@@ -12,7 +12,6 @@ import { StackNavigator } from 'react-navigation';
 
 import Constants from '../etc/Constants';
 import Words from '../etc/Words';
-import TitleText from '../components/TitleText';
 
 const LOADING_ANIMATION_DURATION = 800;
 const LOAD_DELAY = 100;
@@ -31,7 +30,6 @@ class SplashScreen extends React.Component {
 			loadingOpacity: new Animated.Value(0.0),
 		};
 		this.dictLoadCallback = this.dictLoadCallback.bind(this);
-		this.highScoresLoadCallback = this.highScoresLoadCallback.bind(this);
 	}
 	render() {
 		return (
@@ -54,24 +52,14 @@ class SplashScreen extends React.Component {
 	}
 	componentDidMount() {
 		Words.loadDictionary(this.dictLoadCallback);
-		this.loadHighScores(this.highScoresLoadCallback);
-	}
-	async loadHighScores(callback) {
-		// TODO: load high scores here (promise from AsyncStorage)
-		callback();
 	}
 	dictLoadCallback() {
 		console.debug('dictionary loaded (in splash screen callback)');
 		this.isDictLoaded = true;
 		this.setLoadedIfDone();
 	}
-	highScoresLoadCallback() {
-		console.debug('high scores loaded (in splash screen callback)');
-		this.areHighScoresLoaded = true;
-		this.setLoadedIfDone();
-	}
 	setLoadedIfDone() {
-		if (this.isDictLoaded && this.areHighScoresLoaded) {
+		if (this.isDictLoaded) {
 			Animated.timing(
 				this.state.loadingOpacity, {
 					toValue: 1.0,

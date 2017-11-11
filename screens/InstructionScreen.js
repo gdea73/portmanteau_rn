@@ -34,7 +34,9 @@ var pages = [
 		],
 		text: 'The goal of Portmanteau is to drop tiles into the board in '
 			+ 'order to form words. Words are broken when they are formed, and '
-			+ 'longer words yield much greater scores. Any adjacent tiles '
+			+ 'longer words yield more points. The game ends when the board '
+			+ 'becomes full. '
+			+ 'Any adjacent tiles '
 			+ '(vertically or horizontally) are read as a "word". By tapping '
 			+ 'the right column, you can complete the word below, and it will '
 			+ 'break. Notice, however, that the word "CAR" remains, because of '
@@ -146,7 +148,7 @@ class InstructionScreen extends React.Component {
 						/>
 					</View>
 					<ScrollView
-						contentContainerStyle={{padding: PADDING}}
+						contentContainerStyle={{padding: PADDING / 2}}
 						style={{flex: 1}}
 					>
 						<Text style={styles.instructionText}>
@@ -179,6 +181,7 @@ class InstructionScreen extends React.Component {
 styles = StyleSheet.create({
 	container: {
 		flex: 1,
+		backgroundColor: 'black',
 	},
 	boardView: {
 		position: 'absolute',

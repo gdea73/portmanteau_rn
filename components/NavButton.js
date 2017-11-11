@@ -35,7 +35,7 @@ class NavButton extends React.Component {
 			buttonStyle.push(this.props.buttonStyle);
 		}
 		if (!this.state.enabled) {
-			buttonStyle.push({opacity: 0.5});
+			buttonStyle.push({opacity: 0.2});
 		}
 		var textStyle = [];
 		textStyle.push(styles.buttonText);
@@ -79,10 +79,9 @@ const styles = StyleSheet.create({
 	buttonText: {
 		color: 'white',
 		justifyContent: 'center',
-		fontSize: 24,
+		fontSize: 18,
 		textAlign: 'center',
-		fontFamily: 'League Spartan',
-		fontWeight: 'bold',
+		fontFamily: 'League Spartan-Bold',
 	},
 });
 
