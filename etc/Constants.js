@@ -10,6 +10,7 @@ const BOARD_SIZE = 7;
 const STATUS_BAR_HEIGHT = Platform.OS === 'ios' ? 20 : StatusBarManager.HEIGHT;
 const TITLE_IMAGE_ASPECT = 0.1040;
 const TITLE_TEXT_PADDING = 20;
+const BOARD_ASPECT_RATIO = 7/8.05; // slightly over 7/8 for padding
 var BG_IMAGE_STYLE = {
 	flex: 1,
 	width: null,
@@ -46,6 +47,9 @@ class Constants {
 	}
 	static get BG_IMAGE_STYLE() {
 		return BG_IMAGE_STYLE;
+	}
+	static get BOARD_ASPECT_RATIO() {
+		return BOARD_ASPECT_RATIO;
 	}
 	static get LOGO_IMAGE_STYLE() {
 		return LOGO_IMAGE_STYLE;

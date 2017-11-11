@@ -57,9 +57,10 @@ class Board extends React.Component {
                 [' ', ' ', ' ', ' ', ' ', ' ', ' '],
             ];
         }
+		var dropLetter = this.props.initialDropLetter || Words.getDropLetter();
 		this.state = {
 			cols: cols,	
-			dropLetter: ' ',
+			dropLetter: dropLetter,
 		}
 		this.firstRender = true;
 		this.chainLevel = 0;
@@ -547,7 +548,7 @@ class Tile extends React.Component {
 const styles = StyleSheet.create({
     boardContainer: {
         flex: 1,
-        backgroundColor: '#bbdfef',
+        backgroundColor: '#bbdfef77',
         borderRadius: Constants.DEFAULT_BORDER_RAD,
     },  
 

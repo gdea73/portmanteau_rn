@@ -19,10 +19,26 @@ class NavButton extends React.Component {
 		} else {
 			this.height = props.height;
 		}
-		this.state = { enabled: true };
+		if (props.disabled) {
+			this.state = { enabled: false };
+		} else {
+			this.state = { enabled: true };
+		}
 	}
 
 	render() {
+		var buttonStyle = [styles.button, {
+								height: this.height,
+								borderRadius: this.height / 2,
+						  }];
+		if (this.props.buttonStyle) {
+			buttonStyle.push(this.props.buttonStyle);
+		}
+		var textStyle = [];
+		textStyle.push(styles.buttonText);
+		if (this.props.textStyle) {
+			textStyle.push(this.props.textStyle);
+		}
 		return(
 			<TouchableOpacity
 				onPress={() => {
@@ -37,18 +53,15 @@ class NavButton extends React.Component {
 					);
 				}}
 			>
-				<View style={[styles.button, {
-								height: this.height,
-								borderRadius: this.height / 2,
-							}]}>
-					<Text style={styles.buttonText}>{this.props.title}</Text>
+				<View style={buttonStyle}>
+					<Text style={textStyle}>{this.props.title}</Text>
 				</View>
 			</TouchableOpacity>
 		);
 	}
 
 	componentWillUnmount() {
-		clearTimeout(this.debounceTimer);
+		clearTimeout(this.timer);
 	}
 }
 
@@ -58,12 +71,15 @@ const styles = StyleSheet.create({
 		borderWidth: 2,
 		backgroundColor: 'transparent',
 		justifyContent: 'center',
+		padding: 4,
 	},
 	buttonText: {
 		color: 'white',
 		justifyContent: 'center',
 		fontSize: 24,
 		textAlign: 'center',
+		fontFamily: 'League Spartan',
+		fontWeight: 'bold',
 	},
 });
 

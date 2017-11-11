@@ -19,13 +19,10 @@ import Constants from '../etc/Constants';
 const PADDING = 10;
 var { width, height } = require('Dimensions').get('window');
 const { StatusBarManager } = NativeModules;
-// this was 7/8 but I left room for padding in a janky way
-const BOARD_ASPECT_RATIO = 7/8.05;
 
 class GameScreen extends React.Component {
 	static navigationOptions = {
-		title: 'Game',
-		headerMode: 'none',
+		header: null,
 	};
 
 	constructor(props) {
@@ -49,7 +46,7 @@ class GameScreen extends React.Component {
 		if (game !== null) {
 			console.debug('Loaded a game in progress from AsyncStorage.');
 			this.props.initialCols = lastGame.cols;
-			this.props.initialDropTile = lastGame.initialDropTile;
+			this.props.initialDropLetter = lastGame.initialDropLetter;
 		}
 	}
 	
@@ -95,7 +92,7 @@ class GameScreen extends React.Component {
 							   addRecentWord={this.addRecentWord.bind(this)}
 							   gameOver={this.gameOver.bind(this)}
 							   initialCols={this.props.initialCols}
-							   initialDropTile={this.props.initialDropTile}
+							   initialDropLetter={this.props.initialDropLetter}
 						/>
 					</View>
 				</View>
@@ -135,7 +132,7 @@ const styles = StyleSheet.create({
 		paddingBottom: PADDING,
 	},
 	boardView: {
-		aspectRatio: BOARD_ASPECT_RATIO,
+		aspectRatio: Constants.BOARD_ASPECT_RATIO,
 		justifyContent: 'space-between',
 	},
 	viewDefault: {

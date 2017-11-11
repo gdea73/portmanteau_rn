@@ -22,7 +22,7 @@ let {width, height} = Dimensions.get('window');
 
 class SplashScreen extends React.Component {
 	static navigationOptions = {
-		title: 'Portmanteau (Loading...)',
+		header: null,
 	};
 	constructor(props) {
 		super(props);

@@ -20,7 +20,7 @@ let {width, height} = Dimensions.get('window');
 
 class MenuScreen extends React.Component {
 	static navigationOptions = {
-		title: 'PortmanteaU',
+		header: null,
 	};
 	endDebounce() {
 		console.debug('debouncing done');
@@ -49,7 +49,9 @@ class MenuScreen extends React.Component {
 							}}
 						/>
 						<NavButton
-						onPress={() => { Alert.alert('Try to make words out of tiles, and don\'t let the board fill up!')}}
+						onPress={() => {
+							this.props.navigation.navigate('Instructions');
+						}}
 						title="How to Play"
 						/>
 						<NavButton
