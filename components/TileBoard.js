@@ -29,7 +29,7 @@ const COL_TOUCH_LAYER = 200;
 const DROP_TILE_ANIM_X_DURATION = 500;
 const DROP_TILE_ANIM_Y_DURATION = 100;
 const TILE_BREAK_ANIM_DURATION = 200;
-const CHAIN_DELAY = 500;
+const CHAIN_DELAY = 700;
 
 // aesthetic constants
 const DROP_TILE_MARGIN = 2;

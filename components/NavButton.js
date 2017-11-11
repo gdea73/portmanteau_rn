@@ -34,6 +34,9 @@ class NavButton extends React.Component {
 		if (this.props.buttonStyle) {
 			buttonStyle.push(this.props.buttonStyle);
 		}
+		if (!this.state.enabled) {
+			buttonStyle.push({opacity: 0.5});
+		}
 		var textStyle = [];
 		textStyle.push(styles.buttonText);
 		if (this.props.textStyle) {

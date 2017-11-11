@@ -17,7 +17,7 @@ const PADDING = 10;
 const MARGIN = 5;
 const BTN_HEIGHT = 40;
 const PAGE_DELAY = 2000;
-const N_PAGES = 2;
+const N_PAGES = 3;
 
 var { width, height } = require('Dimensions').get('window');
 var pages = [
@@ -54,6 +54,23 @@ var pages = [
 			+ 'letter to drop into the board. You can scroll horizontally to '
 			+ 'find the desired letter, and then select it; then, it becomes '
 			+ 'the new drop letter.',
+	}, {
+		dropLetter: 'T',
+		cols: [
+			[' ', ' ', ' ', ' ', ' ', 'R', 'A'],
+			[' ', ' ', ' ', ' ', 'E', 'I', 'Z'],
+			[' ', ' ', ' ', ' ', 'A', 'K', 'A'],
+			[' ', ' ', ' ', ' ', ' ', ' ', 'P'],
+			[' ', ' ', ' ', ' ', ' ', ' ', ' '],
+			[' ', ' ', ' ', ' ', ' ', ' ', ' '],
+			[' ', ' ', ' ', ' ', ' ', ' ', ' '],
+		],
+		text: 'If you drop the "T" in the far left column, you can break '
+			+ 'two words simultaneously. In addition, you can chain your '
+			+ 'words, although this is difficult to plan. In this case, '
+			+ '"ZAP" will break at chain level 2, since its isolation is a '
+			+ 'direct consequence of "ART" breaking. More chains yield more '
+			+ 'points. If you get a chain of 4 or greater, gimme a ring.',
 	},
 ];
 var page_text = [
