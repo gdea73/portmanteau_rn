@@ -104,23 +104,6 @@ class Board extends React.Component {
 		return over;
 	}
 
-	renderGameOver() {
-		var stats = this.props.getGameOverStats();
-		return(
-			<View style={{flexDirection: 'column', justifyContent: 'center'}}>
-				<View style={{flex: 1}}>
-					<Text style={styles.gameOverTitleText}>GAME OVER</Text>
-				</View>
-				<View style={{flex: 4}}>
-					<Text style={styles.gameOverScoreText}>{stats.score}</Text>
-					<Text style={styles.gameOverMovesText}>Total Moves: {stats.moves}</Text>
-					<Text style={styles.gameOverLongestWordText}>Longest Word: {stats.longestWord}</Text>
-					<Text style={styles.gameOverLongestChainText}>Longest Chain: {stats.longestChain}</Text>
-				</View>
-			</View>
-		);
-	}
-
 	componentDidUpdate() {
 		if (this.isGameOver()) {
 			this.props.gameOver();
