@@ -6,12 +6,15 @@ import {
 	AsyncStorage,
 	Animated,
 	Image,
-	Dimensions
+	Dimensions,
+	BackHandler,
+	Platform
 } from 'react-native';
 import { StackNavigator } from 'react-navigation';
 
 import Constants from '../etc/Constants';
 import Words from '../etc/Words';
+import Root from '../config/router';
 
 const LOADING_ANIMATION_DURATION = 800;
 const LOAD_DELAY = 100;
@@ -30,8 +33,26 @@ class SplashScreen extends React.Component {
 			loadingOpacity: new Animated.Value(0.0),
 		};
 		this.dictLoadCallback = this.dictLoadCallback.bind(this);
+
+		// added for BackHandler
+		// adapted from
+		// https://github.com/react-community/react-navigation/issues/1819
+		this.backButtonListener = null;
+		this.currentRoute = 'Menu';
+		this.lastBackButtonPress = null;
 	}
 	render() {
+		if (this.state.isAppLoaded) {
+			console.debug('app loaded (exiting splash)');
+			return (
+				<Root 
+					onNavigationStateChange={(prev, current, action) => {
+						this.currentRoute = current.routes[current.index]
+											.routeName;
+						console.debug('set new route ' + this.currentRoute);
+					}} />
+			);
+		}
 		return (
 				<View style={styles.container}>
 					<Image source={require('../img/gradient_bg.png')}
@@ -52,6 +73,16 @@ class SplashScreen extends React.Component {
 	}
 	componentDidMount() {
 		Words.loadDictionary(this.dictLoadCallback);
+
+		if (Platform.OS === 'android') {
+			this.backButtonListener = BackHandler.addEventListener(
+				'hardwareBackPress', () => {
+					console.debug('back button pressed; route name: ' + this.currentRoute);
+					if (this.currentRoute !== 'Menu') {
+						return false;
+					}
+				});
+		}
 	}
 	dictLoadCallback() {
 		console.debug('dictionary loaded (in splash screen callback)');
@@ -66,12 +97,6 @@ class SplashScreen extends React.Component {
 					duration: LOADING_ANIMATION_DURATION,
 				}
 			).start(() => { this.setState({ isAppLoaded: true, }); });
-				
-			}
-	}
-	componentDidUpdate() {
-		if (this.state.isAppLoaded) {
-			this.props.navigation.navigate('Menu');
 		}
 	}
 	componentWillUnmount() {

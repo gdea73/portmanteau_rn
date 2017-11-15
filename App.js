@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
-import Root from './config/router';
+import SplashScreen from './screens/SplashScreen';
 
 class App extends Component {
 	render() {
-		return <Root />;
+		return <SplashScreen />;
 	}
 }
 

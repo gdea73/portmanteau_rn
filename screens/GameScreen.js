@@ -8,7 +8,8 @@ import {
 	Text,
 	NativeModules,
 	AsyncStorage,
-	Image
+	Image,
+	BackHandler
 } from 'react-native';
 import { StackNavigator } from 'react-navigation';
 
@@ -21,33 +22,47 @@ var { width, height } = require('Dimensions').get('window');
 const { StatusBarManager } = NativeModules;
 
 class GameScreen extends React.Component {
-	static navigationOptions = {
+	/* static navigationOptions = {
 		header: null,
-	};
+	}; */
 
 	constructor(props) {
 		super(props);
 		this.state = {
 			gameOver: false,
 		}
+	   this.increaseScore=this.increaseScore.bind(this);
+	   this.incrementMoveCount=this.incrementMoveCount.bind(this);
+	   this.addRecentWord=this.addRecentWord.bind(this);
+	   this.gameOver=this.gameOver.bind(this);
+	   this.autoSaveGame=this.autoSaveGame.bind(this);
+
 	}
 
 	componentDidMount() {
-		/* TODO: mess with persistent game storage
-		try {
-			AsyncStorage.getItem('@Portmanteau:lastGame')
-				.then(this.tryLoadGame(value));
-		} catch (error) {
-			console.info('error attempting to load game: ' + error);
-		} */
+		BackHandler.addEventListener('hardwareBackPress', this.onBackButtonPress);
 	}
 
-	tryLoadGame(game) {
-		if (game !== null) {
-			console.debug('Loaded a game in progress from AsyncStorage.');
-			this.props.initialCols = lastGame.cols;
-			this.props.initialDropLetter = lastGame.initialDropLetter;
-		}
+	componentWillUnmount() {
+		BackHandler.removeEventListener('hardwareBackPress', this.onBackButtonPress);
+	}
+
+	onBackButtonPress = () => {
+		console.debug('back button pressed in gamescreen; returning false;');
+		return true;
+	}
+
+	autoSaveGame() {
+		// This function is to be called periodically by the Board, and will
+		// save the current board state (including drop tile), and game status
+		// to AsyncStorage.
+	}
+
+	displayQuitModal() {
+		// this should be called on the press of the 'Back' button,
+		// and should render a modal asking the user whether they want
+		// to save or discard the game in progress. However, if the game has
+		// already ended, this should do nothing.
 	}
 	
 	render() {
@@ -87,10 +102,10 @@ class GameScreen extends React.Component {
 					<GameStatus onRef={ref => (this.gameStatus = ref) } />
 					<View style={styles.boardView}>
 						<Board width={Math.floor(width - 2 * PADDING)}
-							   increaseScore={this.increaseScore.bind(this)}
-							   incrementMoveCount={this.incrementMoveCount.bind(this)}
-							   addRecentWord={this.addRecentWord.bind(this)}
-							   gameOver={this.gameOver.bind(this)}
+							   increaseScore={this.increaseScore}
+							   incrementMoveCount={this.incrementMoveCount}
+							   addRecentWord={this.addRecentWord}
+							   gameOver={this.gameOver}
 							   initialCols={this.props.initialCols}
 							   initialDropLetter={this.props.initialDropLetter}
 						/>
