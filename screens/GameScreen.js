@@ -7,7 +7,6 @@ import {
 	StyleSheet,
 	Text,
 	NativeModules,
-	AsyncStorage,
 	Image,
 	BackHandler
 } from 'react-native';
@@ -15,32 +14,114 @@ import { StackNavigator } from 'react-navigation';
 
 import Board from '../components/TileBoard';
 import GameStatus from '../components/GameStatus';
+import NavButton from '../components/NavButton';
 import Constants from '../etc/Constants';
+import Storage from '../etc/Storage';
 
 const PADDING = 10;
 var { width, height } = require('Dimensions').get('window');
 const { StatusBarManager } = NativeModules;
 
 class GameScreen extends React.Component {
-	/* static navigationOptions = {
+	static navigationOptions = {
 		header: null,
-	}; */
+	};
 
 	constructor(props) {
 		super(props);
 		this.state = {
 			gameOver: false,
+			showQuitModal: false,
 		}
-	   this.increaseScore=this.increaseScore.bind(this);
-	   this.incrementMoveCount=this.incrementMoveCount.bind(this);
-	   this.addRecentWord=this.addRecentWord.bind(this);
-	   this.gameOver=this.gameOver.bind(this);
-	   this.autoSaveGame=this.autoSaveGame.bind(this);
-
+		this.increaseScore = this.increaseScore.bind(this);
+		this.incrementMoveCount = this.incrementMoveCount.bind(this);
+		this.addRecentWord = this.addRecentWord.bind(this);
+		this.gameOver = this.gameOver.bind(this);
+		this.saveGame = this.saveGame.bind(this);
+		this.getStats = this.getStats.bind(this);
+		this.renderQuitModal = this.renderQuitModal.bind(this);
+		this.renderGameOver = this.renderGameOver.bind(this);
+		this.removeSavedGame = this.removeSavedGame.bind(this);
+		this.saveHighScore = this.saveHighScore.bind(this);
+		if (this.props.navigation.state.params
+			&& this.props.navigation.state.params.gameData) {
+			console.debug('GameScreen was passed saved game data');
+			var gameData = this.props.navigation.state.params.gameData;
+			this.initialCols = gameData.cols;
+			this.initialDropLetter = gameData.dropLetter;
+			// load saved game stats for the GameStatus component
+			this.initialStats = gameData.gameStats;
+		}
 	}
 
 	componentDidMount() {
 		BackHandler.addEventListener('hardwareBackPress', this.onBackButtonPress);
+	}
+
+	componentWillUpdate() {
+		// clear any saved-game data if the game is over
+		if (this.state.gameOver) {
+			this.removeSavedGame();
+		}
+	}
+
+	removeSavedGame() {
+		Storage.removeSavedGame().then(() => {
+			console.debug('removed saved game');
+		}).catch(() => {
+			console.debug('failed to remove saved game (maybe there was none)');	
+		});
+	}
+
+	saveHighScore(score) {
+		var d = new Date();
+		var date = '';
+		date += (d.getMonth() + 1) + '/' + d.getDay() + '/' + d.getYear();
+		var newScore = {
+			score: score,
+			date: date
+		};
+		Storage.loadHighScores().then((scores) => {
+            console.debug('loaded high scores (pre-save)');
+            if (score > scores[0].score) {
+                // worth adding to the list
+				var status = 'high';
+				if (score > scores[Constants.N_HIGH_SCORES - 1]) {
+					status = 'best';
+				}
+                scores[0] = newScore;
+                scores.sort();
+                console.debug('setting high scores: ');
+                console.debug(scores);
+                Storage.saveHighScores(scores).then(() => {
+					console.debug('successfully saved high scores');
+					return status;
+				}).catch((error) => {
+					console.debug('failed to save high scores: ' + error);
+					return error;
+				});
+            } else {
+				return 'low';
+			}
+        }).catch(() => {
+            // most likely, no high scores have yet to be saved;
+            // create a new array of size N_HIGH_SCORES
+            var scores = []; 
+            for (var i = 0; i < Constants.N_HIGH_SCORES - 1; i++) {
+                scores[i] = {
+					score: 0,
+					date: null
+				};
+            }   
+            scores[Constants.N_HIGH_SCORES - 1] = newScore;
+            Storage.saveHighScores(scores).then(() => {
+				console.debug('successfully saved high scores');
+				return 'best';
+			}).catch((error) => {
+				console.debug('failed to save high scores: ' + error);
+				return error;
+			});
+        }); 
 	}
 
 	componentWillUnmount() {
@@ -48,69 +129,157 @@ class GameScreen extends React.Component {
 	}
 
 	onBackButtonPress = () => {
-		console.debug('back button pressed in gamescreen; returning false;');
+		console.debug('back button handler called in GameScreen');
+		if (this.state.showQuitModal) {
+			console.debug('\tcancelling quit modal');
+			// dismiss (cancel) the quit modal if currently being shown)
+			var state = this.state;
+			state.showQuitModal = false;
+			this.setState(state);
+		} else if (this.state.gameOver) {
+			console.debug('\tgame is over, going back');
+			// If the game is over, a back button press must immediately quit,
+			// but also must remove any saved game data.
+			this.removeSavedGame();
+			this.props.navigation.goBack(null);
+		} else {
+			// the game is in progress; show quit modal for confirmation
+			console.debug('\tshowing quit modal');
+			var state = this.state;
+			state.showQuitModal = true;
+			this.setState(state);
+		}
 		return true;
 	}
 
-	autoSaveGame() {
+	saveGame(callback) {
 		// This function is to be called periodically by the Board, and will
 		// save the current board state (including drop tile), and game status
 		// to AsyncStorage.
+		var stats = this.getStats();
+		var dropLetter = this.boardRef.state.dropLetter;
+		var cols = this.boardRef.state.cols;
+		return Storage.saveGame(stats, dropLetter, cols).then(callback);
 	}
 
-	displayQuitModal() {
-		// this should be called on the press of the 'Back' button,
-		// and should render a modal asking the user whether they want
-		// to save or discard the game in progress. However, if the game has
-		// already ended, this should do nothing.
+	// this should be called on the press of the 'Back' button,
+	// and should render a modal asking the user whether they want
+	// to save or discard the game in progress. However, if the game has
+	// already ended, this should do nothing.
+	renderQuitModal() {
+		return (
+			<View style={styles.quitModalContainer}>
+				<View style={styles.quitModal}>
+					<NavButton
+						buttonStyle={styles.modalButton}
+						textStyle={styles.modalButtonText}
+						onPress={() => {
+							this.saveGame(() => {
+								console.debug('game saved successfully');
+								this.props.navigation.goBack(null);
+								// execute the MenuScreen callback; otherwise,
+								// the game can only be resumed after a restart.
+								this.props.navigation
+									.state.params.onSaveCallback();
+							});
+						}}
+						title="Save & Quit"
+					/>
+					<NavButton
+						buttonStyle={styles.modalButton}
+						textStyle={styles.modalButtonText}
+						onPress={() => {
+							console.debug('discarding game');
+							this.removeSavedGame();
+							this.props.navigation.goBack(null);
+							this.props.navigation
+								.state.params.onSaveCallback();
+						}}
+						title="Discard & Quit"
+					/>
+					<NavButton
+						buttonStyle={styles.modalButton}
+						textStyle={styles.modalButtonText}
+						onPress={() => {
+							var state = this.state;
+							state.showQuitModal = false;
+							this.setState(state);
+						}}
+						title="Return to Game"
+					/>
+				</View>
+			</View>
+		);
+	}
+
+	getStats() {
+		return  {
+			score: this.gameStatus.state.score,
+			moves: this.gameStatus.state.moves,
+			longestChain: this.gameStatus.state.longestChain,
+			longestWord: this.gameStatus.state.longestWord,
+			recentWords: this.gameStatus.state.recentWords,
+		};
+	}
+
+	renderGameOver() {
+		var stats = this.getStats();
+		var scoreStatus = this.saveHighScore(stats.score);
+		var scoreStatusText = '';
+		if (scoreStatus === 'best') {
+			scoreStatusText = 'NEW HIGH SCORE';
+		} else if (scoreStatus === 'high') {
+			scoreStatusText = 'IN THE TOP 10';
+		}
+		return(
+			<View style={styles.gameOverContainer}>
+				<View style={{flex: 1}}>
+					<Text style={styles.gameOverText}>GAME OVER</Text>
+					<Text style={styles.gameOverText}>{scoreStatusText}</Text>
+				</View>
+				<View style={{flex: 4, justifyContent: 'space-around'}}>
+					<Text style={styles.gameOverScoreText}>{stats.score}</Text>
+					<Text style={styles.gameOverLongestWordText}>Longest Word: {stats.longestWord} letters</Text>
+					<Text style={styles.gameOverLongestChainText}>Longest Chain: {stats.longestChain} words</Text>
+					<Text style={styles.gameOverMovesText}>Total Moves: {stats.moves}</Text>
+					<Button
+						onPress={() => {
+							this.removeSavedGame();
+							this.props.navigation.goBack(null);
+						}}
+						title="Go Back"
+					/>
+				</View>
+			</View>
+		);
 	}
 	
 	render() {
-		// console.debug('board width in boardview: ' + (width - 2 * PADDING));
 		if (this.state.gameOver) {
-			var stats = {
-				score: this.gameStatus.state.score,
-				moves: this.gameStatus.state.moves,
-				longestChain: this.gameStatus.state.longestChain,
-				longestWord: this.gameStatus.state.longestWord,
-			};
-			return(
-				<View style={styles.gameOverContainer}>
-					<View style={{flex: 1}}>
-						<Text style={styles.gameOverTitleText}>GAME OVER</Text>
-					</View>
-					<View style={{flex: 4, justifyContent: 'space-around'}}>
-						<Text style={styles.gameOverScoreText}>{stats.score}</Text>
-						<Text style={styles.gameOverLongestWordText}>Longest Word: {stats.longestWord}</Text>
-						<Text style={styles.gameOverLongestChainText}>Longest Chain: {stats.longestChain}</Text>
-						<Text style={styles.gameOverMovesText}>Total Moves: {stats.moves}</Text>
-						<Button
-							onPress={() => {
-								this.props.navigation.goBack(null);
-							}}
-							title="Go Back"
-						/>
-					</View>
-				</View>
-			);
+			return this.renderGameOver();
 		}
 		return(
 			<View style={{flex: 1, backgroundColor: 'black'}}>
 				<Image style={Constants.BG_IMAGE_STYLE}
 					   source={require('../img/gradient_bg.png')} />
 				<View style={styles.container}>
-					<GameStatus onRef={ref => (this.gameStatus = ref) } />
+					<GameStatus
+						onRef={ref => (this.gameStatus = ref) }
+						initialStats={this.initialStats}
+					/>
 					<View style={styles.boardView}>
 						<Board width={Math.floor(width - 2 * PADDING)}
 							   increaseScore={this.increaseScore}
 							   incrementMoveCount={this.incrementMoveCount}
 							   addRecentWord={this.addRecentWord}
 							   gameOver={this.gameOver}
-							   initialCols={this.props.initialCols}
-							   initialDropLetter={this.props.initialDropLetter}
+							   initialCols={this.initialCols}
+							   initialDropLetter={this.initialDropLetter}
+							   onRef={ref => (this.boardRef = ref) }
 						/>
 					</View>
 				</View>
+				{this.state.showQuitModal && this.renderQuitModal()}
 			</View>
 		);
 	}
@@ -150,21 +319,15 @@ const styles = StyleSheet.create({
 		aspectRatio: Constants.BOARD_ASPECT_RATIO,
 		justifyContent: 'space-between',
 	},
-	viewDefault: {
-		borderRadius: Constants.defaultBorderRad,
-	},
 	gameOverContainer: {
         position: 'absolute',
 		padding: 40,
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
+        top: 0, left: 0, right: 0, bottom: 0,
         backgroundColor: '#123',
 		flexDirection: 'column',
 		justifyContent: 'center',
     },  
-    gameOverTitleText: {
+    gameOverText: {
         fontSize: 42, 
 		textAlign: 'center',
         color: 'white',
@@ -188,7 +351,25 @@ const styles = StyleSheet.create({
         fontSize: 16, 
 		textAlign: 'center',
         color: 'white',
-    },  
+    }, 
+	quitModalContainer: {
+		position: 'absolute',
+		top: 0, left: 0, right: 0, bottom: 0,
+		justifyContent: 'center',
+		alignItems: 'center',
+	},
+	quitModal: {
+		backgroundColor: 'white',
+		borderRadius: Constants.DEFAULT_BORDER_RAD,
+		padding: 20,
+	},
+	modalButton: {
+		borderColor: 'black',
+		margin: 10,
+	},
+	modalButtonText: {
+		color: 'black',
+	},
 });
 
 export default GameScreen;

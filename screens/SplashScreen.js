@@ -41,16 +41,20 @@ class SplashScreen extends React.Component {
 		this.currentRoute = 'Menu';
 		this.lastBackButtonPress = null;
 	}
+	/* onNavigationStateChange={(prev, current, action) => {
+		let prevRouteName = prev.routes[prev.index].routeName;
+		let routeName = current.routes[current.index].routeName;
+		console.debug('navigation state change from ' + prevRouteName + ' to ' + routeName);
+		if (prevRouteName === 'Game' && routeName === 'Menu') {
+			console.debug('loading saved game from AsyncStorage');
+		}
+	}} */
 	render() {
 		if (this.state.isAppLoaded) {
 			console.debug('app loaded (exiting splash)');
 			return (
-				<Root 
-					onNavigationStateChange={(prev, current, action) => {
-						this.currentRoute = current.routes[current.index]
-											.routeName;
-						console.debug('set new route ' + this.currentRoute);
-					}} />
+				<Root
+				/>
 			);
 		}
 		return (
@@ -73,16 +77,6 @@ class SplashScreen extends React.Component {
 	}
 	componentDidMount() {
 		Words.loadDictionary(this.dictLoadCallback);
-
-		if (Platform.OS === 'android') {
-			this.backButtonListener = BackHandler.addEventListener(
-				'hardwareBackPress', () => {
-					console.debug('back button pressed; route name: ' + this.currentRoute);
-					if (this.currentRoute !== 'Menu') {
-						return false;
-					}
-				});
-		}
 	}
 	dictLoadCallback() {
 		console.debug('dictionary loaded (in splash screen callback)');

@@ -13,6 +13,7 @@ import { StackNavigator } from 'react-navigation';
 import Words from '../etc/Words';
 import NavButton from '../components/NavButton';
 import Constants from '../etc/Constants';
+import Storage from '../etc/Storage';
 
 const BUTTON_VIEW_PADDING = 40;
 
@@ -22,10 +23,83 @@ class MenuScreen extends React.Component {
 	static navigationOptions = {
 		header: null,
 	};
-	endDebounce() {
-		console.debug('debouncing done');
-		this.debounceActive = false;
+
+	constructor(props) {
+		super(props);
+		this.state = {
+			savedGamePresent: false,
+			savedGameData: null,
+		};
+		this.loadSavedGame = this.loadSavedGame.bind(this);
+		this.renderGameButton = this.renderGameButton.bind(this);
 	}
+
+	componentWillMount() {
+		this.loadSavedGame();
+		/* Storage.loadScores().then(() => {
+			console.debug('initial menu mount: loaded saved scores');
+		}).catch(() => {
+			console.debug('initial menu mount: could not load saved scores');
+		}); */
+	}
+
+	loadSavedGame() {
+		console.debug('menu is trying to load saved game');
+		Storage.loadGame().then((game) => {
+			if (!game) {
+				var state = this.state;
+				state.savedGamePresent = false;
+				state.savedGameData = null;
+				this.setState(state);
+				return;
+			}
+			console.debug('menu loaded saved game');
+			var state = {
+				savedGamePresent: true,
+				savedGameData: JSON.parse(game),
+			};
+			this.setState(state);
+
+
+		}).catch(() => {
+			console.debug('menu could not load saved game');
+			var state = this.state;
+			state.savedGamePresent = false;
+			state.savedGameData = null;
+			this.setState(state);
+		});
+	}
+
+	renderGameButton() {
+		if (this.state.savedGamePresent) {
+			return (
+				<NavButton
+					title="RESUME GAME"
+					onPress={() => {
+						this.props.navigation.navigate(
+							'Game', {
+								gameData: this.state.savedGameData,
+								onSaveCallback: this.loadSavedGame,
+							},
+						);
+					}}
+				/>
+			);
+		} else {
+			return (
+				<NavButton
+					title="NEW GAME"
+					onPress={() => {
+						this.props.navigation.navigate(
+							'Game',
+							{ onSaveCallback: this.loadSavedGame },
+						);
+					}}
+				/>
+			);
+		}
+	}
+
 	render() {
 		var logoHeight = height - Constants.STATUS_BAR_HEIGHT
 								- Constants.TITLE_TEXT_PADDING;
@@ -42,12 +116,7 @@ class MenuScreen extends React.Component {
 								height: logoHeight,
 						  }
 						  ]}>
-						<NavButton
-								title="NEW GAME"
-								onPress={() => {
-									this.props.navigation.navigate('Game');
-								}}
-						/>
+						{this.renderGameButton()}
 						<NavButton
 							onPress={() => {
 								this.props.navigation.navigate('Instructions');

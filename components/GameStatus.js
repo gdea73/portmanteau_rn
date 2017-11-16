@@ -19,13 +19,19 @@ class GameStatus extends React.Component {
 		for (let i = 0; i < RECENT_WORD_CACHE_SIZE; i++) {
 			recentWords.push('');
 		}
-		this.state = {
-			score: 0,
-			moves: 0,
-			longestChain: 0,
-			longestWord: 0,
-			recentWords: recentWords,
-		};
+		if (props.initialStats) {
+			this.state = props.initialStats;
+			console.debug('GameStatus received these initial stats:');
+			console.debug(props.initialStats);
+		} else {
+			this.state = {
+				score: 0,
+				moves: 0,
+				longestChain: 0,
+				longestWord: 0,
+				recentWords: recentWords,
+			};
+		}
 		this.increaseScore = this.increaseScore.bind(this);
 		this.incrementMoveCount = this.incrementMoveCount.bind(this);
 		this.addRecentWord = this.addRecentWord.bind(this);

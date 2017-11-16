@@ -26,7 +26,7 @@ const COL_BG_LAYER = 100;
 const COL_TOUCH_LAYER = 200;
 
 // timing-related constants
-const DROP_TILE_ANIM_X_DURATION = 500;
+const DROP_TILE_ANIM_X_DURATION = 200;
 const DROP_TILE_ANIM_Y_DURATION = 100;
 const TILE_BREAK_ANIM_DURATION = 200;
 const CHAIN_DELAY = 700;
@@ -94,14 +94,21 @@ class Board extends React.Component {
 
 	isGameOver() {
 		var over = true;
-		for (let c = 0; c < Constants.BOARD_SIZE; c++) {
+		// FIXME: testing
+		for (let c = 0; c < 1 /* Constants.BOARD_SIZE */; c++) {
 			for (let r = 0; r < Constants.BOARD_SIZE; r++) {
 				if (this.state.cols[c][r] === ' ') {
 					over = false;
 				}
 			}
-		 }
+		}
 		return over;
+	}
+
+	componentDidMount() {
+		if (this.props.onRef) {
+			this.props.onRef(this);
+		}
 	}
 
 	componentDidUpdate() {
@@ -128,6 +135,9 @@ class Board extends React.Component {
 
 	componentWillUnmount() {
 		clearTimeout(this.timer);
+		if (this.props.onRef) {
+			this.props.onRef(undefined);
+		}
 	}
 
 	resetGravAnims() {

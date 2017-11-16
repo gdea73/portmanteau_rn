@@ -40,7 +40,11 @@ var pages = [
 			+ '(vertically or horizontally) are read as a "word". By tapping '
 			+ 'the right column, you can complete the word below, and it will '
 			+ 'break. Notice, however, that the word "CAR" remains, because of '
-			+ 'the "V" immediately next to it.',
+			+ 'the "V" immediately next to it.\n'
+			+ 'Some additional rules:\n'
+			+ '· Words can be oriented in any way (left to right, top to'
+			+ ' bottom, &c.).\n'
+			+ '· Only words of 3 or more letters will be broken.',
 	}, {
 		dropLetter: ' ',
 		cols: [
@@ -60,8 +64,8 @@ var pages = [
 		dropLetter: 'T',
 		cols: [
 			[' ', ' ', ' ', ' ', ' ', 'R', 'A'],
-			[' ', ' ', ' ', ' ', 'E', 'I', 'Z'],
-			[' ', ' ', ' ', ' ', 'A', 'K', 'A'],
+			[' ', ' ', ' ', ' ', 'E', 'Q', 'Z'],
+			[' ', ' ', ' ', ' ', 'A', 'X', 'A'],
 			[' ', ' ', ' ', ' ', ' ', ' ', 'P'],
 			[' ', ' ', ' ', ' ', ' ', ' ', ' '],
 			[' ', ' ', ' ', ' ', ' ', ' ', ' '],
@@ -139,6 +143,9 @@ class InstructionScreen extends React.Component {
 							height={BTN_HEIGHT}
 							textStyle={{fontSize: 12}}
 						/>
+						<Text style={styles.titleText}>
+							Instructions (page {this.page + 1} of {N_PAGES})
+						</Text>
 						<NavButton
 							onPress={() => { this.setPage(this.page + 1); }}
 							title="Continue"
@@ -212,6 +219,11 @@ styles = StyleSheet.create({
 		flex: 0, height: BTN_HEIGHT,
 		flexDirection: 'row',
 		justifyContent: 'space-between',
+	},
+	titleText: {
+		fontSize: 16,
+		fontFamily: 'League Spartan-Bold',
+		color: 'white',
 	},
 });
 
