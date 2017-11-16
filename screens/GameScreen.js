@@ -76,12 +76,13 @@ class GameScreen extends React.Component {
 	saveHighScore(score) {
 		var d = new Date();
 		var date = '';
-		date += (d.getMonth() + 1) + '/' + d.getDay() + '/' + d.getYear();
+		date += (d.getMonth() + 1) + '/' + d.getDay() + '/' + d.getFullYear();
 		var newScore = {
 			score: score,
 			date: date
 		};
-		Storage.loadHighScores().then((scores) => {
+		Storage.loadHighScores().then((scoresJSON) => {
+			var scores = JSON.parse(scoresJSON);
             console.debug('loaded high scores (pre-save)');
             if (score > scores[0].score) {
                 // worth adding to the list
@@ -90,7 +91,19 @@ class GameScreen extends React.Component {
 					status = 'best';
 				}
                 scores[0] = newScore;
-                scores.sort();
+                scores.sort((score_a, score_b) => {
+					var a = score_a.score;
+					var b = score_b.score;
+					if (a == null && b == null || a == b) {
+						return 0;
+					}
+					if (a == null || a < b) {
+						return -1;
+					}
+					if (b == null || b > a) {
+						return 1;
+					}
+				});
                 console.debug('setting high scores: ');
                 console.debug(scores);
                 Storage.saveHighScores(scores).then(() => {

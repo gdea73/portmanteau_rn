@@ -24,59 +24,68 @@ class HighScoreScreen extends React.Component {
 	constructor(props) {
 		super(props);
 		this.renderScores = this.renderScores.bind(this);
+		this.state = {
+			scoresLoaded: false,
+			scores: null,
+		};
 	}
 
 	renderScores() {
+		if (!this.state.scores) {
+			return [];
+		}
+		var result = [];
+		let i = Constants.N_HIGH_SCORES - 1;
+		while (i >= 0 && this.state.scores[i].score !== 0) {
+			result.push(
+				<View style={styles.score} key={'score' + i}>
+					<Text style={styles.scoreText}>{this.state.scores[i].score}</Text>
+					<Text style={styles.scoreDate}>{this.state.scores[i].date}</Text>
+				</View>
+			);
+			i--;
+		}
+		return result;
+	}
+
+	componentWillMount() {
 		Storage.loadHighScores().then((scoresJSON) => {
 			var scores = JSON.parse(scoresJSON);
-			console.debug('read these scores from asyncstorage');
-			console.debug(scores);
-			var result = [];
-			let i = Constants.N_HIGH_SCORES - 1;
-			while (i >= 0 && scores[i].score !== 0) {
-				result.push(
-					<View style={styles.score}>
-						<Text style={styles.scoreText}>{scores[i].score}</Text>
-						<Text style={styles.scoreDate}>{scores[i].date}</Text>
-					</View>
-				);
-			}
-			return result;
-		}).catch(() => {
-			return (
-				<Text style={styles.titleText}>Loading high scores failed</Text>
-			);
+			this.setState({
+				scoresLoaded: true,
+				scores: scores,
+			});
 		});
 	}
 
 	render() {
 		return (
-				<View style={styles.container}>
-					<Image source={require('../img/gradient_bg.png')}
-						   style={Constants.BG_IMAGE_STYLE}
-					/>
-					<View style={styles.scoresContainer}>
-						<View style={{position: 'absolute', left: 0, top: 0}}>
-							<NavButton
-								onPress={() => {
-									this.props.navigation.goBack(null)
-								}}
-								title="Go Back"
-								textStyle={{fontSize: 12}}
-								height={BTN_HEIGHT}
-							/>
-						</View>
-						<View style={styles.header}>
-							<Text style={styles.titleText}>HIGH SCORES</Text>
-						</View>
-						<View style={styles.scoreList}>
-							<ScrollView>
-								{this.renderScores()}
-							</ScrollView>
-						</View>
+			<View style={styles.container}>
+				<Image source={require('../img/gradient_bg.png')}
+					   style={Constants.BG_IMAGE_STYLE}
+				/>
+				<View style={styles.scoresContainer}>
+					<View style={{position: 'absolute', left: 0, top: 0}}>
+						<NavButton
+							onPress={() => {
+								this.props.navigation.goBack(null)
+							}}
+							title="Go Back"
+							textStyle={{fontSize: 12}}
+							height={BTN_HEIGHT}
+						/>
+					</View>
+					<View style={styles.header}>
+						<Text style={styles.titleText}>HIGH SCORES</Text>
+					</View>
+					<View style={styles.scoreList}>
+						<ScrollView>
+							{this.renderScores()}
+						</ScrollView>
 					</View>
 				</View>
-			   );
+			</View>
+	   );
 	}
 }
 
@@ -102,21 +111,27 @@ const styles = StyleSheet.create({
 		color: 'white',
 	},
 	scoreText: {
-		fontSize: 12,
+		fontSize: 16,
 		fontFamily: 'League Spartan-Bold',
 		color: 'white',
 	},
 	scoreDate: {
-		fontSize: 8,
+		fontSize: 12,
 		fontFamily: 'League Spartan-Bold',
 		color: 'white',
 	},
 	scoreList: {
 		flex: 1,
 		margin: 10,
-		backgroundColor: 'white',
-		opacity: 0.3,
+		backgroundColor: '#ffffff33',
 		borderRadius: Constants.DEFAULT_BORDER_RAD,
+	},
+	score: {
+		flexDirection: 'row',
+		justifyContent: 'space-between',
+		padding: 8,
+		borderBottomWidth: 1,
+		borderColor: 'white',
 	},
 });
 

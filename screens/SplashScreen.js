@@ -26,36 +26,27 @@ class SplashScreen extends React.Component {
 	static navigationOptions = {
 		header: null,
 	};
+
 	constructor(props) {
 		super(props);
 		this.state = {
 			isAppLoaded: false,
 			loadingOpacity: new Animated.Value(0.0),
+			backgrounded: false,
 		};
 		this.dictLoadCallback = this.dictLoadCallback.bind(this);
-
-		// added for BackHandler
-		// adapted from
-		// https://github.com/react-community/react-navigation/issues/1819
-		this.backButtonListener = null;
-		this.currentRoute = 'Menu';
-		this.lastBackButtonPress = null;
 	}
-	/* onNavigationStateChange={(prev, current, action) => {
-		let prevRouteName = prev.routes[prev.index].routeName;
-		let routeName = current.routes[current.index].routeName;
-		console.debug('navigation state change from ' + prevRouteName + ' to ' + routeName);
-		if (prevRouteName === 'Game' && routeName === 'Menu') {
-			console.debug('loading saved game from AsyncStorage');
-		}
-	}} */
+
+	componentDidMount() {
+		console.debug('SplashScreen did mount');
+		Words.loadDictionary(this.dictLoadCallback);
+	}
+
 	render() {
+		console.debug('rendering SplashScreen');
 		if (this.state.isAppLoaded) {
 			console.debug('app loaded (exiting splash)');
-			return (
-				<Root
-				/>
-			);
+			return (<Root />);
 		}
 		return (
 				<View style={styles.container}>
@@ -75,14 +66,13 @@ class SplashScreen extends React.Component {
 			   </View>
 			   );
 	}
-	componentDidMount() {
-		Words.loadDictionary(this.dictLoadCallback);
-	}
+
 	dictLoadCallback() {
 		console.debug('dictionary loaded (in splash screen callback)');
 		this.isDictLoaded = true;
 		this.setLoadedIfDone();
 	}
+
 	setLoadedIfDone() {
 		if (this.isDictLoaded) {
 			Animated.timing(
@@ -90,11 +80,12 @@ class SplashScreen extends React.Component {
 					toValue: 1.0,
 					duration: LOADING_ANIMATION_DURATION,
 				}
-			).start(() => { this.setState({ isAppLoaded: true, }); });
+			).start(() => {
+				var state = this.state;
+				state.isAppLoaded = true;
+				this.setState(state);
+			});
 		}
-	}
-	componentWillUnmount() {
-		clearTimeout(this.timer);
 	}
 }
 

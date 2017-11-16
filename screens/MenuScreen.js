@@ -6,6 +6,7 @@ import {
 	Text,
 	View,
 	Dimensions,
+	BackHandler,
 	Image
 } from 'react-native';
 import { StackNavigator } from 'react-navigation';
@@ -32,15 +33,23 @@ class MenuScreen extends React.Component {
 		};
 		this.loadSavedGame = this.loadSavedGame.bind(this);
 		this.renderGameButton = this.renderGameButton.bind(this);
+		this.backPress = this.backPress.bind(this);
 	}
 
 	componentWillMount() {
 		this.loadSavedGame();
-		/* Storage.loadScores().then(() => {
-			console.debug('initial menu mount: loaded saved scores');
-		}).catch(() => {
-			console.debug('initial menu mount: could not load saved scores');
-		}); */
+	}
+
+	componentDidMount() {
+		BackHandler.addEventListener('hardwareBackPress', this.backPress);
+	}
+
+	backPress() {
+		BackHandler.exitApp();
+	}
+
+	componentWillUnmount() {
+		BackHandler.removeEventListener('hardwareBackPress', this.backPress);
 	}
 
 	loadSavedGame() {

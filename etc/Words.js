@@ -130,6 +130,8 @@ class Words {
 					dictLoaded = true;
 					callback();
 			});
+		} else {
+			callback();
 		}
 	}
 

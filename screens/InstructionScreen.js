@@ -44,7 +44,8 @@ var pages = [
 			+ 'Some additional rules:\n'
 			+ '· Words can be oriented in any way (left to right, top to'
 			+ ' bottom, &c.).\n'
-			+ '· Only words of 3 or more letters will be broken.',
+			+ '· Only words of 3 or more letters will be broken.\n'
+			+ '· The game ends when the board is filled with tiles.',
 	}, {
 		dropLetter: ' ',
 		cols: [
