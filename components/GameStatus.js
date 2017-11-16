@@ -80,7 +80,7 @@ class GameStatus extends React.Component {
 			<View style={styles.statusView}>
 				<View style={{flexDirection: 'column', paddingRight: (width - 2 * PADDING) / 2}}> 
 					<Text style={styles.score}>{this.state.score}</Text>
-					<Text style={styles.moves}>Moves: {this.state.moves}</Text>
+					<Text style={styles.moves}>MOVES: {this.state.moves}</Text>
 				</View>
 				<ScrollView style={[styles.viewDefault, styles.recentWordsContainer]}>
 					{this.renderRecentWords()}
@@ -113,12 +113,12 @@ const styles = StyleSheet.create({
 	score: {
 		color: 'white',
 		fontSize: 30,
-		fontFamily: 'League Spartan',
+		fontFamily: 'League Spartan-Bold',
 	},
 	moves: {
 		color: 'white',
 		fontSize: 15,
-		fontFamily: 'League Spartan',
+		fontFamily: 'League Spartan-Bold',
 	},
 	recentWordsContainer: {
 		height: RECENT_WORDS_VISIBLE * RECENT_WORD_FONT_SIZE * RECENT_WORD_SPACING,
@@ -128,7 +128,7 @@ const styles = StyleSheet.create({
 	recentWord: {
 		color: 'white',
 		fontSize: RECENT_WORD_FONT_SIZE,
-		fontFamily: 'League Spartan',
+		fontFamily: 'League Spartan-Bold',
 	},	
 });
 

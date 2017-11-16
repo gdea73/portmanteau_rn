@@ -3,7 +3,6 @@ import {
 	Platform,
 	ScrollView,
 	View,
-	Button,
 	StyleSheet,
 	Text,
 	NativeModules,
@@ -76,7 +75,7 @@ class GameScreen extends React.Component {
 	saveHighScore(score) {
 		var d = new Date();
 		var date = '';
-		date += (d.getMonth() + 1) + '/' + d.getDay() + '/' + d.getFullYear();
+		date += (d.getMonth() + 1) + '/' + d.getDate() + '/' + d.getFullYear();
 		var newScore = {
 			score: score,
 			date: date
@@ -84,6 +83,7 @@ class GameScreen extends React.Component {
 		Storage.loadHighScores().then((scoresJSON) => {
 			var scores = JSON.parse(scoresJSON);
             console.debug('loaded high scores (pre-save)');
+			console.debug(scores);
             if (score > scores[0].score) {
                 // worth adding to the list
 				var status = 'high';
@@ -255,10 +255,12 @@ class GameScreen extends React.Component {
 					<Text style={styles.gameOverLongestWordText}>Longest Word: {stats.longestWord} letters</Text>
 					<Text style={styles.gameOverLongestChainText}>Longest Chain: {stats.longestChain} words</Text>
 					<Text style={styles.gameOverMovesText}>Total Moves: {stats.moves}</Text>
-					<Button
+					<NavButton
 						onPress={() => {
 							this.removeSavedGame();
 							this.props.navigation.goBack(null);
+							this.props.navigation
+								.state.params.onSaveCallback();
 						}}
 						title="Go Back"
 					/>

@@ -45,6 +45,7 @@ var pages = [
 			+ '· Words can be oriented in any way (left to right, top to'
 			+ ' bottom, &c.).\n'
 			+ '· Only words of 3 or more letters will be broken.\n'
+			+ '· Letters have individual point values (similar to Scrabble).\n'
 			+ '· The game ends when the board is filled with tiles.',
 	}, {
 		dropLetter: ' ',

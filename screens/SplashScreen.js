@@ -60,7 +60,7 @@ class SplashScreen extends React.Component {
 						<Animated.Text style={[
 							styles.loadingText,
 							{ opacity: this.state.loadingOpacity }]}>
-								Loading
+								LOADING
 						</Animated.Text>
 					</View>
 			   </View>
@@ -101,6 +101,7 @@ const styles = StyleSheet.create({
 	},
 	loadingText: {
 		color: 'white',
+		fontFamily: 'League Spartan-Bold',
 		textAlign: 'center',
 		fontSize: 24,
 	},

@@ -94,8 +94,7 @@ class Board extends React.Component {
 
 	isGameOver() {
 		var over = true;
-		// FIXME: testing
-		for (let c = 0; c < 1 /* Constants.BOARD_SIZE */; c++) {
+		for (let c = 0; c < Constants.BOARD_SIZE; c++) {
 			for (let r = 0; r < Constants.BOARD_SIZE; r++) {
 				if (this.state.cols[c][r] === ' ') {
 					over = false;
@@ -531,7 +530,8 @@ class Tile extends React.Component {
 		return(
 			<Animated.View style={[styles.defaultStile,
 					              screenDependentStile, this.props.style]}
-						   onStartShouldSetResponder={this.props.onStartShouldSetResponder}>
+						   onStartShouldSetResponder=
+						   		{this.props.onStartShouldSetResponder}>
 				<Text style={styles.tileText}>{this.props.letter}</Text>
 			</Animated.View>
 		);
@@ -555,8 +555,11 @@ const styles = StyleSheet.create({
 
 	tileText: {
 		fontSize: TILE_FONT_SIZE,
+		fontFamily: 'League Spartan-Bold',
 		backgroundColor: 'transparent',
 		color: 'white',
+		textShadowColor: 'black',
+		textShadowOffset: {width: -0.5, height: 1},
 	},
 
 	tilePickerOuterView: {
@@ -573,32 +576,32 @@ const styles = StyleSheet.create({
 });
 
 const TILE_COLORS = { 
-    'A': '#c2efcb',
-    'B': '#29d40e',
-    'C': '#b3dc31',
-    'D': '#6e6c81',
-    'E': '#6da7c6',
-    'F': '#ffdc33',
-    'G': '#e6379f',
-    'H': '#9bb04f',
-    'I': '#515311',
-    'J': '#fa0c8b',
-    'K': '#7a094f',
-    'L': '#34f978',
-    'M': '#2b18a8',
-    'N': '#58b76b',
-    'O': '#0c4c6b',
-    'P': '#4870ba',
-    'Q': '#661f4d',
-    'R': '#7fc737',
-    'S': '#8b36d9',
-    'T': '#71e385',
-    'U': '#fd6831',
-    'V': '#25b113',
-    'W': '#98daf6',
-    'X': '#507248',
-    'Y': '#b34882',
-    'Z': '#db482b',
+    'A': '#F45F62',
+    'B': '#5AC3E2',
+    'C': '#5AE270',
+    'D': '#4940FF',
+    'E': '#A040FF',
+    'F': '#9E2680',
+    'G': '#40FFE6',
+    'H': '#A55FF4',
+    'I': '#84F035',
+    'J': '#4F0D4B',
+    'K': '#3E7386',
+    'L': '#EE35F0',
+    'M': '#F2C424',
+    'N': '#35F099',
+    'O': '#F03587',
+    'P': '#FDFF40',
+    'Q': '#0D2506',
+    'R': '#C9F035',
+    'S': '#6D35F0',
+    'T': '#35F093',
+    'U': '#35F071',
+    'V': '#D01A23',
+    'W': '#80B0A2',
+    'X': '#02E2A3',
+    'Y': '#B1DA34',
+    'Z': '#062405',
     'BLANK': '#ffffff',
     'NONE': 'transparent',
 };
