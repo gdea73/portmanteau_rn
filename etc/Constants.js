@@ -12,6 +12,7 @@ const TITLE_IMAGE_ASPECT = 0.1040;
 const TITLE_TEXT_PADDING = 20;
 const BOARD_ASPECT_RATIO = 7/8.05; // slightly over 7/8 for padding
 const N_HIGH_SCORES = 10;
+const LEVEL_LENGTH = 25;
 var BG_IMAGE_STYLE = {
 	flex: 1,
 	width: null,
@@ -57,6 +58,9 @@ class Constants {
 	}
 	static get N_HIGH_SCORES() {
 		return N_HIGH_SCORES;
+	}
+	static get LEVEL_LENGTH() {
+		return LEVEL_LENGTH;
 	}
 	static LOGO_CONTAINER_STYLE(height)  {
 		return {

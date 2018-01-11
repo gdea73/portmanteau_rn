@@ -7,6 +7,7 @@ import Constants from '../etc/Constants';
 const RECENT_WORDS_VISIBLE = 5;
 const RECENT_WORD_CACHE_SIZE = 14;
 const RECENT_WORD_FONT_SIZE = 18;
+const RECENT_WORD_FONT_WIDTH_RATIO = 0.8;
 const RECENT_WORD_SPACING = 1.35;
 const PADDING = 3;
 
@@ -32,9 +33,6 @@ class GameStatus extends React.Component {
 				recentWords: recentWords,
 			};
 		}
-		this.increaseScore = this.increaseScore.bind(this);
-		this.incrementMoveCount = this.incrementMoveCount.bind(this);
-		this.addRecentWord = this.addRecentWord.bind(this);
 	}
 
 	// these functions allow the parent to access its GameScreen component
@@ -78,9 +76,11 @@ class GameStatus extends React.Component {
 	render() {
 		return(
 			<View style={styles.statusView}>
-				<View style={{flexDirection: 'column', paddingRight: (width - 2 * PADDING) / 2}}> 
+				<View style={{flexDirection: 'column', flex: 1}}> 
 					<Text style={styles.score}>{this.state.score}</Text>
-					<Text style={styles.moves}>MOVES: {this.state.moves}</Text>
+					<Text style={styles.level}>
+						LEVEL: {Math.floor(this.state.moves / Constants.LEVEL_LENGTH + 1)}
+					</Text>
 				</View>
 				<ScrollView style={[styles.viewDefault, styles.recentWordsContainer]}>
 					{this.renderRecentWords()}
@@ -115,13 +115,15 @@ const styles = StyleSheet.create({
 		fontSize: 30,
 		fontFamily: 'League Spartan-Bold',
 	},
-	moves: {
+	level: {
 		color: 'white',
 		fontSize: 15,
 		fontFamily: 'League Spartan-Bold',
 	},
 	recentWordsContainer: {
 		height: RECENT_WORDS_VISIBLE * RECENT_WORD_FONT_SIZE * RECENT_WORD_SPACING,
+		width: RECENT_WORD_FONT_SIZE * RECENT_WORD_FONT_WIDTH_RATIO * 7,
+		flex: 0,
 		backgroundColor: '#332222',
 		borderRadius: Constants.DEFAULT_BORDER_RAD,
 	},

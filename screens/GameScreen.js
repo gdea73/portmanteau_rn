@@ -32,16 +32,7 @@ class GameScreen extends React.Component {
 			gameOver: false,
 			showQuitModal: false,
 		}
-		this.increaseScore = this.increaseScore.bind(this);
-		this.incrementMoveCount = this.incrementMoveCount.bind(this);
-		this.addRecentWord = this.addRecentWord.bind(this);
-		this.gameOver = this.gameOver.bind(this);
-		this.saveGame = this.saveGame.bind(this);
-		this.getStats = this.getStats.bind(this);
-		this.renderQuitModal = this.renderQuitModal.bind(this);
-		this.renderGameOver = this.renderGameOver.bind(this);
-		this.removeSavedGame = this.removeSavedGame.bind(this);
-		this.saveHighScore = this.saveHighScore.bind(this);
+		this.getMoveCount = this.getMoveCount.bind(this);
 		if (this.props.navigation.state.params
 			&& this.props.navigation.state.params.gameData) {
 			console.debug('GameScreen was passed saved game data');
@@ -72,7 +63,7 @@ class GameScreen extends React.Component {
 		});
 	}
 
-	saveHighScore(score) {
+	saveHighScore = (score) => {
 		var d = new Date();
 		var date = '';
 		date += (d.getMonth() + 1) + '/' + d.getDate() + '/' + d.getFullYear();
@@ -165,7 +156,7 @@ class GameScreen extends React.Component {
 		return true;
 	}
 
-	saveGame(callback) {
+	saveGame = (callback) => {
 		// This function is to be called periodically by the Board, and will
 		// save the current board state (including drop tile), and game status
 		// to AsyncStorage.
@@ -175,11 +166,11 @@ class GameScreen extends React.Component {
 		return Storage.saveGame(stats, dropLetter, cols).then(callback);
 	}
 
-	// this should be called on the press of the 'Back' button,
+	// This should be called on the press of the 'Back' button,
 	// and should render a modal asking the user whether they want
 	// to save or discard the game in progress. However, if the game has
 	// already ended, this should do nothing.
-	renderQuitModal() {
+	renderQuitModal = () => {
 		return (
 			<View style={styles.quitModalContainer}>
 				<View style={styles.quitModal}>
@@ -225,7 +216,7 @@ class GameScreen extends React.Component {
 		);
 	}
 
-	getStats() {
+	getStats = () => {
 		return  {
 			score: this.gameStatus.state.score,
 			moves: this.gameStatus.state.moves,
@@ -235,7 +226,7 @@ class GameScreen extends React.Component {
 		};
 	}
 
-	renderGameOver() {
+	renderGameOver = () => {
 		var stats = this.getStats();
 		var scoreStatus = this.saveHighScore(stats.score);
 		var scoreStatusText = '';
@@ -286,6 +277,7 @@ class GameScreen extends React.Component {
 						<Board width={Math.floor(width - 2 * PADDING)}
 							   increaseScore={this.increaseScore}
 							   incrementMoveCount={this.incrementMoveCount}
+							   getMoveCount={this.getMoveCount}
 							   addRecentWord={this.addRecentWord}
 							   gameOver={this.gameOver}
 							   initialCols={this.initialCols}
@@ -299,21 +291,29 @@ class GameScreen extends React.Component {
 		);
 	}
 
-	gameOver() {
+	gameOver = () => {
 		var newState = this.state;
 		newState.gameOver = true;
 		this.setState(newState);
 	}
 
 	// Callbacks for Board to update GameStatus
-	increaseScore(points, chainLevel) {
+	increaseScore = (points, chainLevel) => {
 		this.gameStatus.increaseScore(points, chainLevel);
 		// TODO: animate display of chain level if > 1
 	}
-	incrementMoveCount() {
+	incrementMoveCount = () => {
 		this.gameStatus.incrementMoveCount();
 	}
-	addRecentWord(word) {
+	getMoveCount() {
+		if (!this.gameStatus) {
+			return 0;
+		}
+		return this.gameStatus.state.moves;
+	}
+
+	// Allows Board to query total move count for level-based logic
+	addRecentWord = (word) => {
 		this.gameStatus.addRecentWord(word);
 	}
 }

@@ -66,19 +66,20 @@ const pointValues = {
 const lengthMultipliers = [
 	// TODO: solicit user feedback on factorial increase
 	0, // shouldn't be calculating score with length 0
-	1, // 								 	  ... or 1, for that matter
-	2,
-	10, // currently MIN_WORD_LENGTH
-	50,
-	250,
-	1250,
-	2500 // seems absurd, but this is BOARD_SIZE, so this is hard to do.
+	0, // 								 	  ... or 1, for that matter
+	0,
+	7, // currently MIN_WORD_LENGTH
+	21,
+	49,
+	73,
+	256
 ];
 
 var dictLoaded = false;
 var dictionary = [];
 var charTableLoaded = false;
 var charTable = [];
+var tileSet = [];
 
 function initCharTable() {
 	for (let letter in quantities) {
@@ -90,6 +91,16 @@ function initCharTable() {
 	for (let j = charTable.length; j < CHAR_TABLE_SIZE; j++) {
 		// pad the rest of the char table with BLANKS.
 		charTable.push(' ');
+	}
+}
+function generateTileSet() {
+	tileSet = charTable.slice();
+	let i = 0, j = 0, temp = null;
+	for (i = tileSet.length - 1; i > 0; i--) {
+		j = Math.floor(Math.random() * (i + 1));
+		temp = tileSet[i];
+		tileSet[i] = tileSet[j];
+		tileSet[j] = temp;
 	}
 }
 function binSearch(string, start, end) {
@@ -110,14 +121,22 @@ function binSearch(string, start, end) {
 }
 
 class Words {
-	static getDropLetter() {
+	static getDropLetter(moves) {
 		if (!charTableLoaded) {
 			initCharTable();
 			charTableLoaded = true;
 		}
-		var index = Math.floor(Math.random() * CHAR_TABLE_SIZE);
-		return charTable[index];
+		if (moves % Constants.LEVEL_LENGTH == 0) {
+			// level up; generate a new set of drop tiles
+			generateTileSet();
+		}
+		// the length of tileSet is equal to that of charTable, but elements
+		// beyond the index LEVEL_LENGTH - 1 are ignored.
+		return tileSet[moves % Constants.LEVEL_LENGTH];
+		// var index = Math.floor(Math.random() * CHAR_TABLE_SIZE);
+		// return charTable[index];
 	}
+
 
 	static loadDictionary(callback) {
 		if (!dictLoaded) {

@@ -57,7 +57,8 @@ class Board extends React.Component {
                 [' ', ' ', ' ', ' ', ' ', ' ', ' '],
             ];
         }
-		var dropLetter = this.props.initialDropLetter || Words.getDropLetter();
+		var dropLetter = this.props.initialDropLetter
+					   || Words.getDropLetter(this.props.getMoveCount());
 		this.state = {
 			cols: cols,	
 			dropLetter: dropLetter,
@@ -383,7 +384,7 @@ class Board extends React.Component {
 				console.debug('validWord: ' + validWord + '; score: ' + Words.getWordScore(validWord, this.chainLevel) + ' (chain level ' + this.chainLevel + ')');
 				this.props.increaseScore(
 					Words.getWordScore(validWord, this.chainLevel),
-					this.chainLevel
+					this.chainLevel++
 				);
 				this.props.addRecentWord(validWord, this.chainLevel);
 				// "break" the word; leave empty space in its board position
@@ -411,7 +412,7 @@ class Board extends React.Component {
 			// will not be re-entered upon the next render() after setState().
 			this.chainLevel = 0;
 			// the chain is over, so we need a new drop letter.
-			this.nextDropLetter = Words.getDropLetter();
+			this.nextDropLetter = Words.getDropLetter(this.props.getMoveCount());
 			this.setNextBoardState();
 			return;
 		}
@@ -445,7 +446,7 @@ class Board extends React.Component {
 		}
 		// Words were found and broken! After refreshing the visual board,
 		// this callback shall be called again with chainLevel incremented.
-		this.chainLevel++;
+		/* now incremented per-word within each call of this function this.chainLevel++; */
 		// First, the breaking animations should occur in parallel; the
 		// following parallel batch of animations, for gravity, must not
 		// begin until the tiles have broken.
