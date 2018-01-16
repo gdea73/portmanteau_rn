@@ -8,3 +8,4 @@ android/build/**
 *.keystore
 yarn.lock
 .gradle**
+.DS_Store
