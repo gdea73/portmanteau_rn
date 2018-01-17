@@ -1,12 +1,11 @@
 import Constants from './Constants';
-import DICT_STRING from './Dictionary';
 
 var RNFS = require('react-native-fs');
 
 const CHAR_TABLE_SIZE = 102;
 const MIN_WORD_LENGTH = 3;
 
-const quantities = {
+const quantities = { 
     A: 9,
 	B: 2,
 	C: 2,
@@ -35,7 +34,7 @@ const quantities = {
 	Z: 1
 };
 
-const pointValues = {
+const pointValues = { 
     A: 1,
 	B: 3,
 	C: 3,
@@ -142,15 +141,14 @@ class Words {
 	static loadDictionary(callback) {
 		if (!dictLoaded) {
 			console.debug('attempting to load dictionary from bundle...');
-      dictionary = Dictionary.DICT_STRING.split(/\n/g);
 			// get a list of files and directories in the main bundle
-			// RNFS.readFileAssets('dictionary.txt', 'utf8')
-			// 	.then((result) => {
-			// 		console.debug('got dictionary from resources; splitting (slow)...');
-			// 		dictionary = result.split(/\n/g);
-			// 		dictLoaded = true;
-			// 		callback();
-			// });
+			RNFS.readFileAssets('dictionary.txt', 'utf8')
+				.then((result) => {
+					console.debug('got dictionary from resources; splitting (slow)...');
+					dictionary = result.split(/\n/g);
+					dictLoaded = true;
+					callback();
+			});
 		} else {
 			callback();
 		}
@@ -224,7 +222,7 @@ class Words {
 	}
 
 	static getWordsToCheck(board) {
-        var wordsToCheck = [];
+        var wordsToCheck = []; 
         // read the bord for "words," beginning with columns
         for (let c = 0; c < Constants.BOARD_SIZE; c++) {
             // only scan if there are at least two tiles in the column
@@ -234,14 +232,14 @@ class Words {
                     while (endRow > 0 && board[c][endRow - 1] !== ' ') {
                         endRow--;
                     }
-                    let word = {
+                    let word = { 
                         startCol: c,
                         endCol: c,
                         startRow: Constants.BOARD_SIZE - 1,
                         endRow: endRow
-                    };
+                    };  
                     wordsToCheck.push(word);
-            }
+            }   
         }
         // scan for horizontal (contiguous) "words"
         for (let r = 0; r < Constants.BOARD_SIZE; r++) {
@@ -255,7 +253,7 @@ class Words {
                     if (board[c][r] === ' ') {
                         // the word has ended; mark its end column as (c - 1)
                         inWord = false;
-                        var word = {
+                        var word = { 
                             startCol: startCol,
                             endCol: c - 1,
                             startRow: r,
