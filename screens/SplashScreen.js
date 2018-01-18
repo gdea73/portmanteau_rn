@@ -101,7 +101,7 @@ const styles = StyleSheet.create({
 	},
 	loadingText: {
 		color: 'white',
-		fontFamily: 'Constants.LEAGUE_SPARTAN',
+		fontFamily: Constants.LEAGUE_SPARTAN,
 		textAlign: 'center',
 		fontSize: 24,
 	},

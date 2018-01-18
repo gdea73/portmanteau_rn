@@ -107,17 +107,17 @@ const styles = StyleSheet.create({
 	},
 	titleText: {
 		fontSize: 16,
-		fontFamily: 'Constants.LEAGUE_SPARTAN',
+		fontFamily: Constants.LEAGUE_SPARTAN,
 		color: 'white',
 	},
 	scoreText: {
 		fontSize: 16,
-		fontFamily: 'Constants.LEAGUE_SPARTAN',
+		fontFamily: Constants.LEAGUE_SPARTAN,
 		color: 'white',
 	},
 	scoreDate: {
 		fontSize: 12,
-		fontFamily: 'Constants.LEAGUE_SPARTAN',
+		fontFamily: Constants.LEAGUE_SPARTAN,
 		color: 'white',
 	},
 	scoreList: {

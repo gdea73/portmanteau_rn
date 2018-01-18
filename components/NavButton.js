@@ -81,7 +81,7 @@ const styles = StyleSheet.create({
 		justifyContent: 'center',
 		fontSize: 18,
 		textAlign: 'center',
-		fontFamily: 'Constants.LEAGUE_SPARTAN',
+		fontFamily: Constants.LEAGUE_SPARTAN,
 	},
 });
 

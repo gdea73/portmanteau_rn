@@ -224,7 +224,7 @@ styles = StyleSheet.create({
 	},
 	titleText: {
 		fontSize: 16,
-		fontFamily: 'Constants.LEAGUE_SPARTAN',
+		fontFamily: Constants.LEAGUE_SPARTAN,
 		color: 'white',
 	},
 });
