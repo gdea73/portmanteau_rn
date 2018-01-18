@@ -143,6 +143,7 @@ class Words {
 		if (!dictLoaded) {
 			console.debug('attempting to load dictionary from bundle...');
       dictionary = DICT_STRING.split(/\n/g);
+      callback();
 			// get a list of files and directories in the main bundle
 			// RNFS.readFileAssets('dictionary.txt', 'utf8')
 			// 	.then((result) => {
@@ -157,10 +158,6 @@ class Words {
 	}
 
 	static isValidWord(string) {
-		// just poll until the dictionary is loaded, though this may slow down
-		// that process; it'll only happen if the player taps a column within
-		// roughly 1 second of the game first loading.
-		while (!dictLoaded);
 		if (string.length < MIN_WORD_LENGTH) {
 			return false;
 		}
