@@ -556,7 +556,7 @@ const styles = StyleSheet.create({
 
 	tileText: {
 		fontSize: TILE_FONT_SIZE,
-		fontFamily: 'League Spartan-Bold',
+		fontFamily: 'Constants.LEAGUE_SPARTAN',
 		backgroundColor: 'transparent',
 		color: 'white',
 		textShadowColor: 'black',

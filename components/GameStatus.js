@@ -113,12 +113,12 @@ const styles = StyleSheet.create({
 	score: {
 		color: 'white',
 		fontSize: 30,
-		fontFamily: 'League Spartan-Bold',
+		fontFamily: Constants.LEAGUE_SPARTAN,
 	},
 	level: {
 		color: 'white',
 		fontSize: 15,
-		fontFamily: 'League Spartan-Bold',
+		fontFamily: 'Constants.LEAGUE_SPARTAN',
 	},
 	recentWordsContainer: {
 		height: RECENT_WORDS_VISIBLE * RECENT_WORD_FONT_SIZE * RECENT_WORD_SPACING,
@@ -130,7 +130,7 @@ const styles = StyleSheet.create({
 	recentWord: {
 		color: 'white',
 		fontSize: RECENT_WORD_FONT_SIZE,
-		fontFamily: 'League Spartan-Bold',
+		fontFamily: 'Constants.LEAGUE_SPARTAN',
 	},	
 });
 
