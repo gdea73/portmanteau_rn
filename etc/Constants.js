@@ -12,7 +12,7 @@ const LEAGUE_SPARTAN_FONT = Platform.OS === 'ios' ? 'League Spartan' : 'League S
 const TITLE_IMAGE_ASPECT = 0.1040;
 const TITLE_TEXT_PADDING = 20;
 const BOARD_ASPECT_RATIO = 7/8.05; // slightly over 7/8 for padding
-const N_HIGH_SCORES = 10;
+const N_HIGH_SCORES = 50;
 const LEVEL_LENGTH = 25;
 var BG_IMAGE_STYLE = {
 	flex: 1,

@@ -98,6 +98,7 @@ function generateTileSet() {
 	tileSet = charTable.slice();
 	let i = 0, j = 0, temp = null;
 	for (i = tileSet.length - 1; i > 0; i--) {
+		// shuffle the char table and retrieve tiles in order
 		j = Math.floor(Math.random() * (i + 1));
 		temp = tileSet[i];
 		tileSet[i] = tileSet[j];
@@ -127,34 +128,18 @@ class Words {
 			initCharTable();
 			charTableLoaded = true;
 		}
-		if (moves % Constants.LEVEL_LENGTH == 0) {
-			// level up; generate a new set of drop tiles
+		if (moves % CHAR_TABLE_SIZE == 0) {
+			// we've exhausted the char table; generate a new set of drop tiles
 			generateTileSet();
 		}
-		// the length of tileSet is equal to that of charTable, but elements
-		// beyond the index LEVEL_LENGTH - 1 are ignored.
-		return tileSet[moves % Constants.LEVEL_LENGTH];
-		// var index = Math.floor(Math.random() * CHAR_TABLE_SIZE);
-		// return charTable[index];
+		return tileSet[moves % CHAR_TABLE_SIZE];
 	}
 
 
 	static loadDictionary(callback) {
-		if (!dictLoaded) {
-			console.debug('attempting to load dictionary from bundle...');
-      dictionary = DICT_STRING.split(/\n/g);
-      callback();
-			// get a list of files and directories in the main bundle
-			// RNFS.readFileAssets('dictionary.txt', 'utf8')
-			// 	.then((result) => {
-			// 		console.debug('got dictionary from resources; splitting (slow)...');
-			// 		dictionary = result.split(/\n/g);
-			// 		dictLoaded = true;
-			// 		callback();
-			// });
-		} else {
-			callback();
-		}
+		console.debug('attempting to load dictionary from bundle...');
+		dictionary = DICT_STRING.split(/\n/g);
+		callback();
 	}
 
 	static isValidWord(string) {
