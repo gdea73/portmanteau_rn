@@ -47,6 +47,7 @@ var pages = [
 			+ '· Only words of 3 or more letters will be broken.\n'
 			+ '· Letters have individual point values (similar to Scrabble).\n'
 			+ '· The game ends when the board is filled with tiles.',
+		moveCount: 0,
 	}, {
 		dropLetter: ' ',
 		cols: [
@@ -62,6 +63,7 @@ var pages = [
 			+ 'letter to drop into the board. You can scroll horizontally to '
 			+ 'find the desired letter, and then select it; then, it becomes '
 			+ 'the new drop letter.',
+		moveCount: 0,
 	}, {
 		dropLetter: 'T',
 		cols: [
@@ -79,11 +81,8 @@ var pages = [
 			+ '"ZAP" will break at chain level 2, since its isolation is a '
 			+ 'direct consequence of "ART" breaking. More chains yield more '
 			+ 'points. If you get a chain of 4 or greater, gimme a ring.',
+		moveCount: 0,
 	},
-];
-var page_text = [
-	'Page 1 text.',
-	'Page 2 text. (Blanks!)',
 ];
 
 class InstructionScreen extends React.Component {
@@ -178,6 +177,7 @@ class InstructionScreen extends React.Component {
 					<Board width={Math.floor(width - 2 * MARGIN)}
 						   increaseScore={() => { }}
 						   incrementMoveCount={() => { }}
+						   getMoveCount={() => { return this.state.moveCount; }}
 						   addRecentWord={() => { }} 
 						   initialCols={this.state.cols}
 						   initialDropLetter={this.state.dropLetter}
