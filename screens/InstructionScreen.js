@@ -119,8 +119,6 @@ class InstructionScreen extends React.Component {
 	}
 
 	render() {
-		console.debug('rendering instructions screen; state:');
-		console.debug(this.state);
 		var instrHeight = height - 6 * MARGIN - (width
 						/ Constants.BOARD_ASPECT_RATIO);
 		return (

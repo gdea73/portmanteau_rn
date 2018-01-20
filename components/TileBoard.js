@@ -27,7 +27,7 @@ const COL_TOUCH_LAYER = 200;
 
 // timing-related constants
 const DROP_TILE_ANIM_X_DURATION = 200;
-const DROP_TILE_ANIM_Y_DURATION = 100;
+const DROP_TILE_ANIM_Y_DURATION = 80;
 const TILE_BREAK_ANIM_DURATION = 200;
 const CHAIN_DELAY = 700;
 

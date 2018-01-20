@@ -4,7 +4,7 @@ import { StackNavigator } from 'react-navigation';
 
 import Constants from '../etc/Constants';
 
-const RECENT_WORDS_VISIBLE = 5;
+// const RECENT_WORDS_VISIBLE = 5;
 const RECENT_WORD_CACHE_SIZE = 14;
 const RECENT_WORD_FONT_SIZE = 18;
 const RECENT_WORD_FONT_WIDTH_RATIO = 0.8;
@@ -82,9 +82,16 @@ class GameStatus extends React.Component {
 						LEVEL: {Math.floor(this.state.moves / Constants.LEVEL_LENGTH + 1)}
 					</Text>
 				</View>
-				<ScrollView style={[styles.viewDefault, styles.recentWordsContainer]}>
-					{this.renderRecentWords()}
-				</ScrollView>	
+				<View style={{
+					flexDirection: 'column', flex: 1,
+					width: RECENT_WORD_FONT_SIZE * RECENT_WORD_FONT_WIDTH_RATIO * 7,
+					// height: RECENT_WORDS_VISIBLE * RECENT_WORD_FONT_SIZE * RECENT_WORD_SPACING,
+				}}>
+					<Text style={styles.recentWordsLabel}>Recent Words:</Text>
+					<ScrollView style={[styles.viewDefault, styles.recentWordsContainer]}>
+						{this.renderRecentWords()}
+					</ScrollView>	
+				</View>
 			</View>
 		);
 	}
@@ -108,7 +115,9 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         backgroundColor: '#bbdfef77',
         padding: PADDING,
+		marginBottom: Constants.UI_PADDING,
 		borderRadius: Constants.DEFAULT_BORDER_RAD,
+		flex: 1,
     },
 	score: {
 		color: 'white',
@@ -120,10 +129,13 @@ const styles = StyleSheet.create({
 		fontSize: 15,
 		fontFamily: Constants.LEAGUE_SPARTAN,
 	},
+	recentWordsLabel: {
+		color: 'white',
+		fontSize: 15,
+		fontFamily: Constants.LEAGUE_SPARTAN,
+	},
 	recentWordsContainer: {
-		height: RECENT_WORDS_VISIBLE * RECENT_WORD_FONT_SIZE * RECENT_WORD_SPACING,
-		width: RECENT_WORD_FONT_SIZE * RECENT_WORD_FONT_WIDTH_RATIO * 7,
-		flex: 0,
+		flex: 1,
 		backgroundColor: '#332222',
 		borderRadius: Constants.DEFAULT_BORDER_RAD,
 	},

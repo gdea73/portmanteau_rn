@@ -17,7 +17,6 @@ import NavButton from '../components/NavButton';
 import Constants from '../etc/Constants';
 import Storage from '../etc/Storage';
 
-const PADDING = 10;
 var { width, height } = require('Dimensions').get('window');
 const { StatusBarManager } = NativeModules;
 
@@ -274,7 +273,7 @@ class GameScreen extends React.Component {
 						initialStats={this.initialStats}
 					/>
 					<View style={styles.boardView}>
-						<Board width={Math.floor(width - 2 * PADDING)}
+						<Board width={Math.floor(width - 2 * Constants.UI_PADDING)}
 							   increaseScore={this.increaseScore}
 							   incrementMoveCount={this.incrementMoveCount}
 							   getMoveCount={this.getMoveCount}
@@ -325,10 +324,10 @@ const styles = StyleSheet.create({
 		flexDirection: 'column',
 		backgroundColor: 'transparent',
 		justifyContent: 'space-between',
-		paddingTop: PADDING + Constants.STATUS_BAR_HEIGHT,
-		paddingLeft: PADDING,
-		paddingRight: PADDING,
-		paddingBottom: PADDING,
+		paddingTop: Constants.UI_PADDING,// + Constants.STATUS_BAR_HEIGHT,
+		paddingLeft: Constants.UI_PADDING,
+		paddingRight: Constants.UI_PADDING,
+		paddingBottom: Constants.UI_PADDING,
 	},
 	boardView: {
 		aspectRatio: Constants.BOARD_ASPECT_RATIO,

@@ -6,6 +6,7 @@ const { StatusBarManager } = NativeModules;
 const RECENT_WORDS_COUNT = 10;
 const DEFAULT_BORDER_RAD = 4;
 const TILE_PADDING = 3;
+const UI_PADDING = 10;
 const BOARD_SIZE = 7;
 const STATUS_BAR_HEIGHT = Platform.OS === 'ios' ? 20 : StatusBarManager.HEIGHT;
 const LEAGUE_SPARTAN = Platform.OS === 'ios' ? 'League Spartan' : 'League Spartan-Bold';
@@ -35,6 +36,9 @@ class Constants {
 	}
 	static get TILE_PADDING() {
 		return TILE_PADDING;
+	}
+	static get UI_PADDING() {
+		return UI_PADDING;
 	}
 	static get BOARD_SIZE() {
 		return BOARD_SIZE;
