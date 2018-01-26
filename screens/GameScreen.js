@@ -324,7 +324,7 @@ const styles = StyleSheet.create({
 		flexDirection: 'column',
 		backgroundColor: 'transparent',
 		justifyContent: 'space-between',
-		paddingTop: Constants.UI_PADDING,// + Constants.STATUS_BAR_HEIGHT,
+		paddingTop: Constants.UI_PADDING + Constants.STATUS_BAR_HEIGHT,
 		paddingLeft: Constants.UI_PADDING,
 		paddingRight: Constants.UI_PADDING,
 		paddingBottom: Constants.UI_PADDING,
