@@ -8,10 +8,10 @@ const DEFAULT_BORDER_RAD = 4;
 const TILE_PADDING = 3;
 const UI_PADDING = 10;
 const BOARD_SIZE = 7;
-const STATUS_BAR_HEIGHT = Platform.OS === 'ios' ? 20 : 0;
+const STATUS_BAR_HEIGHT = Platform.OS === 'ios' ? 20 : StatusBarManager.HEIGHT;
 const LEAGUE_SPARTAN = Platform.OS === 'ios' ? 'League Spartan' : 'League Spartan-Bold';
 const TITLE_IMAGE_ASPECT = 0.1040;
-const TITLE_TEXT_PADDING = 20;
+const TITLE_TEXT_PADDING = 40;
 const BOARD_ASPECT_RATIO = 7/8.05; // slightly over 7/8 for padding
 const N_HIGH_SCORES = 50;
 const LEVEL_LENGTH = 25;

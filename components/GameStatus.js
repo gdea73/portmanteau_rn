@@ -4,11 +4,9 @@ import { StackNavigator } from 'react-navigation';
 
 import Constants from '../etc/Constants';
 
-// const RECENT_WORDS_VISIBLE = 5;
 const RECENT_WORD_CACHE_SIZE = 14;
 const RECENT_WORD_FONT_SIZE = 18;
 const RECENT_WORD_FONT_WIDTH_RATIO = 0.8;
-const RECENT_WORD_SPACING = 1.35;
 const PADDING = 3;
 
 var { width, height } = require('Dimensions').get('window');
@@ -85,7 +83,6 @@ class GameStatus extends React.Component {
 				<View style={{
 					flexDirection: 'column', flex: 1,
 					width: RECENT_WORD_FONT_SIZE * RECENT_WORD_FONT_WIDTH_RATIO * 7,
-					// height: RECENT_WORDS_VISIBLE * RECENT_WORD_FONT_SIZE * RECENT_WORD_SPACING,
 				}}>
 					<Text style={styles.recentWordsLabel}>Recent Words:</Text>
 					<ScrollView style={[styles.viewDefault, styles.recentWordsContainer]}>
@@ -116,6 +113,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#bbdfef77',
         padding: PADDING,
 		marginBottom: Constants.UI_PADDING,
+		marginTop: 0,
 		borderRadius: Constants.DEFAULT_BORDER_RAD,
 		flex: 1,
     },

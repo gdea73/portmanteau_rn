@@ -324,7 +324,9 @@ const styles = StyleSheet.create({
 		flexDirection: 'column',
 		backgroundColor: 'transparent',
 		justifyContent: 'space-between',
-		paddingTop: Constants.UI_PADDING + Constants.STATUS_BAR_HEIGHT,
+		paddingTop: Constants.UI_PADDING
+			+ (Platform.OS === 'ios'
+			? Constants.STATUS_BAR_HEIGHT : 0),
 		paddingLeft: Constants.UI_PADDING,
 		paddingRight: Constants.UI_PADDING,
 		paddingBottom: Constants.UI_PADDING,
