@@ -1,5 +1,6 @@
 import React from 'react';
 import {
+	Platform,
 	View,
 	ScrollView,
 	Text,
@@ -37,7 +38,8 @@ const COL_BORDER_RAD = 2;
 const TILE_PADDING = 3;
 const TILE_FONT_SIZE = 26;
 
-var tileSize, tileBorderRad, scaledStile;
+// global vars shared with Tile component
+var tileSize, tileFontSize, tileBorderRad, scaledStile;
 
 class Board extends React.Component {
 	constructor(props) {
@@ -77,6 +79,8 @@ class Board extends React.Component {
 				width: tileSize,
 				borderRadius: tileBorderRad,
 			};
+			tileFontSize = Math.floor(tileSize * 0.385);
+			console.debug('tile size: ' + tileSize + '; tile font size: ' + tileFontSize);
 			this.firstRender = false;
 			this.gravAnims = this.initializeGravAnims();
 			this.breakAnims = this.initializeBreakAnims();
@@ -533,7 +537,7 @@ class Tile extends React.Component {
 					              screenDependentStile, this.props.style]}
 						   onStartShouldSetResponder=
 						   		{this.props.onStartShouldSetResponder}>
-				<Text style={styles.tileText}>{this.props.letter}</Text>
+				<Text style={[{fontSize: tileFontSize}, styles.tileText]}>{this.props.letter}</Text>
 			</Animated.View>
 		);
 	}
@@ -555,7 +559,6 @@ const styles = StyleSheet.create({
 	},
 
 	tileText: {
-		fontSize: TILE_FONT_SIZE,
 		fontFamily: Constants.LEAGUE_SPARTAN,
 		backgroundColor: 'transparent',
 		color: 'white',
