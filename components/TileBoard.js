@@ -79,7 +79,7 @@ class Board extends React.Component {
 				width: tileSize,
 				borderRadius: tileBorderRad,
 			};
-			tileFontSize = Math.floor(tileSize * 0.385);
+			tileFontSize = Math.floor(tileSize * 0.4);
 			console.debug('tile size: ' + tileSize + '; tile font size: ' + tileFontSize);
 			this.firstRender = false;
 			this.gravAnims = this.initializeGravAnims();
@@ -537,7 +537,7 @@ class Tile extends React.Component {
 					              screenDependentStile, this.props.style]}
 						   onStartShouldSetResponder=
 						   		{this.props.onStartShouldSetResponder}>
-				<Text style={[{fontSize: tileFontSize}, styles.tileText]}>{this.props.letter}</Text>
+				<Text style={[{fontSize: tileFontSize, lineHeight: tileFontSize}, styles.tileText]}>{this.props.letter}</Text>
 			</Animated.View>
 		);
 	}
@@ -564,6 +564,7 @@ const styles = StyleSheet.create({
 		color: 'white',
 		textShadowColor: 'black',
 		textShadowOffset: {width: -0.5, height: 1},
+		alignSelf: 'center',
 	},
 
 	tilePickerOuterView: {
