@@ -15,6 +15,11 @@ const TITLE_TEXT_PADDING = 40;
 const BOARD_ASPECT_RATIO = 7/8.05; // slightly over 7/8 for padding
 const N_HIGH_SCORES = 50;
 const LEVEL_LENGTH = 25;
+
+// internal representations of blanks within tile 'deck'
+const BLANK_DROP_TILE = ' ';
+const SUPER_BLANK_DROP_TILE = '*';
+
 var BG_IMAGE_STYLE = {
 	flex: 1,
 	width: null,
@@ -69,6 +74,12 @@ class Constants {
 	}
 	static get LEVEL_LENGTH() {
 		return LEVEL_LENGTH;
+	}
+	static get BLANK_DROP_TILE() {
+		return BLANK_DROP_TILE;
+	}
+	static get SUPER_BLANK_DROP_TILE() {
+		return SUPER_BLANK_DROP_TILE;
 	}
 	static LOGO_CONTAINER_STYLE(height)  {
 		return {

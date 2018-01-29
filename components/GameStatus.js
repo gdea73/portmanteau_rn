@@ -73,19 +73,21 @@ class GameStatus extends React.Component {
 
 	render() {
 		return(
-			<View style={styles.statusView}>
-				<View style={{flexDirection: 'column', flex: 1}}> 
-					<Text style={styles.score}>{this.state.score}</Text>
-					<Text style={styles.level}>
-						LEVEL: {Math.floor(this.state.moves / Constants.LEVEL_LENGTH + 1)}
+			<View style={styles.outerContainer}>
+				<View style={styles.statusContainer}>
+					<Text style={[styles.labelDefault, {fontSize: 30}]}>
+						{this.state.score}
+					</Text>
+					<Text style={styles.labelDefault}>
+						LEVEL: {
+							Math.floor(this.state.moves /
+									   Constants.LEVEL_LENGTH + 1)
+						}
 					</Text>
 				</View>
-				<View style={{
-					flexDirection: 'column', flex: 1,
-					width: RECENT_WORD_FONT_SIZE * RECENT_WORD_FONT_WIDTH_RATIO * 7,
-				}}>
-					<Text style={styles.recentWordsLabel}>Recent Words:</Text>
-					<ScrollView style={[styles.viewDefault, styles.recentWordsContainer]}>
+				<View style={styles.recentWordsOuterContainer}>
+					<Text style={styles.labelDefault}>Recent Words:</Text>
+					<ScrollView style={[styles.recentWordsInnerContainer]}>
 						{this.renderRecentWords()}
 					</ScrollView>	
 				</View>
@@ -107,7 +109,7 @@ class GameStatus extends React.Component {
 }
 
 const styles = StyleSheet.create({
-    statusView: {
+    outerContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         backgroundColor: '#bbdfef77',
@@ -117,22 +119,26 @@ const styles = StyleSheet.create({
 		borderRadius: Constants.DEFAULT_BORDER_RAD,
 		flex: 1,
     },
+	statusContainer: {
+		flex: 3,
+		flexDirection: 'column',
+	},
+	labelDefault: {
+		color: 'white',
+		fontSize: 15,
+		fontFamily: Constants.LEAGUE_SPARTAN,
+	},
 	score: {
 		color: 'white',
 		fontSize: 30,
 		fontFamily: Constants.LEAGUE_SPARTAN,
 	},
-	level: {
-		color: 'white',
-		fontSize: 15,
-		fontFamily: Constants.LEAGUE_SPARTAN,
+	recentWordsOuterContainer: {
+		flex: 4,
+		flexDirection: 'column',
+		width: RECENT_WORD_FONT_SIZE * RECENT_WORD_FONT_WIDTH_RATIO * 7,
 	},
-	recentWordsLabel: {
-		color: 'white',
-		fontSize: 15,
-		fontFamily: Constants.LEAGUE_SPARTAN,
-	},
-	recentWordsContainer: {
+	recentWordsInnerContainer: {
 		flex: 1,
 		backgroundColor: '#332222',
 		borderRadius: Constants.DEFAULT_BORDER_RAD,

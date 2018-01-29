@@ -195,26 +195,29 @@ class Board extends React.Component {
 			top: this.dropTileGravAnim,
 			left: this.dropTileAnim,
 		}
-		if (this.state.dropLetter === ' ') {
+		if (this.state.dropLetter === Constants.BLANK_DROP_TILE) {
 			// the drop tile is a blank -- prompt the user to assign it a letter
 			// and then re-render the board with the newly-chosen drop tile.
 			return (
 				<View style={styles.tilePickerOuterView}>
 					<ScrollView
 						contentContainerStyle={[
-						styles.tilePickerInnerView, { height: tileSize + TILE_PADDING }
-					]}
+							styles.tilePickerInnerView,
+							{height: tileSize + TILE_PADDING}
+						]}
 						horizontal={true}
-
 					>
 						{this.getTilePickerTiles()}
 					</ScrollView>
 				</View>
 			);
+		} else if (this.state.dropLetter === Constants.SUPER_BLANK_DROP_TILE) {
+			// the drop tile is a "super blank"; it replaces an arbitrary tile
+			// on the board
 		} else {
-		return(
-			<Tile style={stile} letter={this.state.dropLetter} />
-		);
+			return(
+				<Tile style={stile} letter={this.state.dropLetter} />
+			);
 		}
 	}
 
@@ -513,7 +516,7 @@ class Board extends React.Component {
             left: this.getColPosX(index),
             backgroundColor: bgColor,
             width: tileSize,
-            height: tileSize * Constants.BOARD_SIZE + TILE_PADDING * (Constants.BOARD_SIZE + 2),
+            height: tileSize * Constants.BOARD_SIZE + TILE_PADDING * (Constants.BOARD_SIZE + 1),
             borderRadius: borderR,
             // TODO: test this properly
             overflow: 'scroll',

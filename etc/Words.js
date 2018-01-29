@@ -5,6 +5,7 @@ var RNFS = require('react-native-fs');
 
 const CHAR_TABLE_SIZE = 102;
 const MIN_WORD_LENGTH = 3;
+const GENERAL_SCORE_MULTIPLIER = 7;
 
 const quantities = {
     A: 9,
@@ -91,7 +92,11 @@ function initCharTable() {
 	console.debug('number of blanks: ' + CHAR_TABLE_SIZE - charTable.length);
 	for (let j = charTable.length; j < CHAR_TABLE_SIZE; j++) {
 		// pad the rest of the char table with BLANKS.
-		charTable.push(' ');
+		if (Math.random() < 0.25) {
+			charTable.push(Constants.SUPER_BLANK_DROP_TILE);
+		} else {
+			charTable.push(Constants.BLANK_DROP_TILE);
+		}
 	}
 }
 function generateTileSet() {
@@ -160,10 +165,10 @@ class Words {
 		if (word === 'MUFFED') {
 			score *= 73;
 		} else if (word === 'GHIA') {
-			score += 1970;
+			score *= 71;
 		}
 		console.debug('score post-multipliers (chainLevel ' + chainLevel + '): ' + score);
-		return score;
+		return score * GENERAL_SCORE_MULTIPLIER;
 	}
 
 	/* parameters:
