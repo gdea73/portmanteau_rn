@@ -37,6 +37,10 @@ const DROP_TILE_MARGIN = 2;
 const COL_BORDER_RAD = 2;
 const TILE_PADDING = 3;
 const TILE_FONT_SIZE = 26;
+const SUPER_BLANK_TILE_UNSELECTED_COLOR = '#222222';
+const SUPER_BLANK_TILE_SELECTED_COLOR = '#888800';
+
+const SUPER_BLANK_PROBABILITY = 0.5;
 
 // global vars shared with Tile component
 var tileSize, tileFontSize, tileBorderRad, scaledStile;
@@ -92,21 +96,35 @@ class Board extends React.Component {
 		return (
 			<View style={styles.boardContainer}>
 				{this.renderColumns()}
-				{this.state.dropLetter == null || this.renderDropTile()}
+				{this.state.dropLetter == null
+					|| (this.state.superBlank && !this.state.superBlankSelectionID)
+					|| this.renderDropTile()
+				}
 			</View>
 		);
 	}
 
 	isGameOver() {
-		var over = true;
 		for (let c = 0; c < Constants.BOARD_SIZE; c++) {
 			for (let r = 0; r < Constants.BOARD_SIZE; r++) {
 				if (this.state.cols[c][r] === ' ') {
-					over = false;
+					return false;
 				}
 			}
 		}
-		return over;
+		return true;
+	}
+
+	tileCount = (nextBoard) => {
+		var tileCount = 0;
+		for (let c = 0; c < Constants.BOARD_SIZE; c++) {
+			for (let r = 0; r < Constants.BOARD_SIZE; r++) {
+				if (nextBoard[c][r] !== ' ') {
+					tileCount++;
+				}
+			}
+		}
+		return tileCount;
 	}
 
 	componentDidMount() {
@@ -195,7 +213,7 @@ class Board extends React.Component {
 			top: this.dropTileGravAnim,
 			left: this.dropTileAnim,
 		}
-		if (this.state.dropLetter === Constants.BLANK_DROP_TILE) {
+		if (this.state.dropLetter === ' ') {
 			// the drop tile is a blank -- prompt the user to assign it a letter
 			// and then re-render the board with the newly-chosen drop tile.
 			return (
@@ -211,9 +229,6 @@ class Board extends React.Component {
 					</ScrollView>
 				</View>
 			);
-		} else if (this.state.dropLetter === Constants.SUPER_BLANK_DROP_TILE) {
-			// the drop tile is a "super blank"; it replaces an arbitrary tile
-			// on the board
 		} else {
 			return(
 				<Tile style={stile} letter={this.state.dropLetter} />
@@ -233,17 +248,35 @@ class Board extends React.Component {
 				width: tileSize,
 				marginRight: TILE_PADDING / 2,
 			}
+			let onPress = () => {
+				console.debug('assigning blank to ' + letter);
+				this.nextDropLetter = letter;
+				this.nextBoard = this.state.cols.slice();
+				this.setNextBoardState();
+			}
+			if (this.state.superBlank) {
+				let tileID = this.state.superBlankSelectionID;
+				onPress = () => {
+					console.debug('replacing tile ID ' + tileID + ' with ' + letter);
+					this.nextBoard[Math.floor(tileID / Constants.BOARD_SIZE)]
+								  [tileID % Constants.BOARD_SIZE] = letter;
+					// consider the replacement a move
+					this.props.incrementMoveCount();
+					// generate a new drop letter
+					this.nextDropLetter = Words.getDropLetter(
+						this.props.getMoveCount()
+					);
+					// check for words after the replacement
+					this.chainLevel = 1;
+					this.setNextBoardState();
+				}
+			}
 			result.push(
-				<TouchableOpacity onPress={() => {
-					  	console.debug('assigning blank to ' + letter);
-					  	this.nextDropLetter = letter;
-						this.nextBoard = this.state.cols.slice();
-						this.setNextBoardState();
-					  }}
-					  key={this.getTileId(Constants.BOARD_SIZE + 1, i)}
+				<TouchableOpacity onPress={onPress}
+					  key={this.getTileID(Constants.BOARD_SIZE + 1, i)}
 				>
 					<Tile style={stile} letter={letter}
-						  key={this.getTileId(Constants.BOARD_SIZE + 2, i)}
+						  key={this.getTileID(Constants.BOARD_SIZE + 2, i)}
 					/>
 				</TouchableOpacity>
 			);
@@ -266,14 +299,21 @@ class Board extends React.Component {
             // last, render the transparent views over the tile area;
 			// these handle the touch events.
             key = COL_TOUCH_LAYER + col;
-            result.push(
-                <View key={key} style={this.getColStyle(key)}
-                    onStartShouldSetResponder={() => this.handleColClick(col)}>
-                </View>
-            );
-			 
+			if (!this.state.superBlank) {
+				result.push(
+					<View key={key} style={this.getColStyle(key)}
+						onStartShouldSetResponder={() => this.handleColClick(col)}>
+					</View>
+				);
+			} 
 		}
 		return result;
+	}
+
+	superBlankSelect = (tileID) => {
+		var state = this.state;
+		state.superBlankSelectionID = tileID;
+		this.setState(state);
 	}
 
 	renderTiles(col) {
@@ -283,24 +323,45 @@ class Board extends React.Component {
 			if (this.state.cols[col][row] !== ' ') {
 				// the gravity animation, if used, will be triggered by
 				// the Board with the proper ending position.
+				let backgroundColor = TILE_COLORS[this.state.cols[col][row]];
+				// tiles only receive touch events during super blank selection
+				let onSelect = undefined;
+				if (this.state.superBlank) {
+					backgroundColor = SUPER_BLANK_TILE_UNSELECTED_COLOR;
+					if (this.state.superBlankSelectionID) {
+						// a selection has been made
+						if (this.state.superBlankSelectionID
+							== this.getTileID(col, row)) {
+							// this is the selected tile; color it accordingly
+							backgroundColor = SUPER_BLANK_TILE_SELECTED_COLOR;
+						}
+					} else {
+						// no selection has been made; generate onSelect
+						onSelect = () => {
+							this.superBlankSelect(this.getTileID(col, row));
+						}
+					}
+				}
 				let stile = {
-					backgroundColor: TILE_COLORS[this.state.cols[col][row]],
+					backgroundColor: backgroundColor,
 					top: this.gravAnims[col][row],
 					opacity: this.breakAnims[col][row],
 					left: 0,
 				}
 				// console.debug('\t\t[' + this.state.cols[col][row] + ']');
 				result.push(
-					<Tile key={this.getTileId(col, row)}
+					<Tile key={this.getTileID(col, row)}
 						  style={stile}
-						  letter={this.state.cols[col][row]} />
+						  letter={this.state.cols[col][row]}
+						  onSelect={onSelect}
+					/>
 				)
 			}
 		}
 		return result;
 	}
 
-	getTileId(col, row) {
+	getTileID(col, row) {
 		return Constants.BOARD_SIZE * col + row;
 	}
 
@@ -309,7 +370,8 @@ class Board extends React.Component {
 		// Most importantly, don't allow any drops to occur
 		// if we're still mid-chain, and words may still be broken.
 		// Also, if we haven't assigned a letter to a blank drop tile, bail.
-		if (this.chainLevel > 0 || this.state.dropLetter === ' ') {
+		if (this.chainLevel > 0 || this.state.superBlank
+			|| this.state.dropLetter === ' ') {
 			return;
 		}
 		var lowestEmptyRow = -1;
@@ -474,9 +536,17 @@ class Board extends React.Component {
 		var newState = this.state;
 		newState.cols = this.nextBoard;
 		newState.dropLetter = this.nextDropLetter; // only differs at chain ending
+		// reset super blank selection
+		newState.superBlankSelectionID = undefined;
+		if (newState.dropLetter === ' '
+			&& Math.random() < SUPER_BLANK_PROBABILITY
+			&& this.tileCount(newState.cols) >= Constants.MIN_WORD_LENGTH) {
+			console.debug('SUPER BLANK');
+			newState.superBlank = true;
+		} else {
+			newState.superBlank = false;
+		}
 		console.debug('about to set new board state with dropLetter ' + newState.dropLetter);
-		/* console.debug('cols:');
-		console.debug(newState.cols); */
 		this.setState(newState);
 	}
 
@@ -539,7 +609,7 @@ class Tile extends React.Component {
 			<Animated.View style={[styles.defaultStile,
 					              screenDependentStile, this.props.style]}
 						   onStartShouldSetResponder=
-						   		{this.props.onStartShouldSetResponder}>
+						   		{this.props.onSelect}>
 				<Text style={[{fontSize: tileFontSize, lineHeight: tileFontSize}, styles.tileText]}>{this.props.letter}</Text>
 			</Animated.View>
 		);
@@ -549,7 +619,7 @@ class Tile extends React.Component {
 const styles = StyleSheet.create({
     boardContainer: {
         flex: 1,
-        backgroundColor: '#bbdfef77',
+        backgroundColor: Constants.COMPONENT_BG_COLOR,
         borderRadius: Constants.DEFAULT_BORDER_RAD,
     },  
 

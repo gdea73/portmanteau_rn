@@ -74,8 +74,8 @@ class GameStatus extends React.Component {
 	render() {
 		return(
 			<View style={styles.outerContainer}>
-				<View style={styles.statusContainer}>
-					<Text style={[styles.labelDefault, {fontSize: 30}]}>
+				<View style={styles.statsContainer}>
+					<Text style={[styles.labelDefault, {fontSize: 50}]}>
 						{this.state.score}
 					</Text>
 					<Text style={styles.labelDefault}>
@@ -112,25 +112,22 @@ const styles = StyleSheet.create({
     outerContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        backgroundColor: '#bbdfef77',
+        backgroundColor: Constants.COMPONENT_BG_COLOR,
         padding: PADDING,
 		marginBottom: Constants.UI_PADDING,
 		marginTop: 0,
 		borderRadius: Constants.DEFAULT_BORDER_RAD,
 		flex: 1,
     },
-	statusContainer: {
+	statsContainer: {
 		flex: 3,
 		flexDirection: 'column',
+		alignItems: 'center',
+		justifyContent: 'space-around',
 	},
 	labelDefault: {
 		color: 'white',
 		fontSize: 15,
-		fontFamily: Constants.LEAGUE_SPARTAN,
-	},
-	score: {
-		color: 'white',
-		fontSize: 30,
 		fontFamily: Constants.LEAGUE_SPARTAN,
 	},
 	recentWordsOuterContainer: {

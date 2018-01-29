@@ -7,6 +7,7 @@ const RECENT_WORDS_COUNT = 10;
 const DEFAULT_BORDER_RAD = 4;
 const TILE_PADDING = 3;
 const UI_PADDING = 10;
+// BOARD_SIZE here for readability, changing this still breaks everything
 const BOARD_SIZE = 7;
 const STATUS_BAR_HEIGHT = Platform.OS === 'ios' ? 20 : StatusBarManager.HEIGHT;
 const LEAGUE_SPARTAN = Platform.OS === 'ios' ? 'League Spartan' : 'League Spartan-Bold';
@@ -15,10 +16,10 @@ const TITLE_TEXT_PADDING = 40;
 const BOARD_ASPECT_RATIO = 7/8.05; // slightly over 7/8 for padding
 const N_HIGH_SCORES = 50;
 const LEVEL_LENGTH = 25;
+const MIN_WORD_LENGTH = 3;
 
-// internal representations of blanks within tile 'deck'
-const BLANK_DROP_TILE = ' ';
-const SUPER_BLANK_DROP_TILE = '*';
+// background color for Board and GameStatus container Views
+const COMPONENT_BG_COLOR = '#FFFFFF' + 'AA' /* alpha */;
 
 var BG_IMAGE_STYLE = {
 	flex: 1,
@@ -75,11 +76,11 @@ class Constants {
 	static get LEVEL_LENGTH() {
 		return LEVEL_LENGTH;
 	}
-	static get BLANK_DROP_TILE() {
-		return BLANK_DROP_TILE;
+	static get MIN_WORD_LENGTH() {
+		return MIN_WORD_LENGTH;
 	}
-	static get SUPER_BLANK_DROP_TILE() {
-		return SUPER_BLANK_DROP_TILE;
+	static get COMPONENT_BG_COLOR() {
+		return COMPONENT_BG_COLOR;
 	}
 	static LOGO_CONTAINER_STYLE(height)  {
 		return {
