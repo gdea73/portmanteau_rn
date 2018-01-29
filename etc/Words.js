@@ -3,7 +3,7 @@ require('./Dictionary.js');
 
 var RNFS = require('react-native-fs');
 
-const CHAR_TABLE_SIZE = 202;
+const CHAR_TABLE_SIZE = 100;
 
 const quantities = {
     A: 9,

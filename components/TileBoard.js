@@ -38,9 +38,9 @@ const COL_BORDER_RAD = 2;
 const TILE_PADDING = 3;
 const TILE_FONT_SIZE = 26;
 const SUPER_BLANK_TILE_UNSELECTED_COLOR = '#222222';
-const SUPER_BLANK_TILE_SELECTED_COLOR = '#888800';
+const SUPER_BLANK_TILE_SELECTED_COLOR = '#AAAA00';
 
-const SUPER_BLANK_PROBABILITY = 0.5;
+const SUPER_BLANK_PROBABILITY = 0.3;
 
 // global vars shared with Tile component
 var tileSize, tileFontSize, tileBorderRad, scaledStile;
@@ -452,7 +452,9 @@ class Board extends React.Component {
 				// update GameStatus via callbacks to GameScreen
 				console.debug('validWord: ' + validWord + '; score: ' + Words.getWordScore(validWord, this.chainLevel) + ' (chain level ' + this.chainLevel + ')');
 				this.props.increaseScore(
-					Words.getWordScore(validWord, this.chainLevel),
+					Words.getWordScore(validWord, this.chainLevel)
+					* Math.floor(this.props.getMoveCount()
+								 / Constants.LEVEL_LENGTH + 1),
 					this.chainLevel++
 				);
 				this.props.addRecentWord(validWord, this.chainLevel);
