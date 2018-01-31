@@ -36,7 +36,7 @@ const CHAIN_DELAY = 700;
 const DROP_TILE_MARGIN = 2;
 const COL_BORDER_RAD = 2;
 const TILE_PADDING = 3;
-const TILE_FONT_RATIO = 0.75;
+const TILE_FONT_RATIO = 0.45;
 const SUPER_BLANK_TILE_UNSELECTED_COLOR = '#222222';
 const SUPER_BLANK_TILE_SELECTED_COLOR = '#AAAA00';
 
@@ -83,7 +83,6 @@ class Board extends React.Component {
 				width: tileSize,
 				borderRadius: tileBorderRad,
 			};
-			// tileFontSize = Math.floor(tileSize * 0.4);
 			tileFontSize = tileSize * TILE_FONT_RATIO;
 			console.debug('tile size: ' + tileSize + '; tile font size: ' + tileFontSize);
 			this.firstRender = false;
@@ -608,16 +607,25 @@ class Board extends React.Component {
 
 class Tile extends React.Component {
 	render() {
-		var textTopValue = (1 - TILE_FONT_RATIO) / 2;
+		var absurdityRatio = 0.90;
+		var fontOffset = (1 - TILE_FONT_RATIO) / 2 * absurdityRatio * tileSize;
+		var textStyle = [styles.tileText, {
+			fontSize: tileFontSize,
+			width: tileSize,
+		}];
+		if (Platform.OS == 'ios') {
+			textStyle.push({
+				position: 'absolute',
+				top: fontOffset,
+			});
+		} else {
+		}
 		return(
 			<Animated.View style={[styles.defaultStile,
 					              screenDependentStile, this.props.style]}
 						   onStartShouldSetResponder=
 						   		{this.props.onSelect}>
-										<Text
-											style={[styles.tileText,
-												{fontSize: tileFontSize, position: 'absolute', top: textTopValue * 0.90 * tileSize, width: tileSize},
-											]}>
+										<Text style={textStyle}>
 											{this.props.letter}
 										</Text>
 			</Animated.View>
@@ -636,6 +644,7 @@ const styles = StyleSheet.create({
 		position: 'absolute',
 		borderWidth: 1,
 		borderColor: 'black',
+		justifyContent: 'center',
 	},
 
 	tileText: {
