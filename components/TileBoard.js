@@ -18,7 +18,7 @@ const {WIDTH, HEIGHT} = require('Dimensions').get('window');
 const CENTER_COL = 3;
 
 /* dumb constants from when I thought "unique ID" meant "unique numeric ID."
-  
+
    layer constants are summed with column numbers
    to generate unique View keys for each layer of
    a column; also used to determine transparency.
@@ -36,7 +36,7 @@ const CHAIN_DELAY = 700;
 const DROP_TILE_MARGIN = 2;
 const COL_BORDER_RAD = 2;
 const TILE_PADDING = 3;
-const TILE_FONT_SIZE = 26;
+const TILE_FONT_RATIO = 0.75;
 const SUPER_BLANK_TILE_UNSELECTED_COLOR = '#222222';
 const SUPER_BLANK_TILE_SELECTED_COLOR = '#AAAA00';
 
@@ -66,7 +66,7 @@ class Board extends React.Component {
 		var dropLetter = this.props.initialDropLetter
 					   || Words.getDropLetter(this.props.getMoveCount());
 		this.state = {
-			cols: cols,	
+			cols: cols,
 			dropLetter: dropLetter,
 		}
 		this.firstRender = true;
@@ -83,7 +83,8 @@ class Board extends React.Component {
 				width: tileSize,
 				borderRadius: tileBorderRad,
 			};
-			tileFontSize = Math.floor(tileSize * 0.4);
+			// tileFontSize = Math.floor(tileSize * 0.4);
+			tileFontSize = tileSize * TILE_FONT_RATIO;
 			console.debug('tile size: ' + tileSize + '; tile font size: ' + tileFontSize);
 			this.firstRender = false;
 			this.gravAnims = this.initializeGravAnims();
@@ -305,7 +306,7 @@ class Board extends React.Component {
 						onStartShouldSetResponder={() => this.handleColClick(col)}>
 					</View>
 				);
-			} 
+			}
 		}
 		return result;
 	}
@@ -408,7 +409,7 @@ class Board extends React.Component {
 
 		// The following code was moved from breakWordsCallback in an attempt
 		// to address the issue of the drop tile's missing break animation.
-		var board = this.state.cols.slice();	
+		var board = this.state.cols.slice();
 		// we've just dropped a tile into the board, so we need to add the
 		// drop tile to our temporary array of colums while we search.
 		board[this.lastDropCol][this.lastDropRow] = this.state.dropLetter;
@@ -434,7 +435,7 @@ class Board extends React.Component {
 		// by the setNextBoardState() callback upon animation completion.
 		this.nextBoard = [];
 		for (let boardCol = 0; boardCol < Constants.BOARD_SIZE; boardCol++) {
-			this.nextBoard.push(board[boardCol].slice());	
+			this.nextBoard.push(board[boardCol].slice());
 		}
 		for (let i = 0; i < wordsToCheck.length; i++) {
 			var boardWord = wordsToCheck[i];
@@ -607,12 +608,18 @@ class Board extends React.Component {
 
 class Tile extends React.Component {
 	render() {
+		var textTopValue = (1 - TILE_FONT_RATIO) / 2;
 		return(
 			<Animated.View style={[styles.defaultStile,
 					              screenDependentStile, this.props.style]}
 						   onStartShouldSetResponder=
 						   		{this.props.onSelect}>
-				<Text style={[{fontSize: tileFontSize, lineHeight: tileFontSize}, styles.tileText]}>{this.props.letter}</Text>
+										<Text
+											style={[styles.tileText,
+												{fontSize: tileFontSize, position: 'absolute', top: textTopValue * 0.90 * tileSize, width: tileSize},
+											]}>
+											{this.props.letter}
+										</Text>
 			</Animated.View>
 		);
 	}
@@ -623,12 +630,10 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: Constants.COMPONENT_BG_COLOR,
         borderRadius: Constants.DEFAULT_BORDER_RAD,
-    },  
+    },
 
 	defaultStile: {
 		position: 'absolute',
-		justifyContent: 'center',
-		alignItems: 'center',
 		borderWidth: 1,
 		borderColor: 'black',
 	},
@@ -638,8 +643,9 @@ const styles = StyleSheet.create({
 		backgroundColor: 'transparent',
 		color: 'white',
 		textShadowColor: 'black',
-		textShadowOffset: {width: -0.5, height: 1},
+		textShadowOffset: {width: -1.5, height: 2},
 		alignSelf: 'center',
+		textAlign: 'center',
 	},
 
 	tilePickerOuterView: {
@@ -653,9 +659,16 @@ const styles = StyleSheet.create({
 	tilePickerInnerView: {
 		flexDirection: 'row',
 	},
+
+	tileTextContainer: {
+		flex: 1,
+		backgroundColor: '#000',
+		justifyContent: 'center',
+		alignItems: 'center',
+	},
 });
 
-const TILE_COLORS = { 
+const TILE_COLORS = {
     'A': '#F45F62',
     'B': '#5AC3E2',
     'C': '#5AE270',
