@@ -40,8 +40,6 @@ const TILE_FONT_RATIO = 0.45;
 const SUPER_BLANK_TILE_UNSELECTED_COLOR = '#222222';
 const SUPER_BLANK_TILE_SELECTED_COLOR = '#AAAA00';
 
-const SUPER_BLANK_PROBABILITY = 0.3;
-
 // global vars shared with Tile component
 var tileSize, tileFontSize, tileBorderRad, scaledStile;
 
@@ -530,6 +528,14 @@ class Board extends React.Component {
 		]).start(this.setNextBoardState.bind(this));
 	}
 
+	// probability of a super blank is given as a function of level:
+	// p_superBlank(level) = -1/(0.1 * level + 1.4) + 1
+	// asymptote is 1; p_superBlank(15) ~= 0.65
+	getSuperBlankProbability = (moveCount) => {
+	 	var level = Math.floor(moveCount / Constants.LEVEL_LENGTH + 1);
+	 	return -1.0/(0.1 * level + 1.4) + 1;
+	}
+
 	setNextBoardState() {
 		// This is called at the end of each breakWordsCallback() execution;
 		// if no words were broken, we have set a new drop letter and chainLevel
@@ -541,7 +547,7 @@ class Board extends React.Component {
 		// reset super blank selection
 		newState.superBlankSelectionID = undefined;
 		if (newState.dropLetter === ' '
-			&& Math.random() < SUPER_BLANK_PROBABILITY
+			&& Math.random() < this.getSuperBlankProbability(this.props.getMoveCount())
 			&& this.tileCount(newState.cols) >= Constants.MIN_WORD_LENGTH) {
 			console.debug('SUPER BLANK');
 			newState.superBlank = true;
@@ -549,6 +555,7 @@ class Board extends React.Component {
 			newState.superBlank = false;
 		}
 		console.debug('about to set new board state with dropLetter ' + newState.dropLetter);
+		console.debug('super blank probability now: ' + this.getSuperBlankProbability(this.props.getMoveCount()));
 		this.setState(newState);
 	}
 
