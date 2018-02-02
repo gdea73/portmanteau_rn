@@ -10,7 +10,7 @@ const quantities = {
 	B: 2,
 	C: 2,
 	D: 4,
-	E: 12,
+	E: 11,
 	F: 2,
 	G: 3,
 	H: 2,

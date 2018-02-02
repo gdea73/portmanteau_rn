@@ -120,7 +120,7 @@ const styles = StyleSheet.create({
 		flex: 1,
     },
 	statsContainer: {
-		flex: 3,
+		flex: 4,
 		flexDirection: 'column',
 		alignItems: 'center',
 		justifyContent: 'space-around',
@@ -131,7 +131,7 @@ const styles = StyleSheet.create({
 		fontFamily: Constants.LEAGUE_SPARTAN,
 	},
 	recentWordsOuterContainer: {
-		flex: 4,
+		flex: 3,
 		flexDirection: 'column',
 		width: RECENT_WORD_FONT_SIZE * RECENT_WORD_FONT_WIDTH_RATIO * 7,
 	},
