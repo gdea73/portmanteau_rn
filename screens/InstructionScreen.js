@@ -78,9 +78,9 @@ var pages = [
 		text: 'If you drop the "T" in the far left column, you can break '
 			+ 'two words simultaneously. In addition, you can chain your '
 			+ 'words, although this is difficult to plan. In this case, '
-			+ '"ZAP" will break at chain level 2, since its isolation is a '
-			+ 'direct consequence of "ART" breaking. More chains yield more '
-			+ 'points. If you get a chain of 4 or greater, gimme a ring.',
+			+ '"ZAP" will break at chain level 3, since its isolation is a '
+			+ 'direct consequence of "ART" and "TEA" breaking. More chains yield '
+			+ 'more points. If you get a chain ≥ 5, you\'re a wizard.',
 		moveCount: 0,
 	},
 ];
@@ -138,19 +138,21 @@ class InstructionScreen extends React.Component {
 									this.props.navigation.goBack(null);
 								}
 							}}
-							title="Go Back"
+							title=" ← "
 							height={BTN_HEIGHT}
-							textStyle={{fontSize: 12}}
+							textStyle={{fontSize: 28, bottom: 6}}
+							buttonStyle={{width: 65}}
 						/>
 						<Text style={styles.titleText}>
-							Instructions (page {this.page + 1} of {N_PAGES})
+							Instructions ({this.page + 1} of {N_PAGES})
 						</Text>
 						<NavButton
 							onPress={() => { this.setPage(this.page + 1); }}
-							title="Continue"
+							title=" → "
 							height={BTN_HEIGHT}
 							disabled={this.page === N_PAGES - 1}
-							textStyle={{fontSize: 12}}
+							textStyle={{fontSize: 28, bottom: 6}}
+							buttonStyle={{width: 65}}
 						/>
 					</View>
 					<ScrollView
