@@ -7,11 +7,12 @@ const AS_GAME_KEY = 'portmanteau:savedGame';
 const AS_SCORES_KEY = 'portmanteau:highScores';
 
 class Storage {
-	static saveGame(gameStats, dropLetter, cols) {
+	static saveGame(gameStats, dropLetter, cols, tileSet) {
 		var savedGame = {
 			gameStats,
 			dropLetter,
-			cols
+			cols,
+			tileSet
 		};
 		return AsyncStorage.setItem(AS_GAME_KEY, JSON.stringify(savedGame));
 	}

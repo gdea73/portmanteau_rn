@@ -16,6 +16,7 @@ import GameStatus from '../components/GameStatus';
 import NavButton from '../components/NavButton';
 import Constants from '../etc/Constants';
 import Storage from '../etc/Storage';
+import Words from '../etc/Words';
 
 var { width, height } = require('Dimensions').get('window');
 const { StatusBarManager } = NativeModules;
@@ -40,6 +41,8 @@ class GameScreen extends React.Component {
 			this.initialDropLetter = gameData.dropLetter;
 			// load saved game stats for the GameStatus component
 			this.initialStats = gameData.gameStats;
+			// load the shuffled collection of tiles
+			Words.tileSet = gameData.tileSet;
 		}
 	}
 
@@ -157,12 +160,12 @@ class GameScreen extends React.Component {
 
 	saveGame = (callback) => {
 		// This function is to be called periodically by the Board, and will
-		// save the current board state (including drop tile), and game status
-		// to AsyncStorage.
-		var stats = this.getStats();
-		var dropLetter = this.boardRef.state.dropLetter;
-		var cols = this.boardRef.state.cols;
-		return Storage.saveGame(stats, dropLetter, cols).then(callback);
+		// save the current board state (including drop tile and tile set), and
+		// game status to AsyncStorage.
+		return Storage.saveGame(
+			this.getStats(), this.boardRef.state.dropLetter,
+			this.boardRef.state.cols, Words.tileSet
+		).then(callback);
 	}
 
 	// This should be called on the press of the 'Back' button,
