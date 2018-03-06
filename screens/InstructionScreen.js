@@ -17,17 +17,16 @@ const PADDING = 10;
 const MARGIN = 5;
 const BTN_HEIGHT = 40;
 const PAGE_DELAY = 2000;
-const N_PAGES = 3;
 
 var { width, height } = require('Dimensions').get('window');
 var pages = [
 	{
 		dropLetter: 'S',
 		cols: [
-			[' ', ' ', ' ', ' ', ' ', 'V', 'A'],
-			[' ', ' ', ' ', ' ', 'Q', 'C', 'G'],
-			[' ', ' ', ' ', ' ', ' ', 'A', 'H'],
-			[' ', ' ', ' ', ' ', ' ', 'R', 'A'],
+			[' ', ' ', ' ', ' ', ' ', 'V', 'R'],
+			[' ', ' ', ' ', ' ', 'Q', 'C', 'O'],
+			[' ', ' ', ' ', ' ', ' ', 'A', 'B'],
+			[' ', ' ', ' ', ' ', ' ', 'R', 'U'],
 			[' ', ' ', ' ', ' ', ' ', ' ', ' '],
 			[' ', ' ', ' ', ' ', ' ', ' ', 'T'],
 			[' ', ' ', ' ', ' ', ' ', ' ', ' '],
@@ -102,7 +101,7 @@ class InstructionScreen extends React.Component {
 	}
 
 	setPage(newPage) {
-		if (newPage < N_PAGES) {
+		if (newPage < pages.length) {
 			this.page = newPage;
 			this.setState({...pages[newPage]});
 		}
@@ -138,21 +137,21 @@ class InstructionScreen extends React.Component {
 									this.props.navigation.goBack(null);
 								}
 							}}
-							title=" ← "
+							title="←"
 							height={BTN_HEIGHT}
-							textStyle={{fontSize: 28, bottom: 6}}
-							buttonStyle={{width: 65}}
+							textStyle={{fontSize: 28}}
+							buttonStyle={{width: 65, borderWidth: 0, padding: 0}}
 						/>
 						<Text style={styles.titleText}>
-							Instructions ({this.page + 1} of {N_PAGES})
+							Instructions ({this.page + 1} of {pages.length})
 						</Text>
 						<NavButton
 							onPress={() => { this.setPage(this.page + 1); }}
-							title=" → "
+							title="→"
 							height={BTN_HEIGHT}
-							disabled={this.page === N_PAGES - 1}
-							textStyle={{fontSize: 28, bottom: 6}}
-							buttonStyle={{width: 65}}
+							disabled={this.page === pages.length - 1}
+							textStyle={{fontSize: 28}}
+							buttonStyle={{width: 65, borderWidth: 0, padding: 0}}
 						/>
 					</View>
 					<ScrollView

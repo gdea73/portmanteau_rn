@@ -461,14 +461,19 @@ class Board extends React.Component {
 					// breaking a vertical word
 					for (let r = boardWord.startRow; r >= boardWord.endRow; r--) {
 						this.nextBoard[boardWord.startCol][r] = ' ';
+						console.debug('adding break animation for (' +
+							boardWord.startCol + ', ' + r + ').');
 						breakAnimations.push(
 							this.getBreakAnimTiming(boardWord.startCol, r)
 						);
+						
 					}
 				} else if (boardWord.startRow === boardWord.endRow) {
 					// breaking a horizontal word
 					for (let c = boardWord.startCol; c <= boardWord.endCol; c++) {
 						this.nextBoard[c][boardWord.startRow] = ' ';
+						console.debug('adding break animation for (' +
+							c + ', ' + boardWord.startCol + ').');
 						breakAnimations.push(
 							this.getBreakAnimTiming(c, boardWord.startRow)
 						);
@@ -523,8 +528,8 @@ class Board extends React.Component {
 		console.debug("this.nextBoard:");
 		console.debug(this.nextBoard);
 		Animated.sequence([
-			Animated.parallel(breakAnimations),
-			Animated.parallel(gravityAnimations),
+			Animated.parallel(breakAnimations, {stopTogether: false}),
+			Animated.parallel(gravityAnimations, {stopTogether: false}),
 		]).start(this.setNextBoardState.bind(this));
 	}
 
