@@ -5,7 +5,8 @@ import {
 	Button,
 	Text,
 	Image,
-	StyleSheet
+	StyleSheet,
+	PixelRatio
 } from 'react-native';
 import { StackNavigator } from 'react-navigation';
 
@@ -15,7 +16,9 @@ import NavButton from '../components/NavButton';
 
 const PADDING = 10;
 const MARGIN = 5;
-const BTN_HEIGHT = 40;
+const BTN_HEIGHT = 30;
+const BTN_WIDTH = 40;
+const BTN_FONT_SIZE = 38;
 const PAGE_DELAY = 2000;
 
 var { width, height } = require('Dimensions').get('window');
@@ -120,6 +123,7 @@ class InstructionScreen extends React.Component {
 	render() {
 		var instrHeight = height - 6 * MARGIN - (width
 						/ Constants.BOARD_ASPECT_RATIO);
+		var enableNextButton = !!(this.page !== pages.length - 1);
 		return (
 			<View style={styles.container}>
 				<Image style={Constants.BG_IMAGE_STYLE}
@@ -139,19 +143,24 @@ class InstructionScreen extends React.Component {
 							}}
 							title="←"
 							height={BTN_HEIGHT}
-							textStyle={{fontSize: 28}}
-							buttonStyle={{width: 65, borderWidth: 0, padding: 0}}
+							textStyle={styles.navButtonFontStyle}
+							buttonStyle={styles.navButtonStyle}
 						/>
 						<Text style={styles.titleText}>
 							Instructions ({this.page + 1} of {pages.length})
 						</Text>
 						<NavButton
-							onPress={() => { this.setPage(this.page + 1); }}
+							onPress={() => {
+								if (enableNextButton) {
+									this.setPage(this.page + 1);
+								}
+							}}
 							title="→"
 							height={BTN_HEIGHT}
-							disabled={this.page === pages.length - 1}
-							textStyle={{fontSize: 28}}
-							buttonStyle={{width: 65, borderWidth: 0, padding: 0}}
+							disabled={!enableNextButton}
+							key={'navButton' + this.page}
+							textStyle={styles.navButtonFontStyle}
+							buttonStyle={styles.navButtonStyle}
 						/>
 					</View>
 					<ScrollView
@@ -220,11 +229,22 @@ styles = StyleSheet.create({
 		flex: 0, height: BTN_HEIGHT,
 		flexDirection: 'row',
 		justifyContent: 'space-between',
+		alignItems: 'center',
 	},
 	titleText: {
 		fontSize: 16,
+		textAlign: 'center',
 		fontFamily: Constants.LEAGUE_SPARTAN,
 		color: 'white',
+		flex: 1,
+	},
+	navButtonStyle: {
+		width: BTN_WIDTH, borderWidth: 0, padding: 0, top: 0,
+		alignItems: 'center',
+	},
+	navButtonFontStyle: {
+		fontSize: BTN_FONT_SIZE,
+		bottom: PixelRatio.getPixelSizeForLayoutSize(3),
 	},
 });
 
