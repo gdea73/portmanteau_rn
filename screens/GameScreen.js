@@ -53,7 +53,6 @@ class GameScreen extends React.Component {
 	}
 
 	autosave = () => {
-		console.debug('~~~ autosave activated');
 		this.saveGame();
 		this.timer = setTimeout(
 			() => { this.autosave() },
@@ -174,7 +173,7 @@ class GameScreen extends React.Component {
 		// This function is to be called periodically by the Board, and will
 		// save the current board state (including drop tile and tile set), and
 		// game status to AsyncStorage.
-		console.debug('~~~ saving game');
+		console.debug('saving game');
 		return Storage.saveGame(
 			this.getStats(), this.boardRef.state.dropLetter,
 			this.boardRef.state.cols, Words.getTileSet()

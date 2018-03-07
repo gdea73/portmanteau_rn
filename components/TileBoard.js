@@ -31,6 +31,7 @@ const DROP_TILE_ANIM_X_DURATION = 200;
 const DROP_TILE_ANIM_Y_DURATION = 80;
 const TILE_BREAK_ANIM_DURATION = 200;
 const CHAIN_DELAY = 700;
+const SUPER_BLANK_REPLACE_DELAY = 500;
 
 // aesthetic constants
 const DROP_TILE_MARGIN = 2;
@@ -91,13 +92,36 @@ class Board extends React.Component {
 		}
 		console.debug('board at render time:');
 		console.debug(this.state.cols);
+		var message = undefined;
+		if (this.state.superBlank) {
+			if (this.state.superBlankSelectionID) {
+				message = 'Choose the new letter for the selected tile.';
+			} else {
+				message = 'Select any letter on the board to edit.';
+			}
+		} else if (!this.state.superBlank && this.state.dropLetter == ' ') {
+			message = 'Choose any letter to drop into the board.';
+		}
 		return (
 			<View style={styles.boardContainer}>
 				{this.renderColumns()}
+				{message && this.renderMessage(message)}
 				{this.state.dropLetter == null
-					|| (this.state.superBlank && !this.state.superBlankSelectionID)
-					|| this.renderDropTile()
-				}
+					|| (
+						this.state.superBlank
+						&& !this.state.superBlankSelectionID
+				  ) || this.renderDropTile()}
+			</View>
+		);
+	}
+
+	renderMessage = (message) => {
+		return(
+			<View style={[
+				styles.messageContainer,
+				{ top: tileSize + 2 * TILE_PADDING },
+			]}>
+				<Text style={styles.messageText}>{message}</Text>
 			</View>
 		);
 	}
@@ -143,10 +167,16 @@ class Board extends React.Component {
 		if (this.chainLevel > 0) {
 			// we're mid-chain; must return to the breakWordsCallback
 			if (this.chainLevel > 1) {
-				// (new: after a brief delay to allow the user to process the chain)
+				// (after a brief delay to allow the user to process the chain)
 				this.timer = setTimeout(() => {
 						this.breakWordsCallback()
-					}, CHAIN_DELAY);
+				}, CHAIN_DELAY);
+			} else if (this.superBlankDelay) {
+				// (new: delay after user edits a tile before words are broken)
+				this.superBlankDelay = false;
+				this.timer = setTimeout(() => {
+						this.breakWordsCallback()
+				}, SUPER_BLANK_REPLACE_DELAY);
 			} else {
 				this.breakWordsCallback();
 			}
@@ -266,7 +296,8 @@ class Board extends React.Component {
 					);
 					// check for words after the replacement
 					this.chainLevel = 1;
-					this.setNextBoardState();
+					this.superBlankDelay = true;
+					this.setNextBoardState()
 				}
 			}
 			result.push(
@@ -560,7 +591,6 @@ class Board extends React.Component {
 			newState.superBlank = false;
 		}
 		console.debug('about to set new board state with dropLetter ' + newState.dropLetter);
-		console.debug('super blank probability now: ' + this.getSuperBlankProbability(this.props.getMoveCount()));
 		this.setState(newState);
 	}
 
@@ -651,14 +681,26 @@ const styles = StyleSheet.create({
         backgroundColor: Constants.COMPONENT_BG_COLOR,
         borderRadius: Constants.DEFAULT_BORDER_RAD,
     },
-
+	messageContainer: {
+		position: 'absolute',
+		left: 0,
+		right: 0,
+		backgroundColor: '#5AE27073',
+		justifyContent: 'center',
+	},
+	messageText: {
+		color: 'white',
+		fontSize: 18,
+		textAlign: 'center',
+		textShadowColor: 'black',
+		textShadowOffset: {width: -0.75, height: 1},
+	},
 	defaultStile: {
 		position: 'absolute',
 		borderWidth: 1,
 		borderColor: 'black',
 		justifyContent: 'center',
 	},
-
 	tileText: {
 		fontFamily: Constants.LEAGUE_SPARTAN,
 		backgroundColor: 'transparent',
@@ -668,7 +710,6 @@ const styles = StyleSheet.create({
 		alignSelf: 'center',
 		textAlign: 'center',
 	},
-
 	tilePickerOuterView: {
 		position: 'absolute',
 		top: TILE_PADDING / 2,
@@ -676,11 +717,9 @@ const styles = StyleSheet.create({
 		right: TILE_PADDING,
 		backgroundColor: 'transparent',
 	},
-
 	tilePickerInnerView: {
 		flexDirection: 'row',
 	},
-
 	tileTextContainer: {
 		flex: 1,
 		backgroundColor: '#000',

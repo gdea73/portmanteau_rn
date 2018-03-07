@@ -64,7 +64,12 @@ var pages = [
 		text: 'Occasionally, you will be given a "blank" instead of a static '
 			+ 'letter to drop into the board. You can scroll horizontally to '
 			+ 'find the desired letter, and then select it; then, it becomes '
-			+ 'the new drop letter.',
+			+ 'the new drop letter.\n'
+			+ 'As the game progresses, '
+			+ 'An increasing fraction of these blanks will be "super blanks;" '
+			+ 'i.e., you can use them to edit a tile already on the board. '
+			+ 'They can be particularly helpful when one letter is preventing '
+			+ 'many potential words from being built.',
 		moveCount: 0,
 	}, {
 		dropLetter: 'T',
