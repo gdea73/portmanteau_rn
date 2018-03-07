@@ -20,6 +20,7 @@ import Words from '../etc/Words';
 
 var { width, height } = require('Dimensions').get('window');
 const { StatusBarManager } = NativeModules;
+const AUTOSAVE_INTERVAL_MS = 30 * 1000;
 
 class GameScreen extends React.Component {
 	static navigationOptions = {
@@ -48,6 +49,16 @@ class GameScreen extends React.Component {
 
 	componentDidMount() {
 		BackHandler.addEventListener('hardwareBackPress', this.onBackButtonPress);
+		this.autosave();
+	}
+
+	autosave = () => {
+		console.debug('~~~ autosave activated');
+		this.saveGame();
+		this.timer = setTimeout(
+			() => { this.autosave() },
+			AUTOSAVE_INTERVAL_MS
+		);
 	}
 
 	componentWillUpdate() {
@@ -132,6 +143,7 @@ class GameScreen extends React.Component {
 
 	componentWillUnmount() {
 		BackHandler.removeEventListener('hardwareBackPress', this.onBackButtonPress);
+		clearTimeout(this.timer);
 	}
 
 	onBackButtonPress = () => {
@@ -162,6 +174,7 @@ class GameScreen extends React.Component {
 		// This function is to be called periodically by the Board, and will
 		// save the current board state (including drop tile and tile set), and
 		// game status to AsyncStorage.
+		console.debug('~~~ saving game');
 		return Storage.saveGame(
 			this.getStats(), this.boardRef.state.dropLetter,
 			this.boardRef.state.cols, Words.getTileSet()
