@@ -259,7 +259,12 @@ class Words {
         }
         return wordsToCheck;
     }
-
+	static getTileSet() {
+		return tileSet;
+	}
+	static setTileSet(newTileSet) {
+		tileSet = newTileSet;
+	}
 }
 
 const words = [

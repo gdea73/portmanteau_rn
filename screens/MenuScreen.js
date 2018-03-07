@@ -68,8 +68,6 @@ class MenuScreen extends React.Component {
 				savedGameData: JSON.parse(game),
 			};
 			this.setState(state);
-
-
 		}).catch(() => {
 			console.debug('menu could not load saved game');
 			var state = this.state;

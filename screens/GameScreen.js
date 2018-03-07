@@ -42,7 +42,7 @@ class GameScreen extends React.Component {
 			// load saved game stats for the GameStatus component
 			this.initialStats = gameData.gameStats;
 			// load the shuffled collection of tiles
-			Words.tileSet = gameData.tileSet;
+			Words.setTileSet(gameData.tileSet);
 		}
 	}
 
@@ -164,7 +164,7 @@ class GameScreen extends React.Component {
 		// game status to AsyncStorage.
 		return Storage.saveGame(
 			this.getStats(), this.boardRef.state.dropLetter,
-			this.boardRef.state.cols, Words.tileSet
+			this.boardRef.state.cols, Words.getTileSet()
 		).then(callback);
 	}
 
