@@ -86,7 +86,6 @@ class GameScreen extends React.Component {
 		Storage.loadHighScores().then((scoresJSON) => {
 			var scores = JSON.parse(scoresJSON);
             console.debug('loaded high scores (pre-save)');
-			console.debug(scores);
             if (score > scores[0].score) {
                 // worth adding to the list
 				var status = 'high';
@@ -107,13 +106,11 @@ class GameScreen extends React.Component {
 						return 1;
 					}
 				});
-                console.debug('setting high scores: ');
-                console.debug(scores);
                 Storage.saveHighScores(scores).then(() => {
 					console.debug('successfully saved high scores');
 					return status;
 				}).catch((error) => {
-					console.debug('failed to save high scores: ' + error);
+					console.warn('failed to save high scores: ' + error);
 					return error;
 				});
             } else {
@@ -241,6 +238,9 @@ class GameScreen extends React.Component {
 	}
 
 	renderGameOver = () => {
+		// disable autosave timer to prevent attempted access to unmounted
+		// GameStatus component
+		clearTimeout(this.timer);
 		var stats = this.getStats();
 		var scoreStatus = this.saveHighScore(stats.score);
 		var scoreStatusText = '';
@@ -257,9 +257,9 @@ class GameScreen extends React.Component {
 				</View>
 				<View style={{flex: 4, justifyContent: 'space-around'}}>
 					<Text style={styles.gameOverScoreText}>{stats.score}</Text>
-					<Text style={styles.gameOverLongestWordText}>Longest Word: {stats.longestWord} letters</Text>
-					<Text style={styles.gameOverLongestChainText}>Longest Chain: {stats.longestChain} words</Text>
-					<Text style={styles.gameOverMovesText}>Total Moves: {stats.moves}</Text>
+					<Text style={styles.gameOverLongestWordText}>LONGEST WORD: {stats.longestWord} letters</Text>
+					<Text style={styles.gameOverLongestChainText}>LONGEST CHAIN: {stats.longestChain} words</Text>
+					<Text style={styles.gameOverMovesText}>TOTAL MOVES: {stats.moves}</Text>
 					<NavButton
 						onPress={() => {
 							this.removeSavedGame();
@@ -267,7 +267,7 @@ class GameScreen extends React.Component {
 							this.props.navigation
 								.state.params.onSaveCallback();
 						}}
-						title="Go Back"
+						title="GO BACK"
 					/>
 				</View>
 			</View>
@@ -359,27 +359,32 @@ const styles = StyleSheet.create({
 		justifyContent: 'center',
     },  
     gameOverText: {
+		fontFamily: Constants.LEAGUE_SPARTAN,
         fontSize: 42, 
 		textAlign: 'center',
         color: 'white',
     },  
     gameOverScoreText: {
+		fontFamily: Constants.LEAGUE_SPARTAN,
         fontSize: 42, 
 		textAlign: 'center',
         color: 'white',
     },  
     gameOverLongestChainText: {
+		fontFamily: Constants.LEAGUE_SPARTAN,
         fontSize: 24, 
 		textAlign: 'center',
         color: 'white',
     },  
     gameOverLongestWordText: {
+		fontFamily: Constants.LEAGUE_SPARTAN,
         fontSize: 24, 
 		textAlign: 'center',
         color: 'white',
     },  
     gameOverMovesText: {
-        fontSize: 16, 
+		fontFamily: Constants.LEAGUE_SPARTAN,
+        fontSize: 18, 
 		textAlign: 'center',
         color: 'white',
     }, 
