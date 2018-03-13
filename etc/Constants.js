@@ -32,6 +32,29 @@ var LOGO_IMAGE_STYLE = {
 	height: null,
 	width: null,
 };
+const BTN_HEIGHT = 30;
+const BTN_WIDTH = 40;
+var BTN_HEADER_STYLE = {
+	flex: 0, height: BTN_HEIGHT,
+	flexDirection: 'row',
+	justifyContent: 'space-between',
+	alignItems: 'center',
+};
+var HEADER_TEXT_STYLE = {
+	fontSize: 16,
+	textAlign: 'center',
+	fontFamily: LEAGUE_SPARTAN,
+	color: 'white',
+	flex: 1,
+};
+var NAV_BTN_STYLE = {
+	width: BTN_WIDTH, borderWidth: 0, padding: 0, top: 0,
+	margin: 0, alignItems: 'center',
+};
+var NAV_BTN_FONT_STYLE = {
+	fontFamily: LEAGUE_SPARTAN,
+	fontSize: 24,
+}
 
 class Constants {
 	static get RECENT_WORDS_COUNT() {
@@ -90,6 +113,24 @@ class Constants {
 			top: 0, left: 0,
 			aspectRatio: Constants.TITLE_IMAGE_ASPECT,
 		};
+	}
+	static get BTN_HEIGHT() {
+		return BTN_HEIGHT;
+	}
+	static get BTN_WIDTH() {
+		return BTN_WIDTH;
+	}
+	static get BTN_HEADER_STYLE() {
+		return BTN_HEADER_STYLE;
+	}
+	static get HEADER_TEXT_STYLE() {
+		return HEADER_TEXT_STYLE;
+	}
+	static get NAV_BTN_STYLE() {
+		return NAV_BTN_STYLE;
+	}
+	static get NAV_BTN_FONT_STYLE() {
+		return NAV_BTN_FONT_STYLE;
 	}
 }
 

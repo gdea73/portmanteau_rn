@@ -16,9 +16,7 @@ import NavButton from '../components/NavButton';
 
 const PADDING = 10;
 const MARGIN = 5;
-const BTN_HEIGHT = 30;
-const BTN_WIDTH = 40;
-const BTN_FONT_SIZE = 38;
+const BTN_FONT_SIZE = 24;
 const PAGE_DELAY = 2000;
 
 var { width, height } = require('Dimensions').get('window');
@@ -137,7 +135,7 @@ class InstructionScreen extends React.Component {
 					style={[styles.instructionsContainer, {
 						height: instrHeight,
 					}]}>
-					<View style={styles.buttonHeader}>
+					<View style={Constants.BTN_HEADER_STYLE}>
 						<NavButton
 							onPress={() => {
 								if (this.page > 0) {
@@ -147,11 +145,12 @@ class InstructionScreen extends React.Component {
 								}
 							}}
 							title="←"
-							height={BTN_HEIGHT}
-							textStyle={styles.navButtonFontStyle}
-							buttonStyle={styles.navButtonStyle}
+							height={Constants.BTN_HEIGHT}
+							key={'navButtonL' + this.page}
+							textStyle={Constants.NAV_BTN_FONT_STYLE}
+							buttonStyle={Constants.NAV_BTN_STYLE}
 						/>
-						<Text style={styles.titleText}>
+						<Text style={Constants.HEADER_TEXT_STYLE}>
 							Instructions ({this.page + 1} of {pages.length})
 						</Text>
 						<NavButton
@@ -161,11 +160,11 @@ class InstructionScreen extends React.Component {
 								}
 							}}
 							title="→"
-							height={BTN_HEIGHT}
+							height={Constants.BTN_HEIGHT}
 							disabled={!enableNextButton}
-							key={'navButton' + this.page}
-							textStyle={styles.navButtonFontStyle}
-							buttonStyle={styles.navButtonStyle}
+							key={'navButtonR' + this.page}
+							textStyle={Constants.NAV_BTN_FONT_STYLE}
+							buttonStyle={Constants.NAV_BTN_STYLE}
 						/>
 					</View>
 					<ScrollView
@@ -229,27 +228,6 @@ styles = StyleSheet.create({
 		textAlign: 'justify',
 		fontFamily: 'Fanwood',
 		color: 'white',
-	},
-	buttonHeader: {
-		flex: 0, height: BTN_HEIGHT,
-		flexDirection: 'row',
-		justifyContent: 'space-between',
-		alignItems: 'center',
-	},
-	titleText: {
-		fontSize: 16,
-		textAlign: 'center',
-		fontFamily: Constants.LEAGUE_SPARTAN,
-		color: 'white',
-		flex: 1,
-	},
-	navButtonStyle: {
-		width: BTN_WIDTH, borderWidth: 0, padding: 0, top: 0,
-		alignItems: 'center',
-	},
-	navButtonFontStyle: {
-		fontSize: BTN_FONT_SIZE,
-		bottom: PixelRatio.getPixelSizeForLayoutSize(3),
 	},
 });
 

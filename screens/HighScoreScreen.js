@@ -13,8 +13,6 @@ import NavButton from '../components/NavButton';
 import Constants from '../etc/Constants';
 import Storage from '../etc/Storage';
 
-const BTN_HEIGHT = 40;
-
 class HighScoreScreen extends React.Component {
 	static navigationOptions = {
 		title: 'High Scores',
@@ -65,18 +63,22 @@ class HighScoreScreen extends React.Component {
 					   style={Constants.BG_IMAGE_STYLE}
 				/>
 				<View style={styles.scoresContainer}>
-					<View style={{position: 'absolute', left: 0, top: 0}}>
+					<View style={{
+						...Constants.BTN_HEADER_STYLE, margin: 10
+					}}>
 						<NavButton
 							onPress={() => {
 								this.props.navigation.goBack(null)
 							}}
-							title="Go Back"
+							title="←"
 							textStyle={{fontSize: 12}}
-							height={BTN_HEIGHT}
+							height={Constants.BTN_HEIGHT}
+							buttonStyle={Constants.NAV_BTN_STYLE}
+							textStyle={Constants.NAV_BTN_FONT_STYLE}
 						/>
-					</View>
-					<View style={styles.header}>
-						<Text style={styles.titleText}>HIGH SCORES</Text>
+						<Text style={Constants.HEADER_TEXT_STYLE}>
+							HIGH SCORES
+						</Text>
 					</View>
 					<View style={styles.scoreList}>
 						<ScrollView>
@@ -97,18 +99,6 @@ const styles = StyleSheet.create({
 	scoresContainer: {
 		position: 'absolute',
 		top: 0, left: 0, right: 0, bottom: 0,
-	},
-	header: {
-		flex: 0, height: BTN_HEIGHT,
-		margin: 10,
-		flexDirection: 'row',
-		alignItems: 'center',
-		justifyContent: 'center',
-	},
-	titleText: {
-		fontSize: 16,
-		fontFamily: Constants.LEAGUE_SPARTAN,
-		color: 'white',
 	},
 	scoreText: {
 		fontSize: 16,
