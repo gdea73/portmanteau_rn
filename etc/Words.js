@@ -10,11 +10,11 @@ const quantities = {
 	B: 2,
 	C: 2,
 	D: 4,
-	E: 11,
+	E: 12,
 	F: 2,
 	G: 3,
 	H: 2,
-	I: 9,
+	I: 8,
 	J: 1,
 	K: 1,
 	L: 4,
@@ -62,6 +62,16 @@ const pointValues = {
 	Y: 4,
 	Z: 10
 };
+
+const chainMultipliers = [
+	1,
+	2,
+	5,
+	10,
+	17,
+	26,
+	37,
+];
 
 const lengthMultipliers = [
 	// TODO: solicit user feedback on factorial increase
@@ -116,8 +126,6 @@ function binSearch(string, start, end) {
 	if (string > dictionary[midpt]) {
 		return binSearch(string, midpt + 1, end);
 	}
-	// if reached, we must have found the string
-	// console.debug('end of binsearch reached, string is ' + string + '; midpt of dict here is ' + dictionary[midpt]);
 	return !!(string === dictionary[midpt]);
 }
 
@@ -154,7 +162,7 @@ class Words {
 			score += pointValues[word.charAt(c)];
 		}
 		score *= lengthMultipliers[word.length];
-		score *= chainLevel * chainLevel * chainLevel;
+		score *= chainMultipliers[chainLevel];
 		// easter eggs
 		if (word === 'MUFFED') {
 			score *= 73;
