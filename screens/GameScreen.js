@@ -231,6 +231,8 @@ class GameScreen extends React.Component {
 		return  {
 			score: this.gameStatus.state.score,
 			moves: this.gameStatus.state.moves,
+			level: this.gameStatus.state.level,
+			tilesBroken: this.gameStatus.state.tilesBroken,
 			longestChain: this.gameStatus.state.longestChain,
 			longestWord: this.gameStatus.state.longestWord,
 			recentWords: this.gameStatus.state.recentWords,
@@ -244,6 +246,7 @@ class GameScreen extends React.Component {
 		var stats = this.getStats();
 		var scoreStatus = this.saveHighScore(stats.score);
 		var scoreStatusText = '';
+		// TODO: fix these messages
 		if (scoreStatus === 'best') {
 			scoreStatusText = 'NEW HIGH SCORE';
 		} else if (scoreStatus === 'high') {
@@ -291,7 +294,9 @@ class GameScreen extends React.Component {
 						<Board width={Math.floor(width - 2 * Constants.UI_PADDING)}
 							   increaseScore={this.increaseScore}
 							   incrementMoveCount={this.incrementMoveCount}
+							   addTilesBrokenCount={this.addTilesBrokenCount}
 							   getMoveCount={this.getMoveCount}
+							   getLevel={this.getLevel}
 							   addRecentWord={this.addRecentWord}
 							   gameOver={this.gameOver}
 							   initialCols={this.initialCols}
@@ -316,6 +321,9 @@ class GameScreen extends React.Component {
 		this.gameStatus.increaseScore(points, chainLevel);
 		// TODO: animate display of chain level if > 1
 	}
+	addTilesBrokenCount = (tilesBroken) => {
+		this.gameStatus.addTilesBrokenCount(tilesBroken);
+	}
 	incrementMoveCount = () => {
 		this.gameStatus.incrementMoveCount();
 	}
@@ -325,7 +333,9 @@ class GameScreen extends React.Component {
 		}
 		return this.gameStatus.state.moves;
 	}
-
+	getLevel = () => {
+		return this.gameStatus.state.level;
+	}
 	// Allows Board to query total move count for level-based logic
 	addRecentWord = (word) => {
 		this.gameStatus.addRecentWord(word);

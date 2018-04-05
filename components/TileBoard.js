@@ -482,10 +482,10 @@ class Board extends React.Component {
 				console.debug('validWord: ' + validWord + '; score: ' + Words.getWordScore(validWord, this.chainLevel) + ' (chain level ' + this.chainLevel + ')');
 				this.props.increaseScore(
 					Words.getWordScore(validWord, this.chainLevel)
-					* Math.floor(this.props.getMoveCount()
-								 / Constants.LEVEL_LENGTH + 1),
-					this.chainLevel++
+					* this.props.getLevel()
 				);
+				this.props.addTilesBrokenCount(validWord.length);
+				this.chainLevel++
 				this.props.addRecentWord(validWord, this.chainLevel);
 				// "break" the word; leave empty space in its board position
 				if (boardWord.startCol === boardWord.endCol) {
@@ -564,12 +564,24 @@ class Board extends React.Component {
 		]).start(this.setNextBoardState.bind(this));
 	}
 
-	// probability of a super blank is given as a function of level:
-	// p_superBlank(level) = -1/(0.1 * level + 1.4) + 1
-	// asymptote is 1; p_superBlank(15) ~= 0.65
-	getSuperBlankProbability = (moveCount) => {
-	 	var level = Math.floor(moveCount / Constants.LEVEL_LENGTH + 1);
-	 	return -1.0/(0.1 * level + 1.4) + 1;
+	// probability of a super blank is given as a function of the number of
+	// tiles on the board
+	getSuperBlankProbability = () => {
+		var tilesOnBoard = 0;
+		for (let c = 0; c < Constants.BOARD_SIZE; c++) {
+			for (let r = 0; r < Constants.BOARD_SIZE; r++) {
+				if (this.state.cols[c][r] !== ' ') {
+					tilesOnBoard++;
+				}
+			}
+		}
+		if (tilesOnBoard < 20) {
+			return 0.0;
+		}
+		if (tilesOnBoard > 42) {
+			return 1.0;
+		}
+		return 2 * tilesOnBoard / 100.0;
 	}
 
 	setNextBoardState() {
@@ -583,7 +595,7 @@ class Board extends React.Component {
 		// reset super blank selection
 		newState.superBlankSelectionID = undefined;
 		if (newState.dropLetter === ' '
-			&& Math.random() < this.getSuperBlankProbability(this.props.getMoveCount())
+			&& Math.random() < this.getSuperBlankProbability()
 			&& this.tileCount(newState.cols) >= Constants.MIN_WORD_LENGTH) {
 			console.debug('SUPER BLANK');
 			newState.superBlank = true;

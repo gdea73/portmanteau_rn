@@ -8,6 +8,7 @@ const RECENT_WORD_CACHE_SIZE = 14;
 const RECENT_WORD_FONT_SIZE = 18;
 const RECENT_WORD_FONT_WIDTH_RATIO = 0.8;
 const PADDING = 3;
+const BASE_LEVEL_THRESHOLD = 20;
 
 var { width, height } = require('Dimensions').get('window');
 
@@ -26,6 +27,9 @@ class GameStatus extends React.Component {
 			this.state = {
 				score: 0,
 				moves: 0,
+				tilesBroken: 0,
+				level: 1,
+				nextLevelThreshold: BASE_LEVEL_THRESHOLD,
 				longestChain: 0,
 				longestWord: 0,
 				recentWords: recentWords,
@@ -71,6 +75,19 @@ class GameStatus extends React.Component {
 		this.setState(newState);
 	}
 
+	addTilesBrokenCount = (tilesBroken) => {
+		newState = this.state;
+		newState.tilesBroken += tilesBroken;
+		if (newState.tilesBroken > newState.nextLevelThreshold) {
+			newState.level = this.state.level + 1;
+			newState.nextLevelThreshold += BASE_LEVEL_THRESHOLD
+				* Math.ceil(this.state.level / 2.0);
+		}
+		console.debug('New level threshold (' + newState.level + ') :'
+			+ newState.nextLevelThreshold);
+		this.setState(newState);
+	}
+
 	render() {
 		return(
 			<View style={styles.outerContainer}>
@@ -79,10 +96,7 @@ class GameStatus extends React.Component {
 						{this.state.score}
 					</Text>
 					<Text style={styles.labelDefault}>
-						LEVEL: {
-							Math.floor(this.state.moves /
-									   Constants.LEVEL_LENGTH + 1)
-						}
+						LEVEL: {this.state.level}
 					</Text>
 				</View>
 				<View style={styles.recentWordsOuterContainer}>
