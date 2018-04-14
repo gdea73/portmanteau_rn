@@ -216,6 +216,15 @@ class GameScreen extends React.Component {
 						buttonStyle={styles.modalButton}
 						textStyle={styles.modalButtonText}
 						onPress={() => {
+							console.debug('giving up');
+							this.gameOver();
+						}}
+						title="End Game"
+					/>
+					<NavButton
+						buttonStyle={styles.modalButton}
+						textStyle={styles.modalButtonText}
+						onPress={() => {
 							var state = this.state;
 							state.showQuitModal = false;
 							this.setState(state);
