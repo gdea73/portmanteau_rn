@@ -295,6 +295,29 @@ class GameScreen extends React.Component {
 				<Image style={Constants.BG_IMAGE_STYLE}
 					   source={require('../img/gradient_bg.png')} />
 				<View style={styles.container}>
+					<View style={{
+						...Constants.BTN_HEADER_STYLE, margin: 10
+					}}>
+						<NavButton
+							onPress={this.onBackButtonPress}
+							title="←"
+							textStyle={{fontSize: 12}}
+							height={Constants.BTN_HEIGHT}
+							buttonStyle={Constants.NAV_BTN_STYLE}
+							textStyle={Constants.NAV_BTN_FONT_STYLE}
+						/>
+						<Text style={Constants.HEADER_TEXT_STYLE}>
+							PORTMANTEAU
+						</Text>
+						<NavButton
+							onPress={() => { }}
+							title="←"
+							textStyle={{fontSize: 12}}
+							height={Constants.BTN_HEIGHT}
+							buttonStyle={Constants.NAV_BTN_STYLE}
+							textStyle={{color: 'transparent'}}
+						/>
+					</View>
 					<GameStatus
 						onRef={ref => (this.gameStatus = ref) }
 						initialStats={this.initialStats}
@@ -373,7 +396,7 @@ const styles = StyleSheet.create({
         position: 'absolute',
 		padding: 40,
         top: 0, left: 0, right: 0, bottom: 0,
-        backgroundColor: '#123',
+        backgroundColor: '#111111',
 		flexDirection: 'column',
 		justifyContent: 'center',
     },  

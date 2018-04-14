@@ -37,8 +37,21 @@ class HighScoreScreen extends React.Component {
 		while (i >= 0 && this.state.scores[i].score !== 0) {
 			result.push(
 				<View style={styles.score} key={'score' + i}>
-					<Text style={styles.scoreText}>{this.state.scores[i].score}</Text>
-					<Text style={styles.scoreDate}>{this.state.scores[i].date}</Text>
+					<Text style={[
+						styles.scoreText, {textAlign: 'left', flex: 1}
+					]}>
+						{(Constants.N_HIGH_SCORES - i) + "."}
+					</Text>
+					<Text style={[
+						styles.scoreText, {textAlign: 'right', flex: 2}
+					]}>
+						{this.state.scores[i].score}
+					</Text>
+					<Text style={[
+						styles.scoreDate, {flex: 5
+					}]}>
+						{this.state.scores[i].date}
+					</Text>
 				</View>
 			);
 			i--;
@@ -79,6 +92,14 @@ class HighScoreScreen extends React.Component {
 						<Text style={Constants.HEADER_TEXT_STYLE}>
 							HIGH SCORES
 						</Text>
+						<NavButton
+							onPress={() => { }}
+							title="←"
+							textStyle={{fontSize: 12}}
+							height={Constants.BTN_HEIGHT}
+							buttonStyle={Constants.NAV_BTN_STYLE}
+							textStyle={{color: 'transparent'}}
+						/>
 					</View>
 					<View style={styles.scoreList}>
 						<ScrollView>
@@ -106,9 +127,11 @@ const styles = StyleSheet.create({
 		color: 'white',
 	},
 	scoreDate: {
+		flex: 3,
 		fontSize: 12,
 		fontFamily: Constants.LEAGUE_SPARTAN,
 		color: 'white',
+		textAlign: 'right',
 	},
 	scoreList: {
 		flex: 1,
@@ -123,6 +146,11 @@ const styles = StyleSheet.create({
 		borderBottomWidth: 1,
 		borderColor: 'white',
 	},
+	innerScore: {
+		flexDirection: 'row',
+		flex: 1,
+		justifyContent: 'space-between',
+	}
 });
 
 export default HighScoreScreen;
