@@ -5,7 +5,8 @@ import com.google.android.gms.ads.MobileAds;
 import android.os.Bundle;
 
 public class MainActivity extends ReactActivity {
-	private static final String ADMOB_APP_ID = "ca-app-pub-8559716447664382/7140833780";
+	private static final String ADMOB_APP_ID
+		= "ca-app-pub-8559716447664382~6704873685";
 
 	protected void onCreate(Bundle savedInstancestate) {
 		super.onCreate(savedInstancestate);

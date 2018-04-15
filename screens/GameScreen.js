@@ -89,10 +89,6 @@ class GameScreen extends React.Component {
             console.debug('loaded high scores (pre-save)');
             if (score > scores[0].score) {
                 // worth adding to the list
-				var status = 'high';
-				if (score > scores[Constants.N_HIGH_SCORES - 1]) {
-					status = 'best';
-				}
                 scores[0] = newScore;
                 scores.sort((score_a, score_b) => {
 					var a = score_a.score;
@@ -109,14 +105,10 @@ class GameScreen extends React.Component {
 				});
                 Storage.saveHighScores(scores).then(() => {
 					console.debug('successfully saved high scores');
-					return status;
 				}).catch((error) => {
 					console.warn('failed to save high scores: ' + error);
-					return error;
 				});
-            } else {
-				return 'low';
-			}
+            }
         }).catch(() => {
             // most likely, no high scores have yet to be saved;
             // create a new array of size N_HIGH_SCORES
@@ -254,19 +246,11 @@ class GameScreen extends React.Component {
 		// GameStatus component
 		clearTimeout(this.timer);
 		var stats = this.getStats();
-		var scoreStatus = this.saveHighScore(stats.score);
-		var scoreStatusText = '';
-		// TODO: fix these messages
-		if (scoreStatus === 'best') {
-			scoreStatusText = 'NEW HIGH SCORE';
-		} else if (scoreStatus === 'high') {
-			scoreStatusText = 'IN THE TOP 10';
-		}
+		this.saveHighScore(stats.score);
 		return(
 			<View style={styles.gameOverContainer}>
 				<View style={{flex: 1}}>
 					<Text style={styles.gameOverText}>GAME OVER</Text>
-					<Text style={styles.gameOverText}>{scoreStatusText}</Text>
 				</View>
 				<View style={{flex: 4, justifyContent: 'space-around'}}>
 					<Text style={styles.gameOverScoreText}>{stats.score}</Text>
