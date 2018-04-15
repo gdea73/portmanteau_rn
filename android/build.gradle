@@ -1,5 +1,7 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
+def googlePlayServicesVersion = '11.8.0'
+
 buildscript {
     repositories {
         jcenter()
@@ -20,5 +22,23 @@ allprojects {
             // All of React Native (JS, Obj-C sources, Android binaries) is installed from npm
             url "$rootDir/../node_modules/react-native/android"
         }
-    }
+		maven {
+			url "https://maven.google.com"
+		}
+        configurations.all {
+            resolutionStrategy {
+                // react-native-admob
+                force "com.google.android.gms:play-services-ads:$googlePlayServicesVersion"
+                // react-native-maps
+                force "com.google.android.gms:play-services-base:$googlePlayServicesVersion"
+                force "com.google.android.gms:play-services-maps:$googlePlayServicesVersion"
+                // react-native-onesignal
+                force "com.google.android.gms:play-services-gcm:$googlePlayServicesVersion"
+                force "com.google.android.gms:play-services-analytics:$googlePlayServicesVersion"
+                force "com.google.android.gms:play-services-location:$googlePlayServicesVersion"
+                // react-native-google-sign-in
+                force "com.google.android.gms:play-services-auth:$googlePlayServicesVersion"
+            }
+        }
+	}
 }

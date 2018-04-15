@@ -10,6 +10,7 @@ import {
 	BackHandler
 } from 'react-native';
 import { StackNavigator } from 'react-navigation';
+import { AdMobBanner } from 'react-native-admob';
 
 import Board from '../components/TileBoard';
 import GameStatus from '../components/GameStatus';
@@ -338,7 +339,21 @@ class GameScreen extends React.Component {
 					</View>
 				</View>
 				{this.state.showQuitModal && this.renderQuitModal()}
+				{this.props.navigation.state.params
+					&& this.props.navigation.state.params.showAds
+					&& this.renderAdBanner()}
 			</View>
+		);
+	}
+
+	renderAdBanner = () => {
+		return (
+			<AdMobBanner
+				adSize="smartBanner"
+				adUnitID="ca-app-pub-8559716447664382/7140833780"
+				testDevices={["D2EFADE35D710C83CFA429B08A06F454"]}
+				onAdFailedToLoad={error => console.warn(error)}
+			/>
 		);
 	}
 

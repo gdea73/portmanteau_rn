@@ -87,6 +87,7 @@ class MenuScreen extends React.Component {
 							'Game', {
 								gameData: this.state.savedGameData,
 								onSaveCallback: this.loadSavedGame,
+								showAds: this.doShowAds(),
 							},
 						);
 					}}
@@ -98,13 +99,20 @@ class MenuScreen extends React.Component {
 					title="NEW GAME"
 					onPress={() => {
 						this.props.navigation.navigate(
-							'Game',
-							{ onSaveCallback: this.loadSavedGame },
+							'Game', {
+								onSaveCallback: this.loadSavedGame,
+								showAds: this.doShowAds(),
+							},
 						);
 					}}
 				/>
 			);
 		}
+	}
+
+	doShowAds = () => {
+		// for testing
+		return true;
 	}
 
 	render() {

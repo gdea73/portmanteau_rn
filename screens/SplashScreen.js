@@ -18,7 +18,6 @@ import Root from '../config/router';
 
 const LOADING_ANIMATION_DURATION = 800;
 const LOAD_DELAY = 100;
-const TITLE_TEXT_PADDING = 50;
 
 let {width, height} = Dimensions.get('window');
 
@@ -30,15 +29,27 @@ class SplashScreen extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			isAppLoaded: false,
+			animationDone: false,
 			loadingOpacity: new Animated.Value(0.0),
-			backgrounded: false,
 		};
-		this.dictLoadCallback = this.dictLoadCallback.bind(this);
 	}
 
 	componentDidMount() {
-		console.debug('SplashScreen did mount');
+		Animated.timing(
+			this.state.loadingOpacity, {
+				toValue: 1.0,
+				duration: LOADING_ANIMATION_DURATION,
+			}
+		).start(() => {
+			if (this.dictionaryLoaded) {
+				// the dictionary was loaded before the animation finished
+				console.debug('dictionary loaded first; going to menu');
+				this.setAppLoaded();
+			}
+			// otherwise, set the animationComplete flag so the dictionary load
+			// callback will load the menu before it terminates.
+			this.animationComplete = true;
+		});
 		Words.loadDictionary(this.dictLoadCallback);
 	}
 
@@ -67,25 +78,22 @@ class SplashScreen extends React.Component {
 			   );
 	}
 
-	dictLoadCallback() {
-		console.debug('dictionary loaded (in splash screen callback)');
-		this.isDictLoaded = true;
-		this.setLoadedIfDone();
+	dictLoadCallback = () => {
+		if (this.animationComplete) {
+			console.debug('animation loaded first; going to menu');
+			// animation finished before loading the dictionary; go to menu
+			this.setAppLoaded();
+		}
+		// otherwise, set the dictionaryLoaded flag so the animation callback
+		// knows to load the menu when the animation is finished.
+		this.dictionaryLoaded = true;
 	}
 
-	setLoadedIfDone() {
-		if (this.isDictLoaded) {
-			Animated.timing(
-				this.state.loadingOpacity, {
-					toValue: 1.0,
-					duration: LOADING_ANIMATION_DURATION,
-				}
-			).start(() => {
-				var state = this.state;
-				state.isAppLoaded = true;
-				this.setState(state);
-			});
-		}
+	setAppLoaded = () => {
+		console.debug('going to menu');
+		var newState = this.state;
+		newState.isAppLoaded = true;
+		this.setState(newState);
 	}
 }
 

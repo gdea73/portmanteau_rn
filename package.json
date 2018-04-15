@@ -4,6 +4,7 @@
   "private": true,
   "devDependencies": {
     "jest-expo": "^21.0.2",
+    "react-native-clean-project": "^1.0.8",
     "react-test-renderer": "16.0.0-alpha.12"
   },
   "scripts": {
@@ -17,12 +18,14 @@
   },
   "dependencies": {
     "babel-preset-react-native-stage-0": "^1.0.1",
-    "react": "16.0.0-alpha.12",
-    "react-native": "^0.48.4",
-    "react-native-fs": "^2.8.1",
+    "react": "16.3.1",
+    "react-native": "0.55.2",
+    "react-native-admob": "^2.0.0-beta.4",
     "react-navigation": "^1.0.0-beta.19"
   },
   "rnpm": {
-	"assets": ["./fonts"]
+    "assets": [
+      "./fonts"
+    ]
   }
 }

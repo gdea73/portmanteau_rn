@@ -1,8 +1,6 @@
 import Constants from './Constants';
 require('./Dictionary.js');
 
-var RNFS = require('react-native-fs');
-
 const CHAR_TABLE_SIZE = 100;
 
 const quantities = {
