@@ -307,6 +307,9 @@ class GameScreen extends React.Component {
 						onRef={ref => (this.gameStatus = ref) }
 						initialStats={this.initialStats}
 					/>
+					{this.props.navigation.state.params
+						&& this.props.navigation.state.params.showAds
+						&& this.renderAdBanner()}
 					<View style={styles.boardView}>
 						<Board width={Math.floor(width - 2 * Constants.UI_PADDING)}
 							   increaseScore={this.increaseScore}
@@ -323,21 +326,20 @@ class GameScreen extends React.Component {
 					</View>
 				</View>
 				{this.state.showQuitModal && this.renderQuitModal()}
-				{this.props.navigation.state.params
-					&& this.props.navigation.state.params.showAds
-					&& this.renderAdBanner()}
 			</View>
 		);
 	}
 
 	renderAdBanner = () => {
 		return (
-			<AdMobBanner
-				adSize="smartBanner"
-				adUnitID="ca-app-pub-8559716447664382/7140833780"
-				testDevices={["D2EFADE35D710C83CFA429B08A06F454"]}
-				onAdFailedToLoad={error => console.warn(error)}
-			/>
+			<View style={styles.adView}>
+				<AdMobBanner
+					adSize="banner"
+					adUnitID="ca-app-pub-8559716447664382/7140833780"
+					testDevices={["D2EFADE35D710C83CFA429B08A06F454"]}
+					onAdFailedToLoad={error => console.warn(error)}
+				/>
+			</View>
 		);
 	}
 
@@ -390,6 +392,10 @@ const styles = StyleSheet.create({
 	boardView: {
 		aspectRatio: Constants.BOARD_ASPECT_RATIO,
 		justifyContent: 'space-between',
+	},
+	adView: {
+		alignSelf: 'center',
+		marginBottom: Constants.UI_PADDING,
 	},
 	gameOverContainer: {
         position: 'absolute',
