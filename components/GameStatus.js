@@ -78,12 +78,13 @@ class GameStatus extends React.Component {
 	addTilesBrokenCount = (tilesBroken) => {
 		newState = this.state;
 		newState.tilesBroken += tilesBroken;
+		console.debug('total tiles broken now ' + newState.tilesBroken);
 		if (newState.tilesBroken > newState.nextLevelThreshold) {
 			newState.level = this.state.level + 1;
 			newState.nextLevelThreshold += BASE_LEVEL_THRESHOLD
 				* Math.ceil(this.state.level / 2.0);
 		}
-		console.debug('New level threshold (' + newState.level + ') :'
+		console.debug('level threshold (' + newState.level + ') :'
 			+ newState.nextLevelThreshold);
 		this.setState(newState);
 	}

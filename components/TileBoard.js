@@ -484,6 +484,7 @@ class Board extends React.Component {
 					Words.getWordScore(validWord, this.chainLevel)
 					* this.props.getLevel()
 				);
+				console.debug('*** broke ' + validWord.length + ' tiles');
 				this.props.addTilesBrokenCount(validWord.length);
 				this.chainLevel++
 				this.props.addRecentWord(validWord, this.chainLevel);
