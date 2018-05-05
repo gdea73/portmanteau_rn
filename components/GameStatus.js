@@ -50,6 +50,7 @@ class GameStatus extends React.Component {
 		var newState = this.state;
 		newState.score = this.state.score + points;
 		if (chainLevel > this.state.longestChain) {
+			console.debug('next longest chain level: ' + chainLevel);
 			newState.longestChain = chainLevel;
 		}
 		this.setState(newState);
