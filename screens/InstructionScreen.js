@@ -187,6 +187,7 @@ class InstructionScreen extends React.Component {
 		console.debug('rendering demo board (page ' + this.page + ')');
 		return (
 					<Board width={Math.floor(width - 2 * MARGIN)}
+						   getLevel={() => { }}
 						   increaseScore={() => { }}
 						   incrementMoveCount={() => { }}
 						   getMoveCount={() => { return this.state.moveCount; }}
