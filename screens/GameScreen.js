@@ -7,7 +7,8 @@ import {
 	Text,
 	NativeModules,
 	Image,
-	BackHandler
+	BackHandler,
+	Animated,
 } from 'react-native';
 import { StackNavigator } from 'react-navigation';
 import { AdMobBanner } from 'react-native-admob';
@@ -22,6 +23,11 @@ import Words from '../etc/Words';
 var { width, height } = require('Dimensions').get('window');
 const { StatusBarManager } = NativeModules;
 const AUTOSAVE_INTERVAL_MS = 30 * 1000;
+const GAME_OVER_FINAL_OPACITY = 0.92;
+const GAME_OVER_FADE_DURATION = 300;
+const QUIT_MODAL_FINAL_OPACITY = 0.95;
+const QUIT_MODAL_FADE_DURATION = 200;
+const QUIT_MODAL_FADE_IN = 1;
 
 class GameScreen extends React.Component {
 	static navigationOptions = {
@@ -46,6 +52,10 @@ class GameScreen extends React.Component {
 			// load the shuffled collection of tiles
 			Words.setTileSet(gameData.tileSet);
 		}
+		// prepare opacity animation for modal and game over
+		this.gameOverOpacity = new Animated.Value(0);
+		this.quitModalOpacity = new Animated.Value(0);
+		this.quitModalFadeIn = false;
 	}
 
 	componentDidMount() {
@@ -61,10 +71,37 @@ class GameScreen extends React.Component {
 		);
 	}
 
-	componentWillUpdate() {
-		// clear any saved-game data if the game is over
+	hideQuitModal = () => {
+		var state = this.state;
+		state.showQuitModal = false;
+		console.debug('fading modal out');
+		Animated.timing(
+			this.quitModalOpacity, {
+				toValue: 0,
+				duration: QUIT_MODAL_FADE_DURATION
+			}
+		).start(() => {console.debug('fade out done'); this.setState(state)});
+	}
+
+	componentDidUpdate = () => {
 		if (this.state.gameOver) {
+			// clear any saved-game data if the game is over
 			this.removeSavedGame();
+			Animated.timing(
+				this.gameOverOpacity, {
+					toValue: GAME_OVER_FINAL_OPACITY,
+					duration: GAME_OVER_FADE_DURATION
+				}
+			).start();
+		}
+		if (this.quitModalFadeIn) {
+			console.debug('fading modal in');
+			Animated.timing(
+				this.quitModalOpacity, {
+					toValue: QUIT_MODAL_FINAL_OPACITY,
+					duration: QUIT_MODAL_FADE_DURATION
+				}
+			).start(() => {this.quitModalFadeIn = false});
 		}
 	}
 
@@ -121,11 +158,9 @@ class GameScreen extends React.Component {
             }   
             scores[Constants.N_HIGH_SCORES - 1] = newScore;
             Storage.saveHighScores(scores).then(() => {
-				console.debug('successfully saved high scores');
-				return 'best';
+				console.debug('successfully saved first high score');
 			}).catch((error) => {
-				console.debug('failed to save high scores: ' + error);
-				return error;
+				console.debug('failed to save first high score: ' + error);
 			});
         }); 
 	}
@@ -140,9 +175,7 @@ class GameScreen extends React.Component {
 		if (this.state.showQuitModal) {
 			console.debug('\tcancelling quit modal');
 			// dismiss (cancel) the quit modal if currently being shown)
-			var state = this.state;
-			state.showQuitModal = false;
-			this.setState(state);
+			this.hideQuitModal();
 		} else if (this.state.gameOver) {
 			console.debug('\tgame is over, going back');
 			// If the game is over, a back button press must immediately quit,
@@ -154,6 +187,7 @@ class GameScreen extends React.Component {
 			console.debug('\tshowing quit modal');
 			var state = this.state;
 			state.showQuitModal = true;
+			this.quitModalFadeIn = true;
 			this.setState(state);
 		}
 		return true;
@@ -175,8 +209,13 @@ class GameScreen extends React.Component {
 	// to save or discard the game in progress. However, if the game has
 	// already ended, this should do nothing.
 	renderQuitModal = () => {
+		this.quitModalOpacity.setValue(0);
+		var style = [
+			styles.QuitModalContainer,
+			{ opacity: this.quitModalOpacity }
+		];
 		return (
-			<View style={styles.quitModalContainer}>
+			<Animated.View style={style}>
 				<View style={styles.quitModal}>
 					<NavButton
 						buttonStyle={styles.modalButton}
@@ -217,15 +256,11 @@ class GameScreen extends React.Component {
 					<NavButton
 						buttonStyle={styles.modalButton}
 						textStyle={styles.modalButtonText}
-						onPress={() => {
-							var state = this.state;
-							state.showQuitModal = false;
-							this.setState(state);
-						}}
+						onPress={this.hideQuitModal}
 						title="Return to Game"
 					/>
 				</View>
-			</View>
+			</Animated.View>
 		);
 	}
 
@@ -248,12 +283,14 @@ class GameScreen extends React.Component {
 		clearTimeout(this.timer);
 		var stats = this.getStats();
 		this.saveHighScore(stats.score);
+		this.gameOverOpacity.setValue(0);
+		var style = [styles.gameOverContainer, { opacity: this.gameOverOpacity }];
 		return(
-			<View style={styles.gameOverContainer}>
+			<Animated.View style={style}>
 				<View style={{flex: 1}}>
 					<Text style={styles.gameOverText}>GAME OVER</Text>
 				</View>
-				<View style={{flex: 4, justifyContent: 'space-around'}}>
+				<View style={styles.gameOverStatsContainer}>
 					<Text style={styles.gameOverScoreText}>{stats.score}</Text>
 					<Text style={styles.gameOverLongestWordText}>LONGEST WORD: {stats.longestWord} letters</Text>
 					<Text style={styles.gameOverLongestChainText}>LONGEST CHAIN: {stats.longestChain} words</Text>
@@ -268,14 +305,11 @@ class GameScreen extends React.Component {
 						title="GO BACK"
 					/>
 				</View>
-			</View>
+			</Animated.View>
 		);
 	}
 	
 	render() {
-		if (this.state.gameOver) {
-			return this.renderGameOver();
-		}
 		return(
 			<View style={{flex: 1, backgroundColor: 'black'}}>
 				<Image style={Constants.BG_IMAGE_STYLE}
@@ -308,9 +342,6 @@ class GameScreen extends React.Component {
 						onRef={ref => (this.gameStatus = ref) }
 						initialStats={this.initialStats}
 					/>
-					{this.props.navigation.state.params
-						&& this.props.navigation.state.params.showAds
-						&& this.renderAdBanner()}
 					<View style={styles.boardView}>
 						<Board width={Math.floor(width - 2 * Constants.UI_PADDING)}
 							   increaseScore={this.increaseScore}
@@ -325,8 +356,12 @@ class GameScreen extends React.Component {
 							   onRef={ref => (this.boardRef = ref) }
 						/>
 					</View>
+					{this.props.navigation.state.params
+						&& this.props.navigation.state.params.showAds
+						&& this.renderAdBanner()}
 				</View>
-				{this.state.showQuitModal && this.renderQuitModal()}
+				{(this.state.gameOver && this.renderGameOver())
+					|| (this.state.showQuitModal && this.renderQuitModal())}
 			</View>
 		);
 	}
@@ -338,7 +373,7 @@ class GameScreen extends React.Component {
 					adSize="banner"
 					adUnitID="ca-app-pub-8559716447664382/7140833780"
 					testDevices={["D2EFADE35D710C83CFA429B08A06F454"]}
-					onAdFailedToLoad={error => console.warn(error)}
+					onAdFailedToLoad={error => console.info(error)}
 				/>
 			</View>
 		);
@@ -396,13 +431,12 @@ const styles = StyleSheet.create({
 	},
 	adView: {
 		alignSelf: 'center',
-		marginBottom: Constants.UI_PADDING,
 	},
 	gameOverContainer: {
         position: 'absolute',
 		padding: 40,
         top: 0, left: 0, right: 0, bottom: 0,
-        backgroundColor: '#111111',
+        backgroundColor: '#222222',
 		flexDirection: 'column',
 		justifyContent: 'center',
     },  
@@ -453,6 +487,10 @@ const styles = StyleSheet.create({
 	},
 	modalButtonText: {
 		color: 'black',
+	},
+	gameOverStatsContainer: {
+		flex: 4,
+		justifyContent: 'space-around',
 	},
 });
 
