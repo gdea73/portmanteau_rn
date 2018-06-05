@@ -53,8 +53,8 @@ class GameScreen extends React.Component {
 			Words.setTileSet(gameData.tileSet);
 		}
 		// prepare opacity animation for modal and game over
-		this.gameOverOpacity = new Animated.Value(0);
-		this.quitModalOpacity = new Animated.Value(0);
+		this.gameOverOpacity = new Animated.Value(0.0);
+		this.quitModalOpacity = new Animated.Value(0.0);
 		this.quitModalFadeIn = false;
 	}
 
@@ -209,9 +209,8 @@ class GameScreen extends React.Component {
 	// to save or discard the game in progress. However, if the game has
 	// already ended, this should do nothing.
 	renderQuitModal = () => {
-		this.quitModalOpacity.setValue(0);
 		var style = [
-			styles.QuitModalContainer,
+			styles.quitModalContainer,
 			{ opacity: this.quitModalOpacity }
 		];
 		return (
@@ -249,6 +248,7 @@ class GameScreen extends React.Component {
 						textStyle={styles.modalButtonText}
 						onPress={() => {
 							console.debug('giving up');
+							this.hideQuitModal();
 							this.gameOver();
 						}}
 						title="End Game"
@@ -283,7 +283,6 @@ class GameScreen extends React.Component {
 		clearTimeout(this.timer);
 		var stats = this.getStats();
 		this.saveHighScore(stats.score);
-		this.gameOverOpacity.setValue(0);
 		var style = [styles.gameOverContainer, { opacity: this.gameOverOpacity }];
 		return(
 			<Animated.View style={style}>

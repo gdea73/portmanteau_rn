@@ -5,7 +5,8 @@ import {
 	Text,
 	View,
 	ScrollView,
-	Image
+	Image,
+	BackHandler,
 } from 'react-native';
 import { StackNavigator } from 'react-navigation';
 
@@ -26,6 +27,20 @@ class HighScoreScreen extends React.Component {
 			scoresLoaded: false,
 			scores: null,
 		};
+	}
+
+	backPress = () => {
+		console.debug('backPress handler in HighScoreScreen');
+		this.props.navigation.goBack(null);
+		return true;
+	}
+
+	componentDidMount() {
+		BackHandler.addEventListener('hardwareBackPress', this.backPress);
+	}
+
+	componentWillUnmount() {
+		BackHandler.removeEventListener('hardwareBackPress', this.backPress);
 	}
 
 	renderScores() {

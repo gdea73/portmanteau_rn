@@ -6,7 +6,8 @@ import {
 	Text,
 	Image,
 	StyleSheet,
-	PixelRatio
+	PixelRatio,
+	BackHandler,
 } from 'react-native';
 import { StackNavigator } from 'react-navigation';
 
@@ -119,8 +120,23 @@ class InstructionScreen extends React.Component {
 		}, PAGE_DELAY);
 	}
 
+	componentDidMount() {
+		BackHandler.addEventListener('hardwareBackPress', this.backPress);
+	}
+
 	componentWillUnmount() {
 		clearTimeout(this.timer);
+		BackHandler.removeEventListener('hardwareBackPress', this.backPress);
+	}
+
+	backPress = () => {
+		console.debug('backPress handler in InstructionScreen');
+		if (this.page == 0) {
+			this.props.navigation.goBack(null);
+		} else {
+			this.setPage(this.page - 1);
+		}
+		return true;
 	}
 
 	render() {
