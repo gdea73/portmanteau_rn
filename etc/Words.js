@@ -76,8 +76,8 @@ const lengthMultipliers = [
 	0, // shouldn't be calculating score with length 0
 	0, // 								 	  ... or 1, for that matter
 	0,
-	9, // currently MIN_WORD_LENGTH
-	23,
+	7, // currently MIN_WORD_LENGTH
+	28,
 	49,
 	73,
 	256

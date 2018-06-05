@@ -85,8 +85,8 @@ var pages = [
 			+ 'two words simultaneously. In addition, you can chain your '
 			+ 'words, although this is difficult to plan. In this case, '
 			+ '"ZAP" will break at chain level 3, since its isolation is a '
-			+ 'direct consequence of "ART" and "TEA" breaking. More chains yield '
-			+ 'more points. If you get a chain ≥ 5, you\'re a wizard.',
+			+ 'direct consequence of "ART" and "TEA" breaking. Longer chains '
+			+ 'yield more points. If you get a chain ≥ 5, you\'re a wizard.',
 		moveCount: 0,
 	},
 ];

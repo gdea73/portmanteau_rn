@@ -487,6 +487,7 @@ class Board extends React.Component {
 				);
 				console.debug('*** broke ' + validWord.length + ' tiles');
 				this.props.addTilesBrokenCount(validWord.length);
+				this.props.incrementWordsBrokenCount();
 				this.chainLevel++
 				this.props.addRecentWord(validWord, this.chainLevel);
 				// "break" the word; leave empty space in its board position

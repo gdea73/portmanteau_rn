@@ -28,6 +28,7 @@ class GameStatus extends React.Component {
 				score: 0,
 				moves: 0,
 				tilesBroken: 0,
+				wordsBroken: 0,
 				level: 1,
 				nextLevelThreshold: BASE_LEVEL_THRESHOLD,
 				longestChain: 0,
@@ -77,7 +78,7 @@ class GameStatus extends React.Component {
 	}
 
 	addTilesBrokenCount = (tilesBroken) => {
-		newState = this.state;
+		var newState = this.state;
 		newState.tilesBroken += tilesBroken;
 		console.debug('total tiles broken now ' + newState.tilesBroken);
 		if (newState.tilesBroken > newState.nextLevelThreshold) {
@@ -87,6 +88,13 @@ class GameStatus extends React.Component {
 		}
 		console.debug('level threshold (' + newState.level + ') :'
 			+ newState.nextLevelThreshold);
+		this.setState(newState);
+	}
+
+	incrementWordsBrokenCount = () => {
+		var newState = this.state;
+		newState.wordsBroken = this.state.wordsBroken + 1;
+		console.debug('new words broken count: ' + newState.wordsBroken);
 		this.setState(newState);
 	}
 

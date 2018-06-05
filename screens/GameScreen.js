@@ -9,6 +9,7 @@ import {
 	Image,
 	BackHandler,
 	Animated,
+	FlatList,
 } from 'react-native';
 import { StackNavigator } from 'react-navigation';
 import { AdMobBanner } from 'react-native-admob';
@@ -265,12 +266,13 @@ class GameScreen extends React.Component {
 	}
 
 	getStats = () => {
-		return  {
+		return {
 			score: this.gameStatus.state.score,
 			moves: this.gameStatus.state.moves,
 			level: this.gameStatus.state.level,
 			nextLevelThreshold: this.gameStatus.state.nextLevelThreshold,
 			tilesBroken: this.gameStatus.state.tilesBroken,
+			wordsBroken: this.gameStatus.state.wordsBroken,
 			longestChain: this.gameStatus.state.longestChain,
 			longestWord: this.gameStatus.state.longestWord,
 			recentWords: this.gameStatus.state.recentWords,
@@ -282,32 +284,72 @@ class GameScreen extends React.Component {
 		// GameStatus component
 		clearTimeout(this.timer);
 		var stats = this.getStats();
-		this.saveHighScore(stats.score);
 		var style = [styles.gameOverContainer, { opacity: this.gameOverOpacity }];
-		return(
+		return (
 			<Animated.View style={style}>
-				<View style={{flex: 1}}>
+				<View style={{flex: 1, paddingBottom: 10}}>
 					<Text style={styles.gameOverText}>GAME OVER</Text>
-				</View>
-				<View style={styles.gameOverStatsContainer}>
 					<Text style={styles.gameOverScoreText}>{stats.score}</Text>
-					<Text style={styles.gameOverLongestWordText}>LONGEST WORD: {stats.longestWord} letters</Text>
-					<Text style={styles.gameOverLongestChainText}>LONGEST CHAIN: {stats.longestChain} words</Text>
-					<Text style={styles.gameOverMovesText}>TOTAL MOVES: {stats.moves}</Text>
-					<NavButton
-						onPress={() => {
-							this.removeSavedGame();
-							this.props.navigation.goBack(null);
-							this.props.navigation
-								.state.params.onSaveCallback();
-						}}
-						title="GO BACK"
-					/>
 				</View>
+				{this.renderGameOverStats(stats)}
+				<NavButton
+					onPress={() => {
+						this.removeSavedGame();
+						this.props.navigation.goBack(null);
+						this.props.navigation
+							.state.params.onSaveCallback();
+					}}
+					title="GO BACK"
+				/>
 			</Animated.View>
 		);
 	}
 	
+	renderGameOverStats = (stats) => {
+		this.saveHighScore(stats.score);
+		var averageWordLength = stats.tilesBroken / stats.wordsBroken;
+		if (!averageWordLength) averageWordLength = 0; // avoid NaN
+		averageWordLength = averageWordLength.toFixed(3);
+		var stats_array = [
+			{ key: 'LEVEL', value: stats.level },
+			{ key: 'MOVES', value: stats.moves },
+			{ key: 'TILES BROKEN', value: stats.tilesBroken },
+			{ key: 'WORDS BROKEN', value: stats.wordsBroken },
+			{ key: 'AVERAGE WORD LENGTH', value: averageWordLength },
+			{ key: 'LONGEST WORD', value: stats.longestWord },
+			{ key: 'LONGEST CHAIN', value: stats.longestChain },
+		];
+		return (
+			<View style={styles.gameOverStatsContainer}>
+				<FlatList
+					data={stats_array} renderItem={({item}) => 
+							<View style={{
+								justifyContent: 'space-between',
+								flexDirection: 'row',
+								paddingTop: 5,
+							}}>
+							<View style={{flex: 1}}>
+								<Text style={[
+									styles.gameOverStatsText,
+									{textAlign: 'left'}
+								]}>
+									{item.key}
+								</Text>
+							</View>
+							<View style={{flex: 0}}>
+								<Text style={[
+									styles.gameOverStatsText,
+									{textAlign: 'left'}
+								]}>
+									{item.value}
+								</Text>
+							</View>
+						</View>
+					}
+				/>
+			</View>
+		);
+	}
 	render() {
 		return(
 			<View style={{flex: 1, backgroundColor: 'black'}}>
@@ -346,6 +388,7 @@ class GameScreen extends React.Component {
 							   increaseScore={this.increaseScore}
 							   incrementMoveCount={this.incrementMoveCount}
 							   addTilesBrokenCount={this.addTilesBrokenCount}
+							   incrementWordsBrokenCount={this.incrementWordsBrokenCount}
 							   getMoveCount={this.getMoveCount}
 							   getLevel={this.getLevel}
 							   addRecentWord={this.addRecentWord}
@@ -392,6 +435,9 @@ class GameScreen extends React.Component {
 	addTilesBrokenCount = (tilesBroken) => {
 		this.gameStatus.addTilesBrokenCount(tilesBroken);
 	}
+	incrementWordsBrokenCount = () => {
+		this.gameStatus.incrementWordsBrokenCount();
+	}
 	incrementMoveCount = () => {
 		this.gameStatus.incrementMoveCount();
 	}
@@ -437,7 +483,7 @@ const styles = StyleSheet.create({
         top: 0, left: 0, right: 0, bottom: 0,
         backgroundColor: '#222222',
 		flexDirection: 'column',
-		justifyContent: 'center',
+		justifyContent: 'space-between',
     },  
     gameOverText: {
 		fontFamily: Constants.LEAGUE_SPARTAN,
@@ -451,24 +497,12 @@ const styles = StyleSheet.create({
 		textAlign: 'center',
         color: 'white',
     },  
-    gameOverLongestChainText: {
+    gameOverStatsText: {
 		fontFamily: Constants.LEAGUE_SPARTAN,
-        fontSize: 24, 
+        fontSize: 14, 
 		textAlign: 'center',
         color: 'white',
     },  
-    gameOverLongestWordText: {
-		fontFamily: Constants.LEAGUE_SPARTAN,
-        fontSize: 24, 
-		textAlign: 'center',
-        color: 'white',
-    },  
-    gameOverMovesText: {
-		fontFamily: Constants.LEAGUE_SPARTAN,
-        fontSize: 18, 
-		textAlign: 'center',
-        color: 'white',
-    }, 
 	quitModalContainer: {
 		position: 'absolute',
 		top: 0, left: 0, right: 0, bottom: 0,
@@ -488,7 +522,8 @@ const styles = StyleSheet.create({
 		color: 'black',
 	},
 	gameOverStatsContainer: {
-		flex: 4,
+		flex: 0,
+		bottom: 20,
 		justifyContent: 'space-around',
 	},
 });
