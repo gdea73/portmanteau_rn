@@ -1,5 +1,6 @@
 import React from 'react';
 import {
+	Platform,
 	StyleSheet,
 	Alert,
 	Button,
@@ -159,6 +160,9 @@ const styles = StyleSheet.create({
 		flex: 1,
 		alignItems: 'center',
 		justifyContent: 'space-around',
+		paddingTop: Constants.UI_PADDING
+			+ (Platform.OS === 'ios'
+			? Constants.STATUS_BAR_HEIGHT : 0),
 	},
 	buttonView: {
 		position: 'absolute',

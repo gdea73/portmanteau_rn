@@ -664,8 +664,8 @@ class Board extends React.Component {
 
 class Tile extends React.Component {
 	render() {
-		var absurdityRatio = 0.90;
-		var fontOffset = (1 - TILE_FONT_RATIO) / 2 * absurdityRatio * tileSize;
+		var absurdityRatio = 1.8;
+		var fontOffset = (1 - TILE_FONT_RATIO) / absurdityRatio * tileSize;
 		var textStyle = [styles.tileText, {
 			fontSize: tileFontSize,
 			width: tileSize,
@@ -675,7 +675,6 @@ class Tile extends React.Component {
 				position: 'absolute',
 				top: fontOffset,
 			});
-		} else {
 		}
 		return(
 			<Animated.View style={[styles.defaultStile,

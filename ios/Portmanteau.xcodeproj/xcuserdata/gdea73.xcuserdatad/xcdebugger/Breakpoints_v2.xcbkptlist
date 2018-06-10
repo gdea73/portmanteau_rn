@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Bucket
+   type = "1"
+   version = "2.0">
+   <Breakpoints>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../node_modules/react-native/Libraries/WebSocket/RCTSRWebSocket.m"
+            timestampString = "550188141.2782789"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "619"
+            endingLineNumber = "619"
+            landmarkName = "-_failWithError:"
+            landmarkType = "7">
+            <Locations>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "-[RCTSRWebSocket _failWithError:]"
+                  moduleName = "Portmanteau"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/gdea73/portmanteau_rn/node_modules/react-native/Libraries/WebSocket/RCTSRWebSocket.m"
+                  timestampString = "550182163.830108"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "619"
+                  endingLineNumber = "619"
+                  offsetFromSymbolStart = "84">
+               </Location>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "__33-[RCTSRWebSocket _failWithError:]_block_invoke"
+                  moduleName = "Portmanteau"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/gdea73/portmanteau_rn/node_modules/react-native/Libraries/WebSocket/RCTSRWebSocket.m"
+                  timestampString = "550182163.837816"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "619"
+                  endingLineNumber = "619"
+                  offsetFromSymbolStart = "30">
+               </Location>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "__destroy_helper_block_.267"
+                  moduleName = "Portmanteau"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/gdea73/portmanteau_rn/node_modules/react-native/Libraries/WebSocket/RCTSRWebSocket.m"
+                  timestampString = "550182163.842784"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "619"
+                  endingLineNumber = "619"
+                  offsetFromSymbolStart = "10">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+   </Breakpoints>
+</Bucket>

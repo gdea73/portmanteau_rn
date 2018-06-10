@@ -29,6 +29,7 @@ const GAME_OVER_FADE_DURATION = 300;
 const QUIT_MODAL_FINAL_OPACITY = 0.95;
 const QUIT_MODAL_FADE_DURATION = 200;
 const QUIT_MODAL_FADE_IN = 1;
+const BOARD_HEIGHT_SCALE_THRESHOLD = 0.65;
 
 class GameScreen extends React.Component {
 	static navigationOptions = {
@@ -350,7 +351,16 @@ class GameScreen extends React.Component {
 			</View>
 		);
 	}
+
 	render() {
+		var boardWidth = Math.floor(width - 2 * Constants.UI_PADDING);
+		if (
+			boardWidth / Constants.BOARD_ASPECT_RATIO / height 
+			> BOARD_HEIGHT_SCALE_THRESHOLD
+		) {
+			boardWidth = BOARD_HEIGHT_SCALE_THRESHOLD * height
+			           * Constants.BOARD_ASPECT_RATIO;
+		}
 		return(
 			<View style={{flex: 1, backgroundColor: 'black'}}>
 				<Image style={Constants.BG_IMAGE_STYLE}
@@ -383,8 +393,8 @@ class GameScreen extends React.Component {
 						onRef={ref => (this.gameStatus = ref) }
 						initialStats={this.initialStats}
 					/>
-					<View style={styles.boardView}>
-						<Board width={Math.floor(width - 2 * Constants.UI_PADDING)}
+					<View style={[styles.boardView, {width: boardWidth}]}>
+						<Board width={boardWidth}
 							   increaseScore={this.increaseScore}
 							   incrementMoveCount={this.incrementMoveCount}
 							   addTilesBrokenCount={this.addTilesBrokenCount}
@@ -469,6 +479,7 @@ const styles = StyleSheet.create({
 		paddingLeft: Constants.UI_PADDING,
 		paddingRight: Constants.UI_PADDING,
 		paddingBottom: Constants.UI_PADDING,
+		alignItems: 'center',
 	},
 	boardView: {
 		aspectRatio: Constants.BOARD_ASPECT_RATIO,
