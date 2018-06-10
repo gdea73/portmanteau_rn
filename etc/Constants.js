@@ -36,6 +36,9 @@ const BTN_HEIGHT = 30;
 const BTN_WIDTH = 40;
 var BTN_HEADER_STYLE = {
 	flex: 0, height: BTN_HEIGHT,
+	marginTop: UI_PADDING
+		+ (Platform.OS === 'ios'
+		? STATUS_BAR_HEIGHT : 0),
 	flexDirection: 'row',
 	justifyContent: 'space-between',
 	alignItems: 'center',
@@ -110,7 +113,10 @@ class Constants {
 			height: height - STATUS_BAR_HEIGHT
 						   - TITLE_TEXT_PADDING,
 			position: 'absolute',
-			top: 0, left: 0,
+			top: UI_PADDING
+				+ (Platform.OS === 'ios'
+				? STATUS_BAR_HEIGHT : 0),
+			left: 0,
 			aspectRatio: Constants.TITLE_IMAGE_ASPECT,
 		};
 	}

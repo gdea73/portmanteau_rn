@@ -156,14 +156,6 @@ const styles = StyleSheet.create({
 		flex: 1,
 		backgroundColor: 'black',
 	},
-	logoView: {
-		flex: 1,
-		alignItems: 'center',
-		justifyContent: 'space-around',
-		paddingTop: Constants.UI_PADDING
-			+ (Platform.OS === 'ios'
-			? Constants.STATUS_BAR_HEIGHT : 0),
-	},
 	buttonView: {
 		position: 'absolute',
 		top: 0, right: 0,
