@@ -19,6 +19,7 @@ const PADDING = 10;
 const MARGIN = 5;
 const BTN_FONT_SIZE = 24;
 const PAGE_DELAY = 2000;
+const BOARD_HEIGHT_SCALE_THRESHOLD = 0.6;
 
 var { width, height } = require('Dimensions').get('window');
 var pages = [
@@ -140,17 +141,12 @@ class InstructionScreen extends React.Component {
 	}
 
 	render() {
-		var instrHeight = height - 6 * MARGIN - (width
-						/ Constants.BOARD_ASPECT_RATIO);
 		var enableNextButton = !!(this.page !== pages.length - 1);
 		return (
-			<View style={styles.container}>
+			<View style={{flex: 1, backgroundColor: 'black'}}>
 				<Image style={Constants.BG_IMAGE_STYLE}
 					   source={require('../img/gradient_bg.png')} />
-				<View
-					style={[styles.instructionsContainer, {
-						height: instrHeight,
-					}]}>
+				<View style={styles.container}>
 					<View style={Constants.BTN_HEADER_STYLE}>
 						<NavButton
 							onPress={() => {
@@ -183,16 +179,16 @@ class InstructionScreen extends React.Component {
 							buttonStyle={Constants.NAV_BTN_STYLE}
 						/>
 					</View>
-					<ScrollView
-						contentContainerStyle={{padding: PADDING / 2}}
-						style={{flex: 1}}
-					>
-						<Text style={styles.instructionText}>
-							{this.state.text}
-						</Text>
-					</ScrollView>
-				</View>
-				<View style={styles.boardView}>
+					<View style={styles.instructionsContainer}>
+						<ScrollView
+							contentContainerStyle={{padding: PADDING / 2}}
+							style={{flex: 1}}
+						>
+							<Text style={styles.instructionText}>
+								{this.state.text}
+							</Text>
+						</ScrollView>
+					</View>
 					{this.renderBoard()}
 				</View>
 			</View>
@@ -201,41 +197,52 @@ class InstructionScreen extends React.Component {
 
 	renderBoard() {
 		console.debug('rendering demo board (page ' + this.page + ')');
+		var boardWidth = Math.floor(width - 2 * Constants.UI_PADDING);
+		if (
+			boardWidth / Constants.BOARD_ASPECT_RATIO / height 
+			> BOARD_HEIGHT_SCALE_THRESHOLD
+		) {
+			boardWidth = BOARD_HEIGHT_SCALE_THRESHOLD * height
+			           * Constants.BOARD_ASPECT_RATIO;
+		}
 		return (
-					<Board width={Math.floor(width - 2 * MARGIN)}
-						   getLevel={() => { return 1; }}
-						   increaseScore={() => { }}
-						   incrementMoveCount={() => { }}
-						   addTilesBrokenCount={() => { }}
-						   getMoveCount={() => { return this.state.moveCount; }}
-						   addRecentWord={() => { }} 
-						   initialCols={this.state.cols}
-						   initialDropLetter={this.state.dropLetter}
-						   key={'board-page' + this.page}
-					/>
+			<View style={[styles.boardView, {width: boardWidth}]}>
+				<Board width={boardWidth}
+					   getLevel={() => { return 1; }}
+					   increaseScore={() => { }}
+					   incrementMoveCount={() => { }}
+					   addTilesBrokenCount={() => { }}
+					   incrementWordsBrokenCount={() => { }}
+					   getMoveCount={() => { return this.state.moveCount; }}
+					   addRecentWord={() => { }} 
+					   initialCols={this.state.cols}
+					   initialDropLetter={this.state.dropLetter}
+					   key={'board-page' + this.page}
+				/>
+			</View>
 		);
 	}
 }
 
 styles = StyleSheet.create({
 	container: {
-		flex: 1,
-		backgroundColor: 'black',
+		position: 'absolute',
+		top: 0, left: 0, right: 0, bottom: 0,
+		flexDirection: 'column',
+		backgroundColor: 'transparent',
+		justifyContent: 'space-between',
+		paddingLeft: Constants.UI_PADDING,
+		paddingRight: Constants.UI_PADDING,
+		paddingBottom: Constants.UI_PADDING,
+		alignItems: 'center',
 	},
 	boardView: {
-		position: 'absolute',
-		bottom: 0,
-		left: 0,
-		right: 0,
 		margin: MARGIN,
 		aspectRatio: Constants.BOARD_ASPECT_RATIO,
 		justifyContent: 'space-between',
 	},
 	instructionsContainer: {
-		position: 'absolute',
-		top: 0,
-		left: 0,
-		right: 0,
+		flex: 1,
 		margin: MARGIN,
 		padding: PADDING,
 		backgroundColor: '#FFFFFF55',
