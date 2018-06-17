@@ -28,34 +28,59 @@ class SplashScreen extends React.Component {
 
 	constructor(props) {
 		super(props);
+		this.loadingOpacity = new Animated.Value(0.0);
+		// keeps track of task completion; used like a barrier sync
+		this.loadingTasks = {
+			animation: false,
+			dictionary: false,
+			ads: false,
+		};
 		this.state = {
-			animationDone: false,
-			loadingOpacity: new Animated.Value(0.0),
+			isAppReady: false,
 		};
 	}
 
-	componentDidMount() {
+	async componentDidMount() {
+		// start loading animation
 		Animated.timing(
-			this.state.loadingOpacity, {
+			this.loadingOpacity, {
 				toValue: 1.0,
 				duration: LOADING_ANIMATION_DURATION,
 			}
-		).start(() => {
-			if (this.dictionaryLoaded) {
-				// the dictionary was loaded before the animation finished
-				console.debug('dictionary loaded first; going to menu');
-				this.setAppLoaded();
-			}
-			// otherwise, set the animationComplete flag so the dictionary load
-			// callback will load the menu before it terminates.
-			this.animationComplete = true;
-		});
-		Words.loadDictionary(this.dictLoadCallback);
+		).start(() => { this.onTaskCompletion('animation'); });
+		// load the dictionary
+		Words.loadDictionary(() => { this.onTaskCompletion('dictionary') });
+		// check whether ads should be shown / add removal can be purchased
+		if (Platform.OS === 'android') {
+			const InAppBilling = require('react-native-billing');
+			await InAppBilling.close();
+			InAppBilling.open()
+				.then(() => InAppBilling.listOwnedProducts())
+				.then(products => {
+					console.debug(products);
+					if (products.indexOf(Constants.AD_REMOVAL_PRODUCT) > -1) {
+						Constants.showAds = false;
+					} else {
+						Constants.showAds = true;
+					}
+					console.debug('show ads? ' + Constants.showAds);
+				})
+				.catch(err => {
+					console.error(err);
+				}).finally(async () => {
+					await InAppBilling.close();	
+					this.onTaskCompletion('ads');
+				});
+		} else {
+			Constants.showAds = true;
+			// consider the 'ads' task complete, no IAP on iOS yet
+			this.onTaskCompletion('ads');
+		}
 	}
 
 	render() {
 		console.debug('rendering SplashScreen');
-		if (this.state.isAppLoaded) {
+		if (this.state.isAppReady) {
 			console.debug('app loaded (exiting splash)');
 			return (<Root />);
 		}
@@ -78,6 +103,26 @@ class SplashScreen extends React.Component {
 			   );
 	}
 
+	onTaskCompletion = (task) => {
+		console.debug('marking task "' + task + '" as complete');
+		this.loadingTasks[task] = true;
+		let appReady = true;
+		Object.keys(this.loadingTasks).forEach((t) => {
+			if (!this.loadingTasks[t]) {
+				console.debug('task "' + t + '" not complete yet');
+				appReady = false;
+			}
+		});
+		if (!appReady) {
+			return;
+		}
+		// everything has loaded; launch the app
+		console.debug('SplashScreen: app is ready');
+		var newState = this.state;
+		newState.isAppReady = true;
+		this.setState(newState);
+	}
+
 	dictLoadCallback = () => {
 		if (this.animationComplete) {
 			console.debug('animation loaded first; going to menu');
@@ -87,13 +132,6 @@ class SplashScreen extends React.Component {
 		// otherwise, set the dictionaryLoaded flag so the animation callback
 		// knows to load the menu when the animation is finished.
 		this.dictionaryLoaded = true;
-	}
-
-	setAppLoaded = () => {
-		console.debug('going to menu');
-		var newState = this.state;
-		newState.isAppLoaded = true;
-		this.setState(newState);
 	}
 }
 

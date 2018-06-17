@@ -57,7 +57,9 @@ var NAV_BTN_STYLE = {
 var NAV_BTN_FONT_STYLE = {
 	fontFamily: LEAGUE_SPARTAN,
 	fontSize: 24,
-}
+};
+// const AD_REMOVAL_PRODUCT = 'net.uselessinventions.portmanteau.remove_ads';
+const AD_REMOVAL_PRODUCT = 'android.test.purchased';
 
 class Constants {
 	static get RECENT_WORDS_COUNT() {
@@ -137,6 +139,9 @@ class Constants {
 	}
 	static get NAV_BTN_FONT_STYLE() {
 		return NAV_BTN_FONT_STYLE;
+	}
+	static get AD_REMOVAL_PRODUCT() {
+		return AD_REMOVAL_PRODUCT;
 	}
 }
 
