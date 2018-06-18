@@ -88,7 +88,6 @@ class MenuScreen extends React.Component {
 							'Game', {
 								gameData: this.state.savedGameData,
 								onSaveCallback: this.loadSavedGame,
-								showAds: this.doShowAds(),
 							},
 						);
 					}}
@@ -102,18 +101,12 @@ class MenuScreen extends React.Component {
 						this.props.navigation.navigate(
 							'Game', {
 								onSaveCallback: this.loadSavedGame,
-								showAds: this.doShowAds(),
 							},
 						);
 					}}
 				/>
 			);
 		}
-	}
-
-	doShowAds = () => {
-		// for testing
-		return true;
 	}
 
 	render() {
@@ -145,9 +138,81 @@ class MenuScreen extends React.Component {
 							}}
 							title="HIGH SCORES"
 						/>
+						{this.renderAdRemovalButton()}
 					</View>
+					{this.renderError()}
+					{this.renderMessage()}
 				</View>
 			   );
+	}
+
+	renderError = () => {
+		if (this.state.error) {
+			return (
+				<View style={styles.errorView}>
+					<Text style={styles.messageText}>{this.state.error}</Text>
+				</View>
+			);
+		}
+	}
+
+	renderMessage = () => {
+		if (this.state.message) {
+			return (
+				<View style={styles.messageView}>
+					<Text style={styles.messageText}>{this.state.message}</Text>
+				</View>
+			);
+		}
+	}
+
+	removeAds = () => {
+		if (Platform.OS !== 'android') {
+			return;
+		}
+		const InAppBilling = require('react-native-billing');
+		InAppBilling.open()
+			.then(() => InAppBilling.purchase(Constants.AD_REMOVAL_PRODUCT_ID))
+			.then(details => {
+				console.debug("Purchased: ", details);
+				if (details.purchaseState === 'PurchasedSuccessfully') {
+					Constants.showAds = false;
+					this.showMessage(
+						'Ads disabled. Thank you for supporting Portmanteau!'
+					);
+				} else {
+					this.showError(
+						'Unfortunately, the purchase could not be completed.'
+					);
+				}
+			})
+			.catch(err => {
+				this.showError(err);
+				console.warn(err);
+			}).finally(async () => {
+				await InAppBilling.close()
+			});
+	}
+
+	showError = (error) => {
+		var newState = this.state;
+		newState.error = error;
+		this.setState(newState);
+	}
+
+	showMessage = (message) => {
+		var newState = this.state;
+		newState.message = message;
+		this.setState(newState);
+	}
+
+	renderAdRemovalButton = () => {
+		if (!Constants.showAds || Platform.OS !== 'android') {
+			return null;
+		}
+		return (
+			<NavButton onPress={this.removeAds} title="REMOVE ADS" />
+		);
 	}
 }
 
@@ -160,9 +225,6 @@ const styles = StyleSheet.create({
 		flex: 1,
 		alignItems: 'center',
 		justifyContent: 'space-around',
-		paddingTop: Constants.UI_PADDING
-			+ (Platform.OS === 'ios'
-			? Constants.STATUS_BAR_HEIGHT : 0),
 	},
 	buttonView: {
 		position: 'absolute',
@@ -174,6 +236,19 @@ const styles = StyleSheet.create({
 	heading: {
 		color: '#111133',
 		fontSize: 30,
+	},
+	errorView: {
+		backgroundColor: '#880000AA',
+	},
+	messageView: {
+		backgroundColor: '#000000AA',
+	},
+	messageText: {
+		color: 'white',
+		fontSize: 18,
+		textAlign: 'center',
+		textShadowColor: 'black',
+		textShadowOffset: {width: -0.75, height: 1},
 	},
 });
 

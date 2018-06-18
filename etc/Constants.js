@@ -36,6 +36,9 @@ const BTN_HEIGHT = 30;
 const BTN_WIDTH = 40;
 var BTN_HEADER_STYLE = {
 	flex: 0, height: BTN_HEIGHT,
+	marginTop: UI_PADDING
+		+ (Platform.OS === 'ios'
+		? STATUS_BAR_HEIGHT : 0),
 	flexDirection: 'row',
 	justifyContent: 'space-between',
 	alignItems: 'center',
@@ -54,7 +57,8 @@ var NAV_BTN_STYLE = {
 var NAV_BTN_FONT_STYLE = {
 	fontFamily: LEAGUE_SPARTAN,
 	fontSize: 24,
-}
+};
+const AD_REMOVAL_PRODUCT_ID = 'portmanteau_ad_removal';
 
 class Constants {
 	static get RECENT_WORDS_COUNT() {
@@ -110,7 +114,10 @@ class Constants {
 			height: height - STATUS_BAR_HEIGHT
 						   - TITLE_TEXT_PADDING,
 			position: 'absolute',
-			top: 0, left: 0,
+			top: UI_PADDING
+				+ (Platform.OS === 'ios'
+				? STATUS_BAR_HEIGHT : 0),
+			left: 0,
 			aspectRatio: Constants.TITLE_IMAGE_ASPECT,
 		};
 	}
@@ -131,6 +138,9 @@ class Constants {
 	}
 	static get NAV_BTN_FONT_STYLE() {
 		return NAV_BTN_FONT_STYLE;
+	}
+	static get AD_REMOVAL_PRODUCT_ID() {
+		return AD_REMOVAL_PRODUCT_ID;
 	}
 }
 
