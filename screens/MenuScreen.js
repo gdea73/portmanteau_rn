@@ -172,7 +172,7 @@ class MenuScreen extends React.Component {
 		}
 		const InAppBilling = require('react-native-billing');
 		InAppBilling.open()
-			.then(() => InAppBilling.purchase(Constants.AD_REMOVAL_PRODUCT))
+			.then(() => InAppBilling.purchase(Constants.AD_REMOVAL_PRODUCT_ID))
 			.then(details => {
 				console.debug("Purchased: ", details);
 				if (details.purchaseState === 'PurchasedSuccessfully') {

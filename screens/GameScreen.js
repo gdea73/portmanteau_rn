@@ -10,6 +10,7 @@ import {
 	BackHandler,
 	Animated,
 	FlatList,
+	PixelRatio,
 } from 'react-native';
 import { StackNavigator } from 'react-navigation';
 import { AdMobBanner } from 'react-native-admob';
@@ -29,7 +30,6 @@ const GAME_OVER_FADE_DURATION = 300;
 const QUIT_MODAL_FINAL_OPACITY = 0.95;
 const QUIT_MODAL_FADE_DURATION = 200;
 const QUIT_MODAL_FADE_IN = 1;
-const BOARD_HEIGHT_SCALE_THRESHOLD = 0.65;
 
 class GameScreen extends React.Component {
 	static navigationOptions = {
@@ -58,6 +58,11 @@ class GameScreen extends React.Component {
 		this.gameOverOpacity = new Animated.Value(0.0);
 		this.quitModalOpacity = new Animated.Value(0.0);
 		this.quitModalFadeIn = false;
+		console.debug('pixel ratio: ' + PixelRatio.get());
+		this.boardHeightScaleThreshold = 0.433 * PixelRatio.get();
+		if (Constants.showAds) {
+			this.boardHeightScaleThreshold *= 0.9;
+		}
 	}
 
 	componentDidMount() {
@@ -354,12 +359,18 @@ class GameScreen extends React.Component {
 
 	render() {
 		var boardWidth = Math.floor(width - 2 * Constants.UI_PADDING);
+		console.debug('board width: ' + boardWidth);
+		console.debug('board height: ' + boardWidth / Constants.BOARD_ASPECT_RATIO);
+		console.debug('viewport height: ' + height);
+		console.debug('max board height percentage: ' + this.boardHeightScaleThreshold);
 		if (
 			boardWidth / Constants.BOARD_ASPECT_RATIO / height 
-			> BOARD_HEIGHT_SCALE_THRESHOLD
+			> this.boardHeightScaleThreshold
+			// maximum percentage of total viewport height
 		) {
-			boardWidth = BOARD_HEIGHT_SCALE_THRESHOLD * height
+			boardWidth = this.boardHeightScaleThreshold * height
 			           * Constants.BOARD_ASPECT_RATIO;
+			console.debug('board width (adjusted): ' + boardWidth);
 		}
 		return(
 			<View style={{flex: 1, backgroundColor: 'black'}}>
@@ -408,9 +419,7 @@ class GameScreen extends React.Component {
 							   onRef={ref => (this.boardRef = ref) }
 						/>
 					</View>
-					{this.props.navigation.state.params
-						&& this.props.navigation.state.params.showAds
-						&& this.renderAdBanner()}
+					{Constants.showAds && this.renderAdBanner()}
 				</View>
 				{(this.state.gameOver && this.renderGameOver())
 					|| (this.state.showQuitModal && this.renderQuitModal())}

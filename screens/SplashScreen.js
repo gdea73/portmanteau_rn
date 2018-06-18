@@ -58,7 +58,7 @@ class SplashScreen extends React.Component {
 				.then(() => InAppBilling.listOwnedProducts())
 				.then(products => {
 					console.debug(products);
-					if (products.indexOf(Constants.AD_REMOVAL_PRODUCT) > -1) {
+					if (products.indexOf(Constants.AD_REMOVAL_PRODUCT_ID) > -1) {
 						Constants.showAds = false;
 					} else {
 						Constants.showAds = true;
