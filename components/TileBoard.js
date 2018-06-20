@@ -156,7 +156,7 @@ class Board extends React.Component {
 	}
 
 	componentDidUpdate() {
-		if (this.isGameOver()) {
+		if (this.isGameOver() && this.props.gameOver) {
 			this.props.gameOver();
 			return;
 		}

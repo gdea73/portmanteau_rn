@@ -413,7 +413,7 @@ class GameScreen extends React.Component {
 							   getMoveCount={this.getMoveCount}
 							   getLevel={this.getLevel}
 							   addRecentWord={this.addRecentWord}
-							   gameOver={this.gameOver}
+							   gameOver={(this.state.gameOver ? undefined : this.gameOver)}
 							   initialCols={this.initialCols}
 							   initialDropLetter={this.initialDropLetter}
 							   onRef={ref => (this.boardRef = ref) }

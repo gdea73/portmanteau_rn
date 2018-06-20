@@ -187,7 +187,7 @@ class MenuScreen extends React.Component {
 				}
 			})
 			.catch(err => {
-				this.showError(err);
+				this.showError(err.toString());
 				console.warn(err);
 			}).finally(async () => {
 				await InAppBilling.close()
