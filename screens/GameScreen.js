@@ -276,6 +276,8 @@ class GameScreen extends React.Component {
 			score: this.gameStatus.state.score,
 			moves: this.gameStatus.state.moves,
 			level: this.gameStatus.state.level,
+			lastLevelThreshold: this.gameStatus.state.lastLevelThreshold,
+			progress: this.gameStatus.state.progress,
 			nextLevelThreshold: this.gameStatus.state.nextLevelThreshold,
 			tilesBroken: this.gameStatus.state.tilesBroken,
 			wordsBroken: this.gameStatus.state.wordsBroken,

@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, ScrollView, StyleSheet, Text, Button } from 'react-native';
 import { StackNavigator } from 'react-navigation';
+import * as Progress from 'react-native-progress';
 
 import Constants from '../etc/Constants';
 
@@ -30,6 +31,8 @@ class GameStatus extends React.Component {
 				tilesBroken: 0,
 				wordsBroken: 0,
 				level: 1,
+				lastLevelThreshold: 0,
+				progress: 0.0,
 				nextLevelThreshold: BASE_LEVEL_THRESHOLD,
 				longestChain: 0,
 				longestWord: 0,
@@ -83,11 +86,15 @@ class GameStatus extends React.Component {
 		console.debug('total tiles broken now ' + newState.tilesBroken);
 		if (newState.tilesBroken > newState.nextLevelThreshold) {
 			newState.level = this.state.level + 1;
+			newState.lastLevelThreshold = newState.nextLevelThreshold;
 			newState.nextLevelThreshold += BASE_LEVEL_THRESHOLD
 				* Math.ceil(this.state.level / 2.0);
 		}
 		console.debug('level threshold (' + newState.level + ') :'
 			+ newState.nextLevelThreshold);
+		newState.progress = (newState.tilesBroken - newState.lastLevelThreshold)
+			/ (newState.nextLevelThreshold - newState.lastLevelThreshold);
+		console.debug('level progress: ' + newState.progress);
 		this.setState(newState);
 	}
 
@@ -108,6 +115,10 @@ class GameStatus extends React.Component {
 					<Text style={styles.labelDefault}>
 						LEVEL: {this.state.level}
 					</Text>
+					<Progress.Bar
+						progress={this.state.progress}
+						color={'white'}
+					/>
 				</View>
 				<View style={styles.recentWordsOuterContainer}>
 					<Text style={styles.labelDefault}>Recent Words:</Text>
