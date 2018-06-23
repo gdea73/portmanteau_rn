@@ -16,6 +16,7 @@ import Words from '../etc/Words';
 import NavButton from '../components/NavButton';
 import Constants from '../etc/Constants';
 import Storage from '../etc/Storage';
+import Billing from '../etc/Billing';
 
 const BUTTON_VIEW_PADDING = 40;
 
@@ -170,7 +171,8 @@ class MenuScreen extends React.Component {
 		if (Platform.OS !== 'android') {
 			return;
 		}
-		const InAppBilling = require('react-native-billing');
+		console.debug('getting in app billing (android)');
+		var InAppBilling = Billing.getInAppBilling();
 		InAppBilling.open()
 			.then(() => InAppBilling.purchase(Constants.AD_REMOVAL_PRODUCT_ID))
 			.then(details => {

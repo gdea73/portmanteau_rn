@@ -15,6 +15,7 @@ import { StackNavigator } from 'react-navigation';
 import Constants from '../etc/Constants';
 import Words from '../etc/Words';
 import Root from '../config/router';
+import Billing from '../etc/Billing';
 
 const LOADING_ANIMATION_DURATION = 800;
 const LOAD_DELAY = 100;
@@ -52,7 +53,8 @@ class SplashScreen extends React.Component {
 		Words.loadDictionary(() => { this.onTaskCompletion('dictionary') });
 		// check whether ads should be shown / add removal can be purchased
 		if (Platform.OS === 'android') {
-			const InAppBilling = require('react-native-billing');
+			console.debug('getting in app billing (android)');
+			var InAppBilling = Billing.getInAppBilling();
 			await InAppBilling.close();
 			InAppBilling.open()
 				.then(() => InAppBilling.listOwnedProducts())
