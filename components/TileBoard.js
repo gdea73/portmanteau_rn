@@ -41,8 +41,10 @@ const TILE_FONT_RATIO = 0.45;
 const SUPER_BLANK_TILE_UNSELECTED_COLOR = '#222222';
 const SUPER_BLANK_TILE_SELECTED_COLOR = '#AAAA00';
 
+const MESSAGE_FONT_RATIO = 0.3;
+
 // global vars shared with Tile component
-var tileSize, tileFontSize, tileBorderRad, scaledStile;
+var tileSize, tileFontSize, tileBorderRad, scaledStile, messageFontSize;
 
 class Board extends React.Component {
 	constructor(props) {
@@ -83,6 +85,7 @@ class Board extends React.Component {
 				borderRadius: tileBorderRad,
 			};
 			tileFontSize = tileSize * TILE_FONT_RATIO;
+			messageFontSize = tileSize * MESSAGE_FONT_RATIO;
 			console.debug('tile size: ' + tileSize + '; tile font size: ' + tileFontSize);
 			this.firstRender = false;
 			this.gravAnims = this.initializeGravAnims();
@@ -702,7 +705,7 @@ const styles = StyleSheet.create({
 	},
 	messageText: {
 		color: 'white',
-		fontSize: 18,
+		fontSize: messageFontSize,
 		textAlign: 'center',
 		textShadowColor: 'black',
 		textShadowOffset: {width: -0.75, height: 1},
