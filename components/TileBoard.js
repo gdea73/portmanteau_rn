@@ -103,7 +103,7 @@ class Board extends React.Component {
 			message = 'Choose any letter to drop into the board.';
 		}
 		return (
-			<View style={styles.boardContainer}>
+			<View style={[styles.boardContainer, {width: this.props.width}]}>
 				{this.renderColumns()}
 				{message && this.renderMessage(message)}
 				{this.state.dropLetter == null
@@ -692,8 +692,6 @@ class Tile extends React.Component {
 const styles = StyleSheet.create({
     boardContainer: {
         flex: 1,
-        backgroundColor: Constants.COMPONENT_BG_COLOR,
-        borderRadius: Constants.DEFAULT_BORDER_RAD,
     },
 	messageContainer: {
 		position: 'absolute',

@@ -30,6 +30,7 @@ const GAME_OVER_FADE_DURATION = 300;
 const QUIT_MODAL_FINAL_OPACITY = 0.95;
 const QUIT_MODAL_FADE_DURATION = 200;
 const QUIT_MODAL_FADE_IN = 1;
+const ADS_MARGIN = 54;
 
 class GameScreen extends React.Component {
 	static navigationOptions = {
@@ -59,10 +60,6 @@ class GameScreen extends React.Component {
 		this.quitModalOpacity = new Animated.Value(0.0);
 		this.quitModalFadeIn = false;
 		console.debug('pixel ratio: ' + PixelRatio.get());
-		this.boardHeightScaleThreshold = 0.433 * PixelRatio.get();
-		if (Constants.showAds) {
-			this.boardHeightScaleThreshold *= 0.9;
-		}
 	}
 
 	componentDidMount() {
@@ -360,25 +357,47 @@ class GameScreen extends React.Component {
 	}
 
 	render() {
+		// to test this janky form of "responsive design": width = 0.7 * width;
+		var containerStyle = (Constants.showAds)
+			? [styles.container, { paddingBottom: 0, marginBottom: ADS_MARGIN }]
+			: styles.container;
+		var containerHeight = (Constants.showAds) ? height - ADS_MARGIN : height;
+		containerHeight = containerHeight - Constants.BTN_HEIGHT
+			- Constants.BTN_HEADER_MARGIN
+			- 4 * Constants.UI_PADDING;
+		console.debug('width: ' + width + '; height: ' + height);
+		console.debug('containerHeight: ' + containerHeight);
+		// determine if the board will need to be scaled down in order
+		// for GameStatus to achieve its minimum legible height
+		var availableBoardHeight = containerHeight - Constants.GAME_STATUS_MIN_HEIGHT
+		 		- Constants.UI_PADDING;
 		var boardWidth = Math.floor(width - 2 * Constants.UI_PADDING);
-		console.debug('board width: ' + boardWidth);
-		console.debug('board height: ' + boardWidth / Constants.BOARD_ASPECT_RATIO);
-		console.debug('viewport height: ' + height);
-		console.debug('max board height percentage: ' + this.boardHeightScaleThreshold);
-		if (
-			boardWidth / Constants.BOARD_ASPECT_RATIO / height 
-			> this.boardHeightScaleThreshold
-			// maximum percentage of total viewport height
-		) {
-			boardWidth = this.boardHeightScaleThreshold * height
-			           * Constants.BOARD_ASPECT_RATIO;
-			console.debug('board width (adjusted): ' + boardWidth);
+		var boardHeight = boardWidth / Constants.BOARD_ASPECT_RATIO;
+		var gameStatusHeight = Constants.GAME_STATUS_MIN_HEIGHT;
+		var gameStatusWidth = boardWidth;
+		console.debug('boardWidth / board aspect ratio: ' + boardWidth / Constants.BOARD_ASPECT_RATIO);
+		if (boardWidth / Constants.BOARD_ASPECT_RATIO < availableBoardHeight) {
+			// board can use full width; its height won't interfere with GS
+			// expand GS down if possible
+			gameStatusHeight = containerHeight - boardHeight - Constants.UI_PADDING;
+			console.debug('expanding GameStatus height to fill space');
+		} else {
+			// the board width will need to be scaled down to keep
+			// the aspect ratio correct and the GS legible
+			console.debug('shrinking board width to preserve GameStatus min height');
+			boardWidth = availableBoardHeight * Constants.BOARD_ASPECT_RATIO;
+			boardHeight = availableBoardHeight;
 		}
+		var boardContainerWidth = Math.floor(width - 2 * Constants.UI_PADDING);
+		console.debug('boardWidth: ' + boardWidth);
+		console.debug('boardHeight: ' + boardHeight);
+		console.debug('gameStatusHeight: ' + gameStatusHeight);
+		console.debug('board container width: ' + boardContainerWidth);
 		return(
 			<View style={{flex: 1, backgroundColor: 'black'}}>
 				<Image style={Constants.BG_IMAGE_STYLE}
 					   source={require('../img/gradient_bg.png')} />
-				<View style={styles.container}>
+				<View style={containerStyle}>
 					<View style={{
 						...Constants.BTN_HEADER_STYLE, margin: 10
 					}}>
@@ -405,8 +424,15 @@ class GameScreen extends React.Component {
 					<GameStatus
 						onRef={ref => (this.gameStatus = ref) }
 						initialStats={this.initialStats}
+						height={gameStatusHeight}
+						width={gameStatusWidth}
 					/>
-					<View style={[styles.boardView, {width: boardWidth}]}>
+					<View style=
+						{[styles.boardView, {
+							height: boardHeight,
+							width: boardContainerWidth,
+							flex: 0,
+						}]}>
 						<Board width={boardWidth}
 							   increaseScore={this.increaseScore}
 							   incrementMoveCount={this.incrementMoveCount}
@@ -421,8 +447,8 @@ class GameScreen extends React.Component {
 							   onRef={ref => (this.boardRef = ref) }
 						/>
 					</View>
-					{Constants.showAds && this.renderAdBanner()}
 				</View>
+				{Constants.showAds && this.renderAdBanner()}
 				{(this.state.gameOver && this.renderGameOver())
 					|| (this.state.showQuitModal && this.renderQuitModal())}
 			</View>
@@ -483,15 +509,16 @@ const styles = StyleSheet.create({
 		top: 0, left: 0, right: 0, bottom: 0,
 		flexDirection: 'column',
 		backgroundColor: 'transparent',
-		justifyContent: 'space-between',
 		paddingLeft: Constants.UI_PADDING,
 		paddingRight: Constants.UI_PADDING,
 		paddingBottom: Constants.UI_PADDING,
 		alignItems: 'center',
 	},
 	boardView: {
-		aspectRatio: Constants.BOARD_ASPECT_RATIO,
 		justifyContent: 'space-between',
+		backgroundColor: Constants.COMPONENT_BG_COLOR,
+        borderRadius: Constants.DEFAULT_BORDER_RAD,
+		alignItems: 'center',
 	},
 	adView: {
 		alignSelf: 'center',

@@ -142,6 +142,41 @@ class InstructionScreen extends React.Component {
 
 	render() {
 		var enableNextButton = !!(this.page !== pages.length - 1);
+		console.debug('rendering demo board (page ' + this.page + ')');
+		var containerHeight = height - Constants.BTN_HEIGHT
+			- Constants.BTN_HEADER_MARGIN - 4 * Constants.UI_PADDING;
+		console.debug('width: ' + width + '; height: ' + height);
+		console.debug('containerHeight: ' + containerHeight);
+		// determine if the board will need to be scaled down in order
+		// for the instructions to achieve their minimum legible height
+		var availableBoardHeight = containerHeight
+			- Constants.INSTRUCTIONS_MIN_HEIGHT - Constants.UI_PADDING;
+		var containerWidth = Math.floor(width - 2 * Constants.UI_PADDING);
+		var boardWidth = containerWidth;
+		var boardHeight = boardWidth / Constants.BOARD_ASPECT_RATIO;
+		var instructionsHeight = Constants.INSTRUCTIONS_MIN_HEIGHT;
+		var instructionsWidth = containerWidth;
+		if (boardWidth / Constants.BOARD_ASPECT_RATIO < availableBoardHeight) {
+			// the available board height (assuming full width) is sufficient
+			// for the instructions to be legible; expand them down if possible
+			console.debug('expanding instructions height to fill space');
+			instructionsHeight = containerHeight
+				- boardHeight - Constants.UI_PADDING;
+			console.debug('instructions height expanded to ' + instructionsHeight);
+		} else {
+			// the board width will need to be scaled down to keep the aspect
+			// ratio correct and the instructions legible
+			console.debug('shrinking board width to preserve instructions min height');
+			boardWidth = availableBoardHeight * Constants.BOARD_ASPECT_RATIO;
+			boardHeight = availableBoardHeight;
+			console.debug('board height shrunk to ' + boardHeight);
+		}
+		var instructionsContainerStyle = [
+			styles.instructionsContainer, {
+				height: instructionsHeight,
+				width: instructionsWidth,
+			}
+		];
 		return (
 			<View style={{flex: 1, backgroundColor: 'black'}}>
 				<Image style={Constants.BG_IMAGE_STYLE}
@@ -179,7 +214,7 @@ class InstructionScreen extends React.Component {
 							buttonStyle={Constants.NAV_BTN_STYLE}
 						/>
 					</View>
-					<View style={styles.instructionsContainer}>
+					<View style={instructionsContainerStyle}>
 						<ScrollView
 							contentContainerStyle={{padding: PADDING / 2}}
 							style={{flex: 1}}
@@ -189,24 +224,19 @@ class InstructionScreen extends React.Component {
 							</Text>
 						</ScrollView>
 					</View>
-					{this.renderBoard()}
+					{this.renderBoard(containerWidth, boardWidth, boardHeight)}
 				</View>
 			</View>
 		);
 	}
 
-	renderBoard() {
-		console.debug('rendering demo board (page ' + this.page + ')');
-		var boardWidth = Math.floor(width - 2 * Constants.UI_PADDING);
-		if (
-			boardWidth / Constants.BOARD_ASPECT_RATIO / height 
-			> BOARD_HEIGHT_SCALE_THRESHOLD
-		) {
-			boardWidth = BOARD_HEIGHT_SCALE_THRESHOLD * height
-			           * Constants.BOARD_ASPECT_RATIO;
-		}
+	renderBoard(containerWidth, boardWidth, boardHeight) {
 		return (
-			<View style={[styles.boardView, {width: boardWidth}]}>
+			<View style={[
+				styles.boardView, {
+					width: containerWidth, height: boardHeight
+				}
+			]}>
 				<Board width={boardWidth}
 					   getLevel={() => { return 1; }}
 					   increaseScore={() => { }}
@@ -230,23 +260,23 @@ styles = StyleSheet.create({
 		top: 0, left: 0, right: 0, bottom: 0,
 		flexDirection: 'column',
 		backgroundColor: 'transparent',
-		justifyContent: 'space-between',
 		paddingLeft: Constants.UI_PADDING,
 		paddingRight: Constants.UI_PADDING,
 		paddingBottom: Constants.UI_PADDING,
 		alignItems: 'center',
 	},
 	boardView: {
-		margin: MARGIN,
-		aspectRatio: Constants.BOARD_ASPECT_RATIO,
 		justifyContent: 'space-between',
+		backgroundColor: Constants.COMPONENT_BG_COLOR,
+		borderRadius: Constants.DEFAULT_BORDER_RAD,
+		alignItems: 'center',
 	},
 	instructionsContainer: {
-		flex: 1,
-		margin: MARGIN,
-		padding: PADDING,
-		backgroundColor: '#FFFFFF55',
+		padding: Constants.UI_PADDING,
+		backgroundColor: Constants.COMPONENT_BG_COLOR,
 		borderRadius: Constants.DEFAULT_BORDER_RAD,
+		marginTop: Constants.UI_PADDING,
+		marginBottom: Constants.UI_PADDING,
 	},
 	instructionText: {
 		fontSize: 18,

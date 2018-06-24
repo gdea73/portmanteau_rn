@@ -19,7 +19,7 @@ const LEVEL_LENGTH = 25;
 const MIN_WORD_LENGTH = 3;
 
 // background color for Board and GameStatus container Views
-const COMPONENT_BG_COLOR = '#FFFFFF' + 'AA' /* alpha */;
+const COMPONENT_BG_COLOR = '#FFFFFF' + '73' /* alpha */;
 
 var BG_IMAGE_STYLE = {
 	flex: 1,
@@ -34,11 +34,11 @@ var LOGO_IMAGE_STYLE = {
 };
 const BTN_HEIGHT = 30;
 const BTN_WIDTH = 40;
+var BTN_HEADER_MARGIN = UI_PADDING
+	+ (Platform.OS === 'ios' ? STATUS_BAR_HEIGHT : 0);
 var BTN_HEADER_STYLE = {
 	flex: 0, height: BTN_HEIGHT,
-	marginTop: UI_PADDING
-		+ (Platform.OS === 'ios'
-		? STATUS_BAR_HEIGHT : 0),
+	marginTop: BTN_HEADER_MARGIN,
 	flexDirection: 'row',
 	justifyContent: 'space-between',
 	alignItems: 'center',
@@ -59,6 +59,8 @@ var NAV_BTN_FONT_STYLE = {
 	fontSize: 24,
 };
 const AD_REMOVAL_PRODUCT_ID = 'portmanteau_ad_removal';
+const GAME_STATUS_MIN_HEIGHT = 120;
+const INSTRUCTIONS_MIN_HEIGHT = 80;
 
 class Constants {
 	static get RECENT_WORDS_COUNT() {
@@ -127,6 +129,9 @@ class Constants {
 	static get BTN_WIDTH() {
 		return BTN_WIDTH;
 	}
+	static get BTN_HEADER_MARGIN() {
+		return BTN_HEADER_MARGIN;
+	}
 	static get BTN_HEADER_STYLE() {
 		return BTN_HEADER_STYLE;
 	}
@@ -141,6 +146,12 @@ class Constants {
 	}
 	static get AD_REMOVAL_PRODUCT_ID() {
 		return AD_REMOVAL_PRODUCT_ID;
+	}
+	static get GAME_STATUS_MIN_HEIGHT() {
+		return GAME_STATUS_MIN_HEIGHT;
+	}
+	static get INSTRUCTIONS_MIN_HEIGHT() {
+		return INSTRUCTIONS_MIN_HEIGHT;
 	}
 }
 

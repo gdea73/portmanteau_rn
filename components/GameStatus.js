@@ -11,8 +11,6 @@ const RECENT_WORD_FONT_WIDTH_RATIO = 0.8;
 const PADDING = 3;
 const BASE_LEVEL_THRESHOLD = 20;
 
-var { width, height } = require('Dimensions').get('window');
-
 class GameStatus extends React.Component {
 	constructor(props) {
 		super(props);
@@ -106,8 +104,10 @@ class GameStatus extends React.Component {
 	}
 
 	render() {
+		var outerContainerStyle = [styles.outerContainer,
+			{ height: this.props.height, width: this.props.width }];
 		return(
-			<View style={styles.outerContainer}>
+			<View style={outerContainerStyle}>
 				<View style={styles.statsContainer}>
 					<Text style={[styles.labelDefault, {fontSize: 50}]}>
 						{this.state.score}
@@ -152,7 +152,6 @@ const styles = StyleSheet.create({
 		marginBottom: Constants.UI_PADDING,
 		marginTop: 0,
 		borderRadius: Constants.DEFAULT_BORDER_RAD,
-		flex: 1,
     },
 	statsContainer: {
 		flex: 4,
@@ -174,6 +173,7 @@ const styles = StyleSheet.create({
 		flex: 1,
 		backgroundColor: '#332222',
 		borderRadius: Constants.DEFAULT_BORDER_RAD,
+		paddingLeft: 2,
 	},
 	recentWord: {
 		color: 'white',
