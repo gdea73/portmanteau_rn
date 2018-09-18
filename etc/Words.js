@@ -112,22 +112,26 @@ function generateTileSet() {
 		tileSet[j] = temp;
 	}
 }
-function binSearch(string, start, end) {
-	if (start === end) {
-		// as close as it gets
-		return !!(string === words[end]);
-	}
-	var midpt = Math.floor((start + end) / 2);
-	if (string < dictionary[midpt]) {
-		return binSearch(string, start, midpt);
-	}
-	if (string > dictionary[midpt]) {
-		return binSearch(string, midpt + 1, end);
-	}
-	return !!(string === dictionary[midpt]);
-}
+
+
+
 
 class Words {
+	static binSearch(string, start, end) {
+		if (start === end) {
+			// as close as it gets
+			return end;
+		}
+		var midpt = Math.floor((start + end) / 2);
+		if (string < dictionary[midpt]) {
+			return this.binSearch(string, start, midpt);
+		}
+		if (string > dictionary[midpt]) {
+			return this.binSearch(string, midpt + 1, end);
+		}
+		return midpt;
+	}
+
 	static getDropLetter(moves) {
 		if (!charTableLoaded) {
 			initCharTable();
@@ -147,11 +151,16 @@ class Words {
 		callback();
 	}
 
+	static get dictionary() {
+		return dictionary;
+	}
+
 	static isValidWord(string) {
 		if (string.length < Constants.MIN_WORD_LENGTH) {
 			return false;
 		}
-		return binSearch(string, 0, dictionary.length);
+		result = dictionary[binSearch(string, 0, dictionary.length)];
+		return !!(string === result);
 	}
 
 	static getWordScore(word, chainLevel) {

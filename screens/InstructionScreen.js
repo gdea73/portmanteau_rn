@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import { StackNavigator } from 'react-navigation';
 
-import Board from '../components/TileBoard';
+import Board from '../components/Board';
 import Constants from '../etc/Constants';
 import NavButton from '../components/NavButton';
 

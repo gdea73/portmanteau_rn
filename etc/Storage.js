@@ -5,6 +5,7 @@ import Constants from './Constants';
 
 const AS_GAME_KEY = 'portmanteau:savedGame';
 const AS_SCORES_KEY = 'portmanteau:highScores';
+const AS_WORDS_BROKEN_KEY = 'portmanteau:words_broken';
 
 class Storage {
 	static saveGame(gameStats, dropLetter, cols, tileSet) {
@@ -27,6 +28,12 @@ class Storage {
 	}
 	static loadHighScores() {
 		return AsyncStorage.getItem(AS_SCORES_KEY);
+	}
+	static save_words_broken(words_broken) {
+		return AsyncStorage.setItem(AS_WORDS_BROKEN_KEY, JSON.stringify(words_broken));
+	}
+	static load_words_broken() {
+		return AsyncStorage.getItem(AS_WORDS_BROKEN_KEY);
 	}
 }
 

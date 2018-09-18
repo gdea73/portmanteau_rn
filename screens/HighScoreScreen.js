@@ -30,7 +30,7 @@ class HighScoreScreen extends React.Component {
 	}
 
 	backPress = () => {
-		console.debug('backPress handler in HighScoreScreen');
+		Constants.d('backPress handler in HighScoreScreen');
 		this.props.navigation.goBack(null);
 		return true;
 	}
@@ -86,7 +86,7 @@ class HighScoreScreen extends React.Component {
 
 	render() {
 		return (
-			<View style={styles.container}>
+			<View style={Constants.DEFAULT_CONTAINER_STYLE}>
 				<Image source={require('../img/gradient_bg.png')}
 					   style={Constants.BG_IMAGE_STYLE}
 				/>
@@ -128,10 +128,6 @@ class HighScoreScreen extends React.Component {
 }
 
 const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-		backgroundColor: 'black',
-	},
 	scoresContainer: {
 		position: 'absolute',
 		top: 0, left: 0, right: 0, bottom: 0,

@@ -12,6 +12,7 @@ import {
 
 import Constants from '../etc/Constants';
 import Words from '../etc/Words';
+import Tile from './Tile';
 
 // logical constants
 const {WIDTH, HEIGHT} = require('Dimensions').get('window');
@@ -36,15 +37,8 @@ const SUPER_BLANK_REPLACE_DELAY = 500;
 // aesthetic constants
 const DROP_TILE_MARGIN = 2;
 const COL_BORDER_RAD = 2;
-const TILE_PADDING = 3;
-const TILE_FONT_RATIO = 0.45;
-const SUPER_BLANK_TILE_UNSELECTED_COLOR = '#222222';
-const SUPER_BLANK_TILE_SELECTED_COLOR = '#AAAA00';
 
 const MESSAGE_FONT_RATIO = 0.3;
-
-// global vars shared with Tile component
-var tileSize, tileFontSize, tileBorderRad, scaledStile, messageFontSize;
 
 class Board extends React.Component {
 	constructor(props) {
@@ -76,25 +70,17 @@ class Board extends React.Component {
 
 	render() {
 		if (this.firstRender) {
-			tileSize = (this.props.width - (Constants.BOARD_SIZE + 1) * TILE_PADDING)
+			Tile.tile_size = (this.props.width - (Constants.BOARD_SIZE + 1) * Constants.TILE_PADDING)
 					   / Constants.BOARD_SIZE;
-			tileBorderRad = Math.floor(tileSize / 5);
-			screenDependentStile = {
-				height: tileSize,
-				width: tileSize,
-				borderRadius: tileBorderRad,
-			};
-			tileFontSize = tileSize * TILE_FONT_RATIO;
-			messageFontSize = tileSize * MESSAGE_FONT_RATIO;
-			console.debug('tile size: ' + tileSize + '; tile font size: ' + tileFontSize);
+			this.messageFontSize = Tile.tile_size * MESSAGE_FONT_RATIO;
 			this.firstRender = false;
 			this.gravAnims = this.initializeGravAnims();
 			this.breakAnims = this.initializeBreakAnims();
 			this.dropTileGravAnim = new Animated.Value(DROP_TILE_MARGIN);
 			this.dropTileAnim = new Animated.Value(this.getColPosX(CENTER_COL));
 		}
-		console.debug('board at render time:');
-		console.debug(this.state.cols);
+		Constants.d('board at render time:');
+		Constants.d(this.state.cols);
 		var message = undefined;
 		if (this.state.superBlank) {
 			if (this.state.superBlankSelectionID) {
@@ -122,7 +108,7 @@ class Board extends React.Component {
 		return(
 			<View style={[
 				styles.messageContainer,
-				{ top: tileSize + 2 * TILE_PADDING },
+				{ top: Tile.tile_size + 2 * Constants.TILE_PADDING },
 			]}>
 				<Text style={styles.messageText}>{message}</Text>
 			</View>
@@ -227,7 +213,7 @@ class Board extends React.Component {
 		var breakAnims = [[], [], [], [], [], [], []];
 		for (let c = 0; c < Constants.BOARD_SIZE; c++) {
 			for (let r = 0; r < Constants.BOARD_SIZE; r++) {
-				// this was for shrinking animation breakAnims[c][r] = new Animated.Value(tileSize);
+				// this was for shrinking animation breakAnims[c][r] = new Animated.Value(Tile.tile_size);
 				// currently going to fade out instead, "because ... it's easy" -Bob O
 				breakAnims[c][r] = new Animated.Value(1);
 			}
@@ -240,7 +226,7 @@ class Board extends React.Component {
 		// its motion from the center of the board to the chosen drop
 		// column is animated by the Board
 		var stile = {
-			backgroundColor: TILE_COLORS[this.state.dropLetter],
+			backgroundColor: Constants.TILE_COLORS[this.state.dropLetter],
 			top: this.dropTileGravAnim,
 			left: this.dropTileAnim,
 		}
@@ -252,7 +238,7 @@ class Board extends React.Component {
 					<ScrollView
 						contentContainerStyle={[
 							styles.tilePickerInnerView,
-							{height: tileSize + TILE_PADDING}
+							{height: Tile.tile_size + Constants.TILE_PADDING}
 						]}
 						horizontal={true}
 					>
@@ -272,15 +258,15 @@ class Board extends React.Component {
 		for (let i = 0; i < 26; i++) {
 			let letter = String.fromCharCode(65 + i);
 			var stile = {
-				backgroundColor: TILE_COLORS[letter],
+				backgroundColor: Constants.TILE_COLORS[letter],
 				position: 'relative',
 				flex: 1,
-				height: tileSize,
-				width: tileSize,
-				marginRight: TILE_PADDING / 2,
+				height: Tile.tile_size,
+				width: Tile.tile_size,
+				marginRight: Constants.TILE_PADDING / 2,
 			}
 			let onPress = () => {
-				console.debug('assigning blank to ' + letter);
+				Constants.d('assigning blank to ' + letter);
 				this.nextDropLetter = letter;
 				this.nextBoard = this.state.cols.slice();
 				this.setNextBoardState();
@@ -288,7 +274,7 @@ class Board extends React.Component {
 			if (this.state.superBlank) {
 				let tileID = this.state.superBlankSelectionID;
 				onPress = () => {
-					console.debug('replacing tile ID ' + tileID + ' with ' + letter);
+					Constants.d('replacing tile ID ' + tileID + ' with ' + letter);
 					this.nextBoard[Math.floor(tileID / Constants.BOARD_SIZE)]
 								  [tileID % Constants.BOARD_SIZE] = letter;
 					// consider the replacement a move
@@ -350,22 +336,21 @@ class Board extends React.Component {
 
 	renderTiles(col) {
 		var result = [];
-		// console.debug('rendering tiles [' + col + ']:');
 		for (let row = 0; row < Constants.BOARD_SIZE; row++) {
 			if (this.state.cols[col][row] !== ' ') {
 				// the gravity animation, if used, will be triggered by
 				// the Board with the proper ending position.
-				let backgroundColor = TILE_COLORS[this.state.cols[col][row]];
+				let backgroundColor = Constants.TILE_COLORS[this.state.cols[col][row]];
 				// tiles only receive touch events during super blank selection
 				let onSelect = undefined;
 				if (this.state.superBlank) {
-					backgroundColor = SUPER_BLANK_TILE_UNSELECTED_COLOR;
+					backgroundColor = Constants.TILE_UNSELECTED_COLOR;
 					if (this.state.superBlankSelectionID) {
 						// a selection has been made
 						if (this.state.superBlankSelectionID
 							== this.getTileID(col, row)) {
 							// this is the selected tile; color it accordingly
-							backgroundColor = SUPER_BLANK_TILE_SELECTED_COLOR;
+							backgroundColor = Constants.TILE_SELECTED_COLOR;
 						}
 					} else {
 						// no selection has been made; generate onSelect
@@ -380,7 +365,6 @@ class Board extends React.Component {
 					opacity: this.breakAnims[col][row],
 					left: 0,
 				}
-				// console.debug('\t\t[' + this.state.cols[col][row] + ']');
 				result.push(
 					<Tile key={this.getTileID(col, row)}
 						  style={stile}
@@ -398,7 +382,7 @@ class Board extends React.Component {
 	}
 
 	handleColClick(col) {
-		console.debug('handling click on col ' + col);
+		Constants.d('handling click on col ' + col);
 		// Most importantly, don't allow any drops to occur
 		// if we're still mid-chain, and words may still be broken.
 		// Also, if we haven't assigned a letter to a blank drop tile, bail.
@@ -444,7 +428,7 @@ class Board extends React.Component {
 		// we've just dropped a tile into the board, so we need to add the
 		// drop tile to our temporary array of colums while we search.
 		board[this.lastDropCol][this.lastDropRow] = this.state.dropLetter;
-		console.debug('setting dropCol in nextBoard at (' + this.lastDropCol + ', ' + this.lastDropRow + '): ' + this.state.dropLetter);
+		Constants.d('setting dropCol in nextBoard at (' + this.lastDropCol + ', ' + this.lastDropRow + '): ' + this.state.dropLetter);
 		this.nextBoard = board;
 		this.nextDropLetter = null;
 		Animated.sequence(animations).start(this.setNextBoardState.bind(this));
@@ -455,13 +439,11 @@ class Board extends React.Component {
 		// it checks for any valid words, breaks them, pulls tiles downward as
 		// necessary, and repeats the process (at the next chain level).
 		var board = this.state.cols.slice();
-		console.debug('breakWordsCallback() entered; chainLevel ' + this.chainLevel);
+		Constants.d('breakWordsCallback() entered; chainLevel ' + this.chainLevel);
 		var wordsToCheck = Words.getWordsToCheck(board);
 		// we now have the complete array of words to look up in the dictionary.
 		var validWordsFound = false;
 		var breakAnimations = [];
-		console.debug('board words we will check:');
-		console.debug(wordsToCheck);
 		// bring the working 'board' to the class scope, so it can be accessed
 		// by the setNextBoardState() callback upon animation completion.
 		this.nextBoard = [];
@@ -482,13 +464,11 @@ class Board extends React.Component {
 			if (validWord) {
 				validWordsFound = true;
 				// update GameStatus via callbacks to GameScreen
-				console.debug('validWord: ' + validWord + '; score: ' + Words.getWordScore(validWord, this.chainLevel) + ' (chain level ' + this.chainLevel + ')');
 				this.props.increaseScore(
 					Words.getWordScore(validWord, this.chainLevel)
 						* this.props.getLevel(),
 					this.chainLevel
 				);
-				console.debug('*** broke ' + validWord.length + ' tiles');
 				this.props.addTilesBrokenCount(validWord.length);
 				this.props.incrementWordsBrokenCount();
 				this.chainLevel++
@@ -498,19 +478,14 @@ class Board extends React.Component {
 					// breaking a vertical word
 					for (let r = boardWord.startRow; r >= boardWord.endRow; r--) {
 						this.nextBoard[boardWord.startCol][r] = ' ';
-						console.debug('adding break animation for (' +
-							boardWord.startCol + ', ' + r + ').');
 						breakAnimations.push(
 							this.getBreakAnimTiming(boardWord.startCol, r)
 						);
-						
 					}
 				} else if (boardWord.startRow === boardWord.endRow) {
 					// breaking a horizontal word
 					for (let c = boardWord.startCol; c <= boardWord.endCol; c++) {
 						this.nextBoard[c][boardWord.startRow] = ' ';
-						console.debug('adding break animation for (' +
-							c + ', ' + boardWord.startCol + ').');
 						breakAnimations.push(
 							this.getBreakAnimTiming(c, boardWord.startRow)
 						);
@@ -543,7 +518,6 @@ class Board extends React.Component {
 				if (this.nextBoard[c][r] === ' ') {
 					fallDist++;
 				} else if (fallDist > 0) {
-					console.debug('the "' + board[c][r] + '" at c: ' + c + ', r: ' + r + ' will drop by ' + fallDist + ' tiles.');
 					gravityAnimations.push(
 						this.getGravAnimTiming(c, r, fallDist)
 					);
@@ -561,9 +535,8 @@ class Board extends React.Component {
 		// First, the breaking animations should occur in parallel; the
 		// following parallel batch of animations, for gravity, must not
 		// begin until the tiles have broken.
-		console.debug("About to start break and gravity animations in sequence.");
-		console.debug("this.nextBoard:");
-		console.debug(this.nextBoard);
+		Constants.d("this.nextBoard:");
+		Constants.d(this.nextBoard);
 		Animated.sequence([
 			Animated.parallel(breakAnimations, {stopTogether: false}),
 			Animated.parallel(gravityAnimations, {stopTogether: false}),
@@ -603,12 +576,11 @@ class Board extends React.Component {
 		if (newState.dropLetter === ' '
 			&& Math.random() < this.getSuperBlankProbability()
 			&& this.tileCount(newState.cols) >= Constants.MIN_WORD_LENGTH) {
-			console.debug('SUPER BLANK');
 			newState.superBlank = true;
 		} else {
 			newState.superBlank = false;
 		}
-		console.debug('about to set new board state with dropLetter ' + newState.dropLetter);
+		Constants.d('about to set new board state with dropLetter ' + newState.dropLetter);
 		this.setState(newState);
 	}
 
@@ -623,7 +595,6 @@ class Board extends React.Component {
 	}
 
 	getGravAnimTiming(col, row, fallDist) {
-		console.debug('toValue: ' + this.getTilePosY(row + fallDist) + ' (row ' + row + '; fallDist ' + fallDist + ')');
 		return Animated.timing(
 			this.gravAnims[col][row], {
 			toValue: this.getTilePosY(row + fallDist),
@@ -644,11 +615,11 @@ class Board extends React.Component {
         return {
             flex: 0,
             position: 'absolute',
-            top: TILE_PADDING + tileSize,
+            top: Constants.TILE_PADDING + Tile.tile_size,
             left: this.getColPosX(index),
             backgroundColor: bgColor,
-            width: tileSize,
-            height: tileSize * Constants.BOARD_SIZE + TILE_PADDING * (Constants.BOARD_SIZE + 1),
+            width: Tile.tile_size,
+            height: Tile.tile_size * Constants.BOARD_SIZE + Constants.TILE_PADDING * (Constants.BOARD_SIZE + 1),
             borderRadius: borderR,
             // TODO: test this properly
             overflow: 'scroll',
@@ -657,38 +628,11 @@ class Board extends React.Component {
 
 	// Translation methods from board coordinates to absolute coordinates.
 	getTilePosY(row) {
-		return row * (tileSize + TILE_PADDING) + TILE_PADDING;
+		return row * (Tile.tile_size + Constants.TILE_PADDING) + Constants.TILE_PADDING;
 	}
 
 	getColPosX(col) {
-		return tileSize * col + (col + 1) * TILE_PADDING;
-	}
-}
-
-class Tile extends React.Component {
-	render() {
-		var absurdityRatio = 1.8;
-		var fontOffset = (1 - TILE_FONT_RATIO) / absurdityRatio * tileSize;
-		var textStyle = [styles.tileText, {
-			fontSize: tileFontSize,
-			width: tileSize,
-		}];
-		if (Platform.OS == 'ios') {
-			textStyle.push({
-				position: 'absolute',
-				top: fontOffset,
-			});
-		}
-		return(
-			<Animated.View style={[styles.defaultStile,
-					              screenDependentStile, this.props.style]}
-						   onStartShouldSetResponder=
-						   		{this.props.onSelect}>
-										<Text style={textStyle}>
-											{this.props.letter}
-										</Text>
-			</Animated.View>
-		);
+		return Tile.tile_size * col + (col + 1) * Constants.TILE_PADDING;
 	}
 }
 
@@ -705,73 +649,25 @@ const styles = StyleSheet.create({
 	},
 	messageText: {
 		color: 'white',
-		fontSize: messageFontSize,
+		fontSize: this.messageFontSize,
 		textAlign: 'center',
 		textShadowColor: 'black',
 		textShadowOffset: {width: -0.75, height: 1},
 	},
-	defaultStile: {
-		position: 'absolute',
-		borderWidth: 1,
-		borderColor: 'black',
-		justifyContent: 'center',
-	},
-	tileText: {
-		fontFamily: Constants.LEAGUE_SPARTAN,
-		backgroundColor: 'transparent',
-		color: 'white',
-		textShadowColor: 'black',
-		textShadowOffset: {width: -1.5, height: 2},
-		alignSelf: 'center',
-		textAlign: 'center',
-	},
 	tilePickerOuterView: {
 		position: 'absolute',
-		top: TILE_PADDING / 2,
-		left: TILE_PADDING,
-		right: TILE_PADDING,
+		top: Constants.TILE_PADDING / 2,
+		left: Constants.TILE_PADDING,
+		right: Constants.TILE_PADDING,
 		backgroundColor: 'transparent',
 	},
 	tilePickerInnerView: {
 		flexDirection: 'row',
 	},
-	tileTextContainer: {
-		flex: 1,
-		backgroundColor: '#000',
-		justifyContent: 'center',
-		alignItems: 'center',
-	},
 });
 
-const TILE_COLORS = {
-    'A': '#5AE270',
-    'B': '#5AC3E2',
-    'C': '#F45F62',
-    'D': '#4940FF',
-    'E': '#EE35F0',
-    'F': '#9E2680',
-    'G': '#40FFE6',
-    'H': '#A55FF4',
-    'I': '#84F035',
-    'J': '#4F0D4B',
-    'K': '#3E7386',
-    'L': '#C060FF',
-    'M': '#F2C424',
-    'N': '#869BE0',
-    'O': '#E5FD42',
-    'P': '#F03587',
-    'Q': '#0E2322',
-    'R': '#D5B818',
-    'S': '#6D35F0',
-    'T': '#40C8EF',
-    'U': '#35F071',
-    'V': '#761A0D',
-    'W': '#80B0A2',
-    'X': '#4D0004',
-    'Y': '#B1DA34',
-    'Z': '#062445',
-    'BLANK': '#ffffff',
-    'NONE': 'transparent',
-};
-
 export default Board;
+//FIXME: decouple Tile so I can import it separately in DictionaryScreen. I
+//don't need any of the board shit and it's all broken in its current state. If
+//Tile is a separate class (AND FILE), then they can be used board-less for the
+//dictionary tabs and word score displays.

@@ -5,7 +5,7 @@ import * as Progress from 'react-native-progress';
 
 import Constants from '../etc/Constants';
 
-const RECENT_WORD_CACHE_SIZE = 14;
+const RECENT_WORD_DISPLAY_CACHE_SIZE = 25;
 const RECENT_WORD_FONT_SIZE = 18;
 const RECENT_WORD_FONT_WIDTH_RATIO = 0.8;
 const PADDING = 3;
@@ -14,27 +14,24 @@ const BASE_LEVEL_THRESHOLD = 20;
 class GameStatus extends React.Component {
 	constructor(props) {
 		super(props);
-		recentWords = [];
-		for (let i = 0; i < RECENT_WORD_CACHE_SIZE; i++) {
-			recentWords.push('');
-		}
+		var wordsBroken = [];
 		if (props.initialStats) {
 			this.state = props.initialStats;
-			console.debug('GameStatus received these initial stats:');
-			console.debug(props.initialStats);
+			Constants.d('GameStatus received these initial stats:');
+			Constants.d(props.initialStats);
 		} else {
 			this.state = {
 				score: 0,
 				moves: 0,
 				tilesBroken: 0,
-				wordsBroken: 0,
+				wordsBrokenCount: 0,
 				level: 1,
 				lastLevelThreshold: 0,
 				progress: 0.0,
 				nextLevelThreshold: BASE_LEVEL_THRESHOLD,
 				longestChain: 0,
 				longestWord: 0,
-				recentWords: recentWords,
+				wordsBroken: wordsBroken,
 			};
 		}
 	}
@@ -52,7 +49,7 @@ class GameStatus extends React.Component {
 		var newState = this.state;
 		newState.score = this.state.score + points;
 		if (chainLevel > this.state.longestChain) {
-			console.debug('next longest chain level: ' + chainLevel);
+			Constants.d('next longest chain level: ' + chainLevel);
 			newState.longestChain = chainLevel;
 		}
 		this.setState(newState);
@@ -65,41 +62,38 @@ class GameStatus extends React.Component {
 	}
 
 	addRecentWord = (word) => {
-		var recentWords = this.state.recentWords.slice();
-		for (let i = RECENT_WORD_CACHE_SIZE - 1; i >= 0; i--) {
-			recentWords[i] = recentWords[i - 1];
-		}
-		recentWords[0] = word;
 		var newState = this.state;
+		var wordsBroken = this.state.wordsBroken.slice();
+		wordsBroken.push(word);
 		if (word.length > this.state.longestWord) {
 			newState.longestWord = word.length;
 		}
-		newState.recentWords = recentWords;
+		newState.wordsBroken = wordsBroken;
 		this.setState(newState);
 	}
 
 	addTilesBrokenCount = (tilesBroken) => {
 		var newState = this.state;
 		newState.tilesBroken += tilesBroken;
-		console.debug('total tiles broken now ' + newState.tilesBroken);
+		Constants.d('total tiles broken now ' + newState.tilesBroken);
 		if (newState.tilesBroken > newState.nextLevelThreshold) {
 			newState.level = this.state.level + 1;
 			newState.lastLevelThreshold = newState.nextLevelThreshold;
 			newState.nextLevelThreshold += BASE_LEVEL_THRESHOLD
 				* Math.ceil(this.state.level / 2.0);
 		}
-		console.debug('level threshold (' + newState.level + ') :'
+		Constants.d('level threshold (' + newState.level + ') :'
 			+ newState.nextLevelThreshold);
 		newState.progress = (newState.tilesBroken - newState.lastLevelThreshold)
 			/ (newState.nextLevelThreshold - newState.lastLevelThreshold);
-		console.debug('level progress: ' + newState.progress);
+		Constants.d('level progress: ' + newState.progress);
 		this.setState(newState);
 	}
 
 	incrementWordsBrokenCount = () => {
 		var newState = this.state;
-		newState.wordsBroken = this.state.wordsBroken + 1;
-		console.debug('new words broken count: ' + newState.wordsBroken);
+		newState.wordsBrokenCount = this.state.wordsBrokenCount + 1;
+		Constants.d('new words broken count: ' + newState.wordsBrokenCount);
 		this.setState(newState);
 	}
 
@@ -120,9 +114,9 @@ class GameStatus extends React.Component {
 						color={'white'}
 					/>
 				</View>
-				<View style={styles.recentWordsOuterContainer}>
+				<View style={styles.wordsBrokenOuterContainer}>
 					<Text style={styles.labelDefault}>Recent Words:</Text>
-					<ScrollView style={[styles.recentWordsInnerContainer]}>
+					<ScrollView style={[styles.wordsBrokenInnerContainer]}>
 						{this.renderRecentWords()}
 					</ScrollView>	
 				</View>
@@ -131,15 +125,18 @@ class GameStatus extends React.Component {
 	}
 
 	renderRecentWords() {
-		var recentWords = [];
-		for (let i = 0; i < Constants.RECENT_WORDS_COUNT; i++) {
-			recentWords.push(
-				<View key={'recentWords' + i}>
-					<Text style={styles.recentWord}>{this.state.recentWords[i]}</Text>
+		var wordsBroken = [];
+		for (let i = RECENT_WORD_DISPLAY_CACHE_SIZE - 1; i >= 0; i--) {
+			if (this.state.wordsBroken[i] === undefined) {
+				continue
+			}
+			wordsBroken.push(
+				<View key={'wordsBroken' + i}>
+					<Text style={styles.recentWord}>{this.state.wordsBroken[i]}</Text>
 				</View>
 			);
 		}
-		return recentWords;
+		return wordsBroken;
 	}
 }
 
@@ -164,12 +161,12 @@ const styles = StyleSheet.create({
 		fontSize: 15,
 		fontFamily: Constants.LEAGUE_SPARTAN,
 	},
-	recentWordsOuterContainer: {
+	wordsBrokenOuterContainer: {
 		flex: 3,
 		flexDirection: 'column',
 		width: RECENT_WORD_FONT_SIZE * RECENT_WORD_FONT_WIDTH_RATIO * 7,
 	},
-	recentWordsInnerContainer: {
+	wordsBrokenInnerContainer: {
 		flex: 1,
 		backgroundColor: '#332222',
 		borderRadius: Constants.DEFAULT_BORDER_RAD,

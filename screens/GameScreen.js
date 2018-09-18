@@ -15,7 +15,7 @@ import {
 import { StackNavigator } from 'react-navigation';
 import { AdMobBanner } from 'react-native-admob';
 
-import Board from '../components/TileBoard';
+import Board from '../components/Board';
 import GameStatus from '../components/GameStatus';
 import NavButton from '../components/NavButton';
 import Constants from '../etc/Constants';
@@ -46,7 +46,7 @@ class GameScreen extends React.Component {
 		this.getMoveCount = this.getMoveCount.bind(this);
 		if (this.props.navigation.state.params
 			&& this.props.navigation.state.params.gameData) {
-			console.debug('GameScreen was passed saved game data');
+			Constants.d('GameScreen was passed saved game data');
 			var gameData = this.props.navigation.state.params.gameData;
 			this.initialCols = gameData.cols;
 			this.initialDropLetter = gameData.dropLetter;
@@ -59,7 +59,7 @@ class GameScreen extends React.Component {
 		this.gameOverOpacity = new Animated.Value(0.0);
 		this.quitModalOpacity = new Animated.Value(0.0);
 		this.quitModalFadeIn = false;
-		console.debug('pixel ratio: ' + PixelRatio.get());
+		Constants.d('pixel ratio: ' + PixelRatio.get());
 	}
 
 	componentDidMount() {
@@ -78,13 +78,13 @@ class GameScreen extends React.Component {
 	hideQuitModal = () => {
 		var state = this.state;
 		state.showQuitModal = false;
-		console.debug('fading modal out');
+		Constants.d('fading modal out');
 		Animated.timing(
 			this.quitModalOpacity, {
 				toValue: 0,
 				duration: QUIT_MODAL_FADE_DURATION
 			}
-		).start(() => {console.debug('fade out done'); this.setState(state)});
+		).start(() => {Constants.d('fade out done'); this.setState(state)});
 	}
 
 	componentDidUpdate = () => {
@@ -99,7 +99,7 @@ class GameScreen extends React.Component {
 			).start();
 		}
 		if (this.quitModalFadeIn) {
-			console.debug('fading modal in');
+			Constants.d('fading modal in');
 			Animated.timing(
 				this.quitModalOpacity, {
 					toValue: QUIT_MODAL_FINAL_OPACITY,
@@ -111,9 +111,9 @@ class GameScreen extends React.Component {
 
 	removeSavedGame() {
 		Storage.removeSavedGame().then(() => {
-			console.debug('removed saved game');
+			Constants.d('removed saved game');
 		}).catch(() => {
-			console.debug('failed to remove saved game (maybe there was none)');	
+			console.warn('failed to remove saved game (maybe there was none)');	
 		});
 	}
 
@@ -127,7 +127,7 @@ class GameScreen extends React.Component {
 		};
 		Storage.loadHighScores().then((scoresJSON) => {
 			var scores = JSON.parse(scoresJSON);
-            console.debug('loaded high scores (pre-save)');
+            Constants.d('loaded high scores (pre-save)');
             if (score > scores[0].score) {
                 // worth adding to the list
                 scores[0] = newScore;
@@ -145,7 +145,7 @@ class GameScreen extends React.Component {
 					}
 				});
                 Storage.saveHighScores(scores).then(() => {
-					console.debug('successfully saved high scores');
+					Constants.d('successfully saved high scores');
 				}).catch((error) => {
 					console.warn('failed to save high scores: ' + error);
 				});
@@ -162,9 +162,9 @@ class GameScreen extends React.Component {
             }   
             scores[Constants.N_HIGH_SCORES - 1] = newScore;
             Storage.saveHighScores(scores).then(() => {
-				console.debug('successfully saved first high score');
+				Constants.d('successfully saved first high score');
 			}).catch((error) => {
-				console.debug('failed to save first high score: ' + error);
+				Constants.d('failed to save first high score: ' + error);
 			});
         }); 
 	}
@@ -175,20 +175,20 @@ class GameScreen extends React.Component {
 	}
 
 	onBackButtonPress = () => {
-		console.debug('back button handler called in GameScreen');
+		Constants.d('back button handler called in GameScreen');
 		if (this.state.showQuitModal) {
-			console.debug('\tcancelling quit modal');
+			Constants.d('\tcancelling quit modal');
 			// dismiss (cancel) the quit modal if currently being shown)
 			this.hideQuitModal();
 		} else if (this.state.gameOver) {
-			console.debug('\tgame is over, going back');
+			Constants.d('\tgame is over, going back');
 			// If the game is over, a back button press must immediately quit,
 			// but also must remove any saved game data.
 			this.removeSavedGame();
 			this.props.navigation.goBack(null);
 		} else {
 			// the game is in progress; show quit modal for confirmation
-			console.debug('\tshowing quit modal');
+			Constants.d('\tshowing quit modal');
 			var state = this.state;
 			state.showQuitModal = true;
 			this.quitModalFadeIn = true;
@@ -201,7 +201,7 @@ class GameScreen extends React.Component {
 		// This function is to be called periodically by the Board, and will
 		// save the current board state (including drop tile and tile set), and
 		// game status to AsyncStorage.
-		console.debug('saving game');
+		Constants.d('saving game');
 		return Storage.saveGame(
 			this.getStats(), this.boardRef.state.dropLetter,
 			this.boardRef.state.cols, Words.getTileSet()
@@ -225,7 +225,7 @@ class GameScreen extends React.Component {
 						textStyle={styles.modalButtonText}
 						onPress={() => {
 							this.saveGame(() => {
-								console.debug('game saved successfully');
+								Constants.d('game saved successfully');
 								this.props.navigation.goBack(null);
 								// execute the MenuScreen callback; otherwise,
 								// the game can only be resumed after a restart.
@@ -239,7 +239,7 @@ class GameScreen extends React.Component {
 						buttonStyle={styles.modalButton}
 						textStyle={styles.modalButtonText}
 						onPress={() => {
-							console.debug('discarding game');
+							Constants.d('discarding game');
 							this.removeSavedGame();
 							this.props.navigation.goBack(null);
 							this.props.navigation
@@ -251,7 +251,7 @@ class GameScreen extends React.Component {
 						buttonStyle={styles.modalButton}
 						textStyle={styles.modalButtonText}
 						onPress={() => {
-							console.debug('giving up');
+							Constants.d('giving up');
 							this.hideQuitModal();
 							this.gameOver();
 						}}
@@ -277,10 +277,10 @@ class GameScreen extends React.Component {
 			progress: this.gameStatus.state.progress,
 			nextLevelThreshold: this.gameStatus.state.nextLevelThreshold,
 			tilesBroken: this.gameStatus.state.tilesBroken,
-			wordsBroken: this.gameStatus.state.wordsBroken,
+			wordsBrokenCount: this.gameStatus.state.wordsBrokenCount,
 			longestChain: this.gameStatus.state.longestChain,
 			longestWord: this.gameStatus.state.longestWord,
-			recentWords: this.gameStatus.state.recentWords,
+			wordsBroken: this.gameStatus.state.wordsBroken,
 		};
 	}
 
@@ -312,14 +312,17 @@ class GameScreen extends React.Component {
 	
 	renderGameOverStats = (stats) => {
 		this.saveHighScore(stats.score);
-		var averageWordLength = stats.tilesBroken / stats.wordsBroken;
+		Storage.save_words_broken(stats.wordsBroken).catch(() => {
+			console.warn('failed to save words broken');	
+		});
+		var averageWordLength = stats.tilesBroken / stats.wordsBrokenCount;
 		if (!averageWordLength) averageWordLength = 0; // avoid NaN
 		averageWordLength = averageWordLength.toFixed(3);
 		var stats_array = [
 			{ key: 'LEVEL', value: stats.level },
 			{ key: 'MOVES', value: stats.moves },
 			{ key: 'TILES BROKEN', value: stats.tilesBroken },
-			{ key: 'WORDS BROKEN', value: stats.wordsBroken },
+			{ key: 'WORDS BROKEN', value: stats.wordsBrokenCount },
 			{ key: 'AVERAGE WORD LENGTH', value: averageWordLength },
 			{ key: 'LONGEST WORD', value: stats.longestWord },
 			{ key: 'LONGEST CHAIN', value: stats.longestChain },
@@ -365,8 +368,8 @@ class GameScreen extends React.Component {
 		containerHeight = containerHeight - Constants.BTN_HEIGHT
 			- Constants.BTN_HEADER_MARGIN
 			- 4 * Constants.UI_PADDING;
-		console.debug('width: ' + width + '; height: ' + height);
-		console.debug('containerHeight: ' + containerHeight);
+		Constants.d('width: ' + width + '; height: ' + height);
+		Constants.d('containerHeight: ' + containerHeight);
 		// determine if the board will need to be scaled down in order
 		// for GameStatus to achieve its minimum legible height
 		var availableBoardHeight = containerHeight - Constants.GAME_STATUS_MIN_HEIGHT
@@ -375,24 +378,24 @@ class GameScreen extends React.Component {
 		var boardHeight = boardWidth / Constants.BOARD_ASPECT_RATIO;
 		var gameStatusHeight = Constants.GAME_STATUS_MIN_HEIGHT;
 		var gameStatusWidth = boardWidth;
-		console.debug('boardWidth / board aspect ratio: ' + boardWidth / Constants.BOARD_ASPECT_RATIO);
+		Constants.d('boardWidth / board aspect ratio: ' + boardWidth / Constants.BOARD_ASPECT_RATIO);
 		if (boardWidth / Constants.BOARD_ASPECT_RATIO < availableBoardHeight) {
 			// board can use full width; its height won't interfere with GS
 			// expand GS down if possible
 			gameStatusHeight = containerHeight - boardHeight - Constants.UI_PADDING;
-			console.debug('expanding GameStatus height to fill space');
+			Constants.d('expanding GameStatus height to fill space');
 		} else {
 			// the board width will need to be scaled down to keep
 			// the aspect ratio correct and the GS legible
-			console.debug('shrinking board width to preserve GameStatus min height');
+			Constants.d('shrinking board width to preserve GameStatus min height');
 			boardWidth = availableBoardHeight * Constants.BOARD_ASPECT_RATIO;
 			boardHeight = availableBoardHeight;
 		}
 		var boardContainerWidth = Math.floor(width - 2 * Constants.UI_PADDING);
-		console.debug('boardWidth: ' + boardWidth);
-		console.debug('boardHeight: ' + boardHeight);
-		console.debug('gameStatusHeight: ' + gameStatusHeight);
-		console.debug('board container width: ' + boardContainerWidth);
+		Constants.d('boardWidth: ' + boardWidth);
+		Constants.d('boardHeight: ' + boardHeight);
+		Constants.d('gameStatusHeight: ' + gameStatusHeight);
+		Constants.d('board container width: ' + boardContainerWidth);
 		return(
 			<View style={{flex: 1, backgroundColor: 'black'}}>
 				<Image style={Constants.BG_IMAGE_STYLE}

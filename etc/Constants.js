@@ -3,7 +3,6 @@ import { Platform, NativeModules } from 'react-native';
 
 const { StatusBarManager } = NativeModules;
 
-const RECENT_WORDS_COUNT = 10;
 const DEFAULT_BORDER_RAD = 4;
 const TILE_PADDING = 3;
 const UI_PADDING = 10;
@@ -18,8 +17,42 @@ const N_HIGH_SCORES = 50;
 const LEVEL_LENGTH = 25;
 const MIN_WORD_LENGTH = 3;
 
+const TILE_COLORS = {
+    'A': '#5AE270',
+    'B': '#5AC3E2',
+    'C': '#F45F62',
+    'D': '#4940FF',
+    'E': '#EE35F0',
+    'F': '#9E2680',
+    'G': '#40FFE6',
+    'H': '#A55FF4',
+    'I': '#84F035',
+    'J': '#4F0D4B',
+    'K': '#3E7386',
+    'L': '#C060FF',
+    'M': '#F2C424',
+    'N': '#869BE0',
+    'O': '#E5FD42',
+    'P': '#F03587',
+    'Q': '#0E2322',
+    'R': '#D5B818',
+    'S': '#6D35F0',
+    'T': '#40C8EF',
+    'U': '#35F071',
+    'V': '#761A0D',
+    'W': '#80B0A2',
+    'X': '#4D0004',
+    'Y': '#B1DA34',
+    'Z': '#062445',
+    'BLANK': '#ffffff',
+    'NONE': 'transparent',
+};
+
 // background color for Board and GameStatus container Views
 const COMPONENT_BG_COLOR = '#FFFFFF' + '73' /* alpha */;
+
+const TILE_UNSELECTED_COLOR = '#222222';
+const TILE_SELECTED_COLOR = '#AAAA00';
 
 var BG_IMAGE_STYLE = {
 	flex: 1,
@@ -58,13 +91,21 @@ var NAV_BTN_FONT_STYLE = {
 	fontFamily: LEAGUE_SPARTAN,
 	fontSize: 24,
 };
+var DEFAULT_CONTAINER_STYLE = {
+	flex: 1,
+	backgroundColor: 'black',
+};
 const AD_REMOVAL_PRODUCT_ID = 'portmanteau_ad_removal';
 const GAME_STATUS_MIN_HEIGHT = 120;
 const INSTRUCTIONS_MIN_HEIGHT = 80;
 
+const DEBUG_LOGGING = true;
+
 class Constants {
-	static get RECENT_WORDS_COUNT() {
-		return RECENT_WORDS_COUNT;
+	static d(message) {
+		if (DEBUG_LOGGING) {
+			console.log(message);
+		}
 	}
 	static get DEFAULT_BORDER_RAD() {
 		return DEFAULT_BORDER_RAD;
@@ -108,8 +149,17 @@ class Constants {
 	static get MIN_WORD_LENGTH() {
 		return MIN_WORD_LENGTH;
 	}
+	static get TILE_COLORS() {
+		return TILE_COLORS;
+	}
 	static get COMPONENT_BG_COLOR() {
 		return COMPONENT_BG_COLOR;
+	}
+	static get TILE_UNSELECTED_COLOR() {
+		return TILE_UNSELECTED_COLOR;
+	}
+	static get TILE_SELECTED_COLOR() {
+		return TILE_SELECTED_COLOR;
 	}
 	static LOGO_CONTAINER_STYLE(height)  {
 		return {
@@ -143,6 +193,9 @@ class Constants {
 	}
 	static get NAV_BTN_FONT_STYLE() {
 		return NAV_BTN_FONT_STYLE;
+	}
+	static get DEFAULT_CONTAINER_STYLE() {
+		return DEFAULT_CONTAINER_STYLE;
 	}
 	static get AD_REMOVAL_PRODUCT_ID() {
 		return AD_REMOVAL_PRODUCT_ID;

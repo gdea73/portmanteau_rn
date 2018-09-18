@@ -139,6 +139,12 @@ class MenuScreen extends React.Component {
 							}}
 							title="HIGH SCORES"
 						/>
+						<NavButton
+							onPress={() => {
+								this.props.navigation.navigate('Dictionary');
+							}}
+							title="DICTIONARY"
+						/>
 						{this.renderAdRemovalButton()}
 					</View>
 					{this.renderError()}

@@ -27,10 +27,12 @@ class NavButton extends React.Component {
 	}
 
 	render() {
-		var buttonStyle = [styles.button, {
-								height: this.height,
-								borderRadius: this.height / 2,
-						  }];
+		var buttonStyle = [{
+				borderRadius: this.height / 2
+			},
+			styles.button, {
+				height: this.height,
+			}];
 		if (this.props.buttonStyle) {
 			buttonStyle.push(this.props.buttonStyle);
 		}
