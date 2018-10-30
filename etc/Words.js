@@ -95,7 +95,7 @@ function initCharTable() {
 			charTable.push(letter);
 		}
 	}
-	console.debug('number of blanks: ' + CHAR_TABLE_SIZE - charTable.length);
+	Constants.d('number of blanks: ' + CHAR_TABLE_SIZE - charTable.length);
 	for (let j = charTable.length; j < CHAR_TABLE_SIZE; j++) {
 		// pad the rest of the char table with BLANKS.
 		charTable.push(' ');
@@ -146,7 +146,7 @@ class Words {
 
 
 	static loadDictionary(callback) {
-		console.debug('attempting to load dictionary from bundle...');
+		Constants.d('attempting to load dictionary from bundle...');
 		dictionary = DICT_STRING.split(/\n/g);
 		callback();
 	}
@@ -159,7 +159,7 @@ class Words {
 		if (string.length < Constants.MIN_WORD_LENGTH) {
 			return false;
 		}
-		result = dictionary[binSearch(string, 0, dictionary.length)];
+		result = dictionary[this.binSearch(string, 0, dictionary.length)];
 		return !!(string === result);
 	}
 
@@ -176,7 +176,7 @@ class Words {
 		} else if (word === 'GHIA') {
 			score *= 71;
 		}
-		console.debug('score post-multipliers (chainLevel ' + chainLevel + '): ' + score);
+		Constants.d('score post-multipliers (chainLevel ' + chainLevel + '): ' + score);
 		return score;
 	}
 
@@ -215,7 +215,7 @@ class Words {
 			console.warn('Its end coordinates are (' + word.endCol + ', '
 						 + word.endRow + ').');
 		}
-		console.debug('readBoardWord returning "' + string + '" when it read from (' + word.startCol + ', ' + word.startRow + ') to (' + word.endCol + ', ' + word.endRow + ').');
+		Constants.d('readBoardWord returning "' + string + '" when it read from (' + word.startCol + ', ' + word.startRow + ') to (' + word.endCol + ', ' + word.endRow + ').');
 		return string;
 	}
 

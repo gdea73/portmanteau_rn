@@ -3,6 +3,7 @@ import {
 	ScrollView,
 	View,
 	StyleSheet,
+	FlatList,
 	Text,
 	Image,
 	BackHandler,
@@ -26,7 +27,7 @@ class DictionaryScreen extends React.Component {
 		super(props);
 		this.first_letters_broken = [];
 		for (let l = 0; l < 26; l++) {
-			this.first_letters_broken = false;	
+
 		}
 		this.state = {
 			page: 'A',
@@ -50,6 +51,7 @@ class DictionaryScreen extends React.Component {
 	}
 
 	setPage = (letter) => {
+		Constants.d('setting page for letter: ' + letter);
 		if (this.state.page === letter) {
 			return;
 		}
@@ -59,6 +61,10 @@ class DictionaryScreen extends React.Component {
 	}
 
 	renderNavTiles = () => {
+		if (!this.state.words_broken_loaded) {
+			return;
+		}
+
 		var tiles = [];
 
 		for (let l = 'A'; l <= 'Z'; l = String.fromCharCode(l.charCodeAt(0) + 1)) {
@@ -67,16 +73,21 @@ class DictionaryScreen extends React.Component {
 				backgroundColor = Constants.TILE_COLORS[l];
 			}
 			let stile = {
+				position: 'relative',
 				backgroundColor: backgroundColor,
 				flex: 1,
 				height: Tile.tile_size,
 				width: Tile.tile_size,
 			};
 			tiles.push(
-				<Tile key={'nav' + l} style={stile} onPress={() => {this.setPage(l)}} letter={l} />
+				<Tile key={'nav' + l} style={stile} onSelect={() => {this.setPage(l)}} letter={l} />
 			);
 		}
 		return tiles
+	}
+
+	show_word_details = () => {
+		/* TODO: this. Do this. */
 	}
 
 	renderDictPage = () => {
@@ -86,25 +97,34 @@ class DictionaryScreen extends React.Component {
 
 		var words = [];
 
-		var start_idx = Words.binSearch(this.state.page);
+		var start_idx = Words.binSearch(this.state.page, 0, Words.dictionary.length);
 		if (this.state.page === 'Z') {
 			var end_idx = Words.dictionary.length;
 		} else {
-			var end_idx = Words.binSearch(String.fromCharCode(this.state.page.charCodeAt(0) + 1));
+			var end_idx = Words.binSearch(String.fromCharCode(
+				this.state.page.charCodeAt(0) + 1), start_idx, Words.dictionary.length
+			);
 		}
 		Constants.d('page ' + this.state.page + '; [' + start_idx + ', ' + end_idx + ']');
 
 		for (let i = start_idx; i < end_idx; i++) {
-			words.push(<Text key={'dict' + Words.dictionary[i]}>{Words.dictionary[i]}</Text>);
+			let onPress = undefined;
+			if (this.state.words_broken.indexOf(Words.dictionary[i]) >= 0) {
+				onPress = this.show_word_details(Words.dictionary[i]);
+			}
+			words.push(<Text key={'dict' + Words.dictionary[i]} onPress={onPress}>{Words.dictionary[i]}</Text>);
 		}
 
-		Constants.d('words: ' + words);
+		Constants.d('words: ' + words.length);
+		/* TODO: return FlatList that has right subset of dictionary as data and
+		 * provide renderItem to handle word details callback onPress */
 		return words;
 	}
 	
 	// I'm on an airplane and I don't know what the JS builtin is for this, or
 	// whether one exists, so I'll just make one for now.
 	reverse = (string) => {
+		Constants.d('reversing ' + string);
 		var reversed = '';
 		for (let i = 0; i < string.length; i++) {
 			reversed = string[i] + reversed;
@@ -121,12 +141,21 @@ class DictionaryScreen extends React.Component {
 		}
 		Storage.load_words_broken().then((words_broken_JSON) => {
 			var words_broken = JSON.parse(words_broken_JSON);
+			/* My best guess is that my past self chose to iterate backwards on
+			 * account of pushing reversed words onto the end of the array. */
+			Constants.d('words broken (before reverse check): ' + words_broken.length);
 			for (let i = words_broken.length - 1; i >= 0; i--) {
-				words_broken.push(this.reverse(words_broken[i]));
-				this.first_letters_broken[words_broken[0]] = true;
+				let reversed_counterpart = this.reverse(words_broken[i]);
+
+				if (Words.isValidWord(reversed_counterpart)) {
+					words_broken.push(reversed_counterpart);
+					this.first_letters_broken[reversed_counterpart[0]] = true;
+				}
+				
+				this.first_letters_broken[words_broken[i][0]] = true;
 			}
 			words_broken.sort();
-			Constants.d('words broken: ' + words_broken);
+			Constants.d('words broken: ' + words_broken.length);
 			this.setState({
 				words_broken_loaded: true,
 				words_broken: words_broken,
@@ -166,9 +195,9 @@ class DictionaryScreen extends React.Component {
 						/>
 					</View>
 					<View style={{flexDirection: 'row', flex: 1}}>
-						<View style={[styles.navTileView, navTileViewWidth]}>
+						<ScrollView style={[styles.navTileView, navTileViewWidth]}>
 							{this.renderNavTiles()}
-						</View>
+						</ScrollView>
 						<ScrollView style={styles.dictPageView}>
 							<View style={styles.dictModeButtonContainer}>
 								<NavButton
