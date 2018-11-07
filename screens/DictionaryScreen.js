@@ -7,6 +7,7 @@ import {
 	Text,
 	Image,
 	BackHandler,
+	TouchableHighlight,
 } from 'react-native';
 import Tile from '../components/Tile';
 import Words from '../etc/Words';
@@ -86,8 +87,8 @@ class DictionaryScreen extends React.Component {
 		return tiles
 	}
 
-	show_word_details = () => {
-		/* TODO: this. Do this. */
+	show_word_details = (word) => {
+		Constants.d('showing word details for word: ' + word);
 	}
 
 	renderDictPage = () => {
@@ -109,16 +110,34 @@ class DictionaryScreen extends React.Component {
 
 		for (let i = start_idx; i < end_idx; i++) {
 			let onPress = undefined;
+			let word_style = styles.dict_word_default;
 			if (this.state.words_broken.indexOf(Words.dictionary[i]) >= 0) {
-				onPress = this.show_word_details(Words.dictionary[i]);
+				Constants.d('this word (' + Words.dictionary[i] + ') has been broken before');
+				onPress = () => {
+					this.show_word_details(Words.dictionary[i]);
+				};
 			}
-			words.push(<Text key={'dict' + Words.dictionary[i]} onPress={onPress}>{Words.dictionary[i]}</Text>);
+			words.push({key: Words.dictionary[i], onPress: onPress, word_style: word_style});
 		}
 
 		Constants.d('words: ' + words.length);
 		/* TODO: return FlatList that has right subset of dictionary as data and
 		 * provide renderItem to handle word details callback onPress */
-		return words;
+		return (
+			<FlatList
+				data={words}
+				defaultProps={{
+					initialNumToRender: 1000,
+					maxToRenderPerBatch: 100,
+				}}
+				renderItem={({item}) => (
+					<View
+						onStartShouldSetResponder={item.onPress}>
+						<Text style={item.word_style}>{item.key}</Text>
+					</View>
+				)}
+			/>
+		);
 	}
 	
 	// I'm on an airplane and I don't know what the JS builtin is for this, or
@@ -285,6 +304,10 @@ const styles = StyleSheet.create({
 		justifyContent: 'center',
 		padding: 4,
 	},
+	dict_word_default: {
+		color: 'white',
+		fontSize: 16,
+	},	
 });
 
 export default DictionaryScreen;
