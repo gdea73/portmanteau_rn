@@ -589,7 +589,7 @@ class Board extends React.Component {
 			this.breakAnims[col][row], {
 				toValue: 0,
 				duration: TILE_BREAK_ANIM_DURATION,
-				useNativeDriver: false,
+				useNativeDriver: false, // TODO: investigate if this is supported on Android now
 			}
 		);
 	}
@@ -599,7 +599,7 @@ class Board extends React.Component {
 			this.gravAnims[col][row], {
 			toValue: this.getTilePosY(row + fallDist),
 			easing: Easing.quad,
-			useNativeDriver: false,
+			useNativeDriver: false, // TODO: investigate if this is supported on Android now
 		});
 	}
 
