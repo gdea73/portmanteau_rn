@@ -8,6 +8,7 @@ import {
 	StyleSheet,
 	PixelRatio,
 	BackHandler,
+	Dimensions,
 } from 'react-native';
 import { StackNavigator } from 'react-navigation';
 
@@ -21,7 +22,7 @@ const BTN_FONT_SIZE = 24;
 const PAGE_DELAY = 2000;
 const BOARD_HEIGHT_SCALE_THRESHOLD = 0.6;
 
-var { width, height } = require('Dimensions').get('window');
+var { width, height } = Dimensions.get('window');
 var pages = [
 	{
 		dropLetter: 'S',

@@ -16,7 +16,6 @@ import Words from '../etc/Words';
 import NavButton from '../components/NavButton';
 import Constants from '../etc/Constants';
 import Storage from '../etc/Storage';
-import Billing from '../etc/Billing';
 
 const BUTTON_VIEW_PADDING = 40;
 
@@ -168,32 +167,7 @@ class MenuScreen extends React.Component {
 	}
 
 	removeAds = () => {
-		if (Platform.OS !== 'android') {
-			return;
-		}
-		console.debug('getting in app billing (android)');
-		var InAppBilling = Billing.getInAppBilling();
-		InAppBilling.open()
-			.then(() => InAppBilling.purchase(Constants.AD_REMOVAL_PRODUCT_ID))
-			.then(details => {
-				console.debug("Purchased: ", details);
-				if (details.purchaseState === 'PurchasedSuccessfully') {
-					Constants.showAds = false;
-					this.showMessage(
-						'Ads disabled. Thank you for supporting Portmanteau!'
-					);
-				} else {
-					this.showError(
-						'Unfortunately, the purchase could not be completed.'
-					);
-				}
-			})
-			.catch(err => {
-				this.showError(err.toString());
-				console.warn(err);
-			}).finally(async () => {
-				await InAppBilling.close()
-			});
+		// TODO: remove this ad removal function
 	}
 
 	showError = (error) => {

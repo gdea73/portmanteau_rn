@@ -11,9 +11,9 @@ import {
 	Animated,
 	FlatList,
 	PixelRatio,
+	Dimensions,
 } from 'react-native';
 import { StackNavigator } from 'react-navigation';
-import { AdMobBanner } from 'react-native-admob';
 
 import Board from '../components/TileBoard';
 import GameStatus from '../components/GameStatus';
@@ -22,7 +22,7 @@ import Constants from '../etc/Constants';
 import Storage from '../etc/Storage';
 import Words from '../etc/Words';
 
-var { width, height } = require('Dimensions').get('window');
+var { width, height } = Dimensions.get('window');
 const { StatusBarManager } = NativeModules;
 const AUTOSAVE_INTERVAL_MS = 30 * 1000;
 const GAME_OVER_FINAL_OPACITY = 0.92;
@@ -456,16 +456,7 @@ class GameScreen extends React.Component {
 	}
 
 	renderAdBanner = () => {
-		return (
-			<View style={styles.adView}>
-				<AdMobBanner
-					adSize="banner"
-					adUnitID="ca-app-pub-8559716447664382/7140833780"
-					testDevices={["D2EFADE35D710C83CFA429B08A06F454"]}
-					onAdFailedToLoad={error => console.info(error)}
-				/>
-			</View>
-		);
+		return null;
 	}
 
 	gameOver = () => {

@@ -15,7 +15,6 @@ import { StackNavigator } from 'react-navigation';
 import Constants from '../etc/Constants';
 import Words from '../etc/Words';
 import Root from '../config/router';
-import Billing from '../etc/Billing';
 
 const LOADING_ANIMATION_DURATION = 800;
 const LOAD_DELAY = 100;
@@ -51,33 +50,8 @@ class SplashScreen extends React.Component {
 		).start(() => { this.onTaskCompletion('animation'); });
 		// load the dictionary
 		Words.loadDictionary(() => { this.onTaskCompletion('dictionary') });
-		// check whether ads should be shown / add removal can be purchased
-		if (Platform.OS === 'android') {
-			console.debug('getting in app billing (android)');
-			var InAppBilling = Billing.getInAppBilling();
-			await InAppBilling.close();
-			InAppBilling.open()
-				.then(() => InAppBilling.listOwnedProducts())
-				.then(products => {
-					console.debug(products);
-					if (products.indexOf(Constants.AD_REMOVAL_PRODUCT_ID) > -1) {
-						Constants.showAds = false;
-					} else {
-						Constants.showAds = true;
-					}
-					console.debug('show ads? ' + Constants.showAds);
-				})
-				.catch(err => {
-					console.error(err);
-				}).finally(async () => {
-					await InAppBilling.close();	
-					this.onTaskCompletion('ads');
-				});
-		} else {
-			Constants.showAds = true;
-			// consider the 'ads' task complete, no IAP on iOS yet
-			this.onTaskCompletion('ads');
-		}
+		Constants.showAds = false;
+		this.onTaskCompletion('ads');
 	}
 
 	render() {

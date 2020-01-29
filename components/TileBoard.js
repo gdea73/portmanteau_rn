@@ -8,13 +8,14 @@ import {
 	TouchableOpacity,
 	Animated,
 	Easing,
+	Dimensions,
 } from 'react-native';
 
 import Constants from '../etc/Constants';
 import Words from '../etc/Words';
 
 // logical constants
-const {WIDTH, HEIGHT} = require('Dimensions').get('window');
+const {WIDTH, HEIGHT} = Dimensions.get('window');
 const CENTER_COL = 3;
 
 /* dumb constants from when I thought "unique ID" meant "unique numeric ID."
