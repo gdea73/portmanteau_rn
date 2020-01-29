@@ -3,6 +3,7 @@ node_modules/
 npm-debug.*
 *.swp
 android/.gradle**
+android/local.properties
 android/app/build/**
 android/build/**
 *.keystore
