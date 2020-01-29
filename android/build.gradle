@@ -1,13 +1,18 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
-def googlePlayServicesVersion = '11.8.0'
-
 buildscript {
+    ext {
+        buildToolsVersion = "28.0.3"
+        minSdkVersion = 16
+        compileSdkVersion = 28
+        targetSdkVersion = 28
+    }
     repositories {
+        google()
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.2.3'
+        classpath("com.android.tools.build:gradle:3.4.2")
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
@@ -17,28 +22,17 @@ buildscript {
 allprojects {
     repositories {
         mavenLocal()
-        jcenter()
         maven {
             // All of React Native (JS, Obj-C sources, Android binaries) is installed from npm
-            url "$rootDir/../node_modules/react-native/android"
+            url("$rootDir/../node_modules/react-native/android")
         }
-		maven {
-			url "https://maven.google.com"
-		}
-        configurations.all {
-            resolutionStrategy {
-                // react-native-admob
-                force "com.google.android.gms:play-services-ads:$googlePlayServicesVersion"
-                // react-native-maps
-                force "com.google.android.gms:play-services-base:$googlePlayServicesVersion"
-                force "com.google.android.gms:play-services-maps:$googlePlayServicesVersion"
-                // react-native-onesignal
-                force "com.google.android.gms:play-services-gcm:$googlePlayServicesVersion"
-                force "com.google.android.gms:play-services-analytics:$googlePlayServicesVersion"
-                force "com.google.android.gms:play-services-location:$googlePlayServicesVersion"
-                // react-native-google-sign-in
-                force "com.google.android.gms:play-services-auth:$googlePlayServicesVersion"
-            }
+        maven {
+            // Android JSC is installed from npm
+            url("$rootDir/../node_modules/jsc-android/dist")
         }
-	}
+
+        google()
+        jcenter()
+        maven { url 'https://jitpack.io' }
+    }
 }
