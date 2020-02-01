@@ -1,4 +1,5 @@
 import React from 'react';
+import { createAppContainer } from 'react-navigation';
 import { createStackNavigator } from 'react-navigation-stack';
 
 import MenuScreen from '../screens/MenuScreen';
@@ -7,20 +8,13 @@ import InstructionScreen from '../screens/InstructionScreen';
 import HighScoreScreen from '../screens/HighScoreScreen';
 
 const Root = createStackNavigator({
-	Menu: {
-		screen: MenuScreen,
-	},
-	Game: {
-		screen: GameScreen,
-	},
-	Instructions: {
-		screen: InstructionScreen,
-	},
-	HighScores: {
-		screen: HighScoreScreen,
-	},
+	Menu: MenuScreen,
+	Game: GameScreen,
+	Instructions: InstructionScreen,
+	HighScores: HighScoreScreen,
 }, {
 	headerMode: 'screen',
+	initialRouteName: 'Menu'
 });
 
-export default Root;
+export default createAppContainer(Root);
