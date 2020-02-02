@@ -17,7 +17,7 @@ import Storage from '../etc/Storage';
 class HighScoreScreen extends React.Component {
 	static navigationOptions = {
 		title: 'High Scores',
-		header: null,
+		headerShown: false,
 	};
 
 	constructor(props) {

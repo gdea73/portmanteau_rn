@@ -96,7 +96,7 @@ var pages = [
 class InstructionScreen extends React.Component {
 	static navigationOptions = {
 		title: 'Instructions',
-		header: null,
+		headerShown: false,
 	};
 
 	constructor(props) {

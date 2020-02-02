@@ -34,7 +34,7 @@ const ADS_MARGIN = 54;
 
 class GameScreen extends React.Component {
 	static navigationOptions = {
-		header: null,
+		headerShown: false,
 	};
 
 	constructor(props) {
