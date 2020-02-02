@@ -74,7 +74,7 @@ class HighScoreScreen extends React.Component {
 		return result;
 	}
 
-	componentWillMount() {
+	UNSAFE_componentWillMount() {
 		Storage.loadHighScores().then((scoresJSON) => {
 			var scores = JSON.parse(scoresJSON);
 			this.setState({

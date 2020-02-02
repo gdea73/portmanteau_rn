@@ -37,7 +37,7 @@ class MenuScreen extends React.Component {
 		this.backPress = this.backPress.bind(this);
 	}
 
-	componentWillMount() {
+	UNSAFE_componentWillMount() {
 		this.loadSavedGame();
 	}
 
